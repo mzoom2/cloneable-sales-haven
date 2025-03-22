@@ -2,8 +2,8 @@
 import { Button } from "@/components/ui/button";
 
 const Hero = () => {
-  // Set the phone image to the one provided
-  const PHONE_IMAGE_URL = "/lovable-uploads/391c0f05-6d37-4158-9461-c1682ffa41f7.png";
+  // Updated to use a different phone image
+  const PHONE_IMAGE_URL = "https://images.unsplash.com/photo-1605236453806-6ff36851218e?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80";
 
   return (
     <section className="relative pt-24 pb-16 overflow-hidden bg-[#262084]">
