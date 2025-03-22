@@ -5,8 +5,11 @@ import Hero from '@/components/Hero';
 import ProductDisplay from '@/components/ProductDisplay';
 import BecomeAgent from '@/components/BecomeAgent';
 import Footer from '@/components/Footer';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
+  const isMobile = useIsMobile();
+  
   // Add smooth scrolling for anchor links
   useEffect(() => {
     const handleAnchorClick = (e: MouseEvent) => {
@@ -18,7 +21,7 @@ const Index = () => {
         
         if (element) {
           window.scrollTo({
-            top: element.offsetTop - 80, // Offset for fixed header
+            top: element.offsetTop - (isMobile ? 60 : 80), // Adjust offset for fixed header based on device
             behavior: 'smooth'
           });
         }
@@ -30,10 +33,10 @@ const Index = () => {
     return () => {
       document.removeEventListener('click', handleAnchorClick);
     };
-  }, []);
+  }, [isMobile]);
 
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-x-hidden">
       <Header />
       <Hero />
       <ProductDisplay />
