@@ -2,10 +2,8 @@
 import { useEffect } from 'react';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
-import Features from '@/components/Features';
-import ProductSpecs from '@/components/ProductSpecs';
-import Pricing from '@/components/Pricing';
-import Contact from '@/components/Contact';
+import ProductDisplay from '@/components/ProductDisplay';
+import BecomeAgent from '@/components/BecomeAgent';
 import Footer from '@/components/Footer';
 
 const Index = () => {
@@ -38,10 +36,8 @@ const Index = () => {
     <div className="overflow-hidden">
       <Header />
       <Hero />
-      <Features />
-      <ProductSpecs />
-      <Pricing />
-      <Contact />
+      <ProductDisplay />
+      <BecomeAgent />
       <Footer />
     </div>
   );
