@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Index from "./pages/Index";
 import ShopList from "./pages/ShopList";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const AnimatedRoutes = () => {
           <Route path="/" element={<Index />} />
           <Route path="/shop-list" element={<ShopList />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
