@@ -2,11 +2,12 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -24,6 +25,10 @@ const Header = () => {
 
   const isActive = (path: string) => {
     return location.pathname === path;
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
   };
 
   return (
@@ -108,6 +113,7 @@ const Header = () => {
             variant={scrolled ? "outline" : "secondary"}
             size="sm" 
             className={scrolled ? "bg-white text-black border-gray-200 hover:bg-gray-100" : ""}
+            onClick={handleLogin}
           >
             Log in
           </Button>

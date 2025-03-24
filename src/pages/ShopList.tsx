@@ -2,10 +2,16 @@
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { useNavigate } from "react-router-dom";
 
 const ShopList = () => {
   // In a real app, this would be based on authentication state
   const isLoggedIn = false;
+  const navigate = useNavigate();
+  
+  const handleLogin = () => {
+    navigate('/login');
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -45,6 +51,7 @@ const ShopList = () => {
             <Button 
               className="bg-indigo-600 hover:bg-indigo-700 text-white"
               size="lg"
+              onClick={handleLogin}
             >
               Login
             </Button>
