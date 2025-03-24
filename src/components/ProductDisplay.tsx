@@ -7,7 +7,7 @@ const ProductCard = ({ title, imageSrc }: { title: string; imageSrc: string }) =
   
   return (
     <div className="flex flex-col items-center">
-      <div className={`w-full ${isMobile ? 'h-24' : 'h-48'} bg-gray-100 rounded-lg mb-4 overflow-hidden`}>
+      <div className={`w-full ${isMobile ? 'h-40' : 'h-64'} bg-gray-100 rounded-lg mb-4 overflow-hidden`}>
         <img 
           src={imageSrc} 
           alt={title} 
@@ -66,7 +66,7 @@ const ProductDisplay = () => {
               <img 
                 src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80" 
                 alt="Shipment package" 
-                className="w-full h-40 object-cover hover:scale-105 transition-transform"
+                className="w-full h-56 object-cover hover:scale-105 transition-transform"
               />
             </div>
           </div>
@@ -76,21 +76,21 @@ const ProductDisplay = () => {
               <img 
                 src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80" 
                 alt="Shipment package" 
-                className="w-full h-48 object-cover hover:scale-105 transition-transform"
+                className="w-full h-64 object-cover hover:scale-105 transition-transform"
               />
             </div>
             <div className="rounded-lg overflow-hidden">
               <img 
                 src="https://images.unsplash.com/photo-1560343090-f0409e92791a?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80" 
                 alt="Shipping process" 
-                className="w-full h-48 object-cover hover:scale-105 transition-transform"
+                className="w-full h-64 object-cover hover:scale-105 transition-transform"
               />
             </div>
             <div className="rounded-lg overflow-hidden">
               <img 
                 src="https://images.unsplash.com/photo-1577563908411-5077b6dc7624?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80" 
                 alt="Delivery packages" 
-                className="w-full h-48 object-cover hover:scale-105 transition-transform"
+                className="w-full h-64 object-cover hover:scale-105 transition-transform"
               />
             </div>
           </div>
@@ -111,22 +111,22 @@ const ProductDisplay = () => {
         
         <div className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'md:grid-cols-2 gap-12'} max-w-4xl mx-auto`}>
           <div className="flex flex-col items-center">
-            <div className="w-24 h-24 md:w-32 md:h-32 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <div className="w-32 h-32 md:w-40 md:h-40 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <img 
                 src="https://images.unsplash.com/photo-1586953208448-b95a79798f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80" 
                 alt="iPhone" 
-                className="w-16 md:w-20 h-auto"
+                className="w-20 md:w-24 h-auto"
               />
             </div>
             <h3 className="text-xl font-medium">iPhone</h3>
           </div>
           
           <div className="flex flex-col items-center">
-            <div className="w-24 h-24 md:w-32 md:h-32 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <div className="w-32 h-32 md:w-40 md:h-40 bg-gray-100 rounded-full flex items-center justify-center mb-4">
               <img 
                 src="https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80" 
                 alt="Samsung Phones" 
-                className="w-16 md:w-20 h-auto"
+                className="w-20 md:w-24 h-auto"
               />
             </div>
             <h3 className="text-xl font-medium">Samsung Phones</h3>
