@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import ShopList from "./pages/ShopList";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Videos from "./pages/Videos";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const AnimatedRoutes = () => {
           <Route path="/shop-list" element={<ShopList />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/videos" element={<Videos />} />
           <Route path="/ordering-guide" element={<NotFound />} />
           <Route path="/account" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />

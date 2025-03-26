@@ -48,10 +48,16 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
               </Link>
             </li>
             <li>
-              <div className="flex items-center justify-between py-3 px-4 text-gray-800 font-medium">
-                <span>Videos</span>
-                <ChevronRight size={20} />
-              </div>
+              <Link 
+                to="/videos" 
+                className="block py-3 px-4 text-gray-800 font-medium"
+                onClick={onClose}
+              >
+                <div className="flex items-center justify-between">
+                  <span>Videos</span>
+                  <ChevronRight size={20} />
+                </div>
+              </Link>
             </li>
             <li>
               <Link 

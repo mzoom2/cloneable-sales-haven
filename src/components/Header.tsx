@@ -89,12 +89,19 @@ const Header = () => {
             >
               Stock List
             </Link>
-            <div className="px-4 py-2 font-medium cursor-pointer flex items-center gap-1 transition-colors">
-              <span className={scrolled ? 'text-gray-700' : 'text-white'}>Videos</span>
+            <Link 
+              to="/videos" 
+              className={`px-4 py-2 font-medium cursor-pointer flex items-center gap-1 transition-colors ${
+                isActive('/videos') 
+                  ? 'text-white bg-[#2a2158] rounded' 
+                  : (scrolled ? 'text-gray-700 hover:text-primary/80' : 'text-white hover:text-gray-200')
+              }`}
+            >
+              <span>Videos</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
-            </div>
+            </Link>
             <Link 
               to="/ordering-guide" 
               className={`px-4 py-2 font-medium transition-colors ${
