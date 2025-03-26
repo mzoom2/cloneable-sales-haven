@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye } from 'lucide-react';
@@ -28,7 +27,7 @@ const Account = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "mzoomolabewo@gmail.com",
+      email: "",
       password: "",
       rememberMe: false
     },
