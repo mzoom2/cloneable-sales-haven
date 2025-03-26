@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, ChevronDown, Filter, Clock, Star, CirclePlay } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -13,7 +12,7 @@ const videoData = [
   {
     id: 1,
     title: "Client Case",
-    image: "/lovable-uploads/069bfc37-98f5-479b-9c2b-2187e40c029e.png",
+    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80",
     rating: 4.5,
     reviews: 2,
     lessons: 0,
@@ -23,7 +22,7 @@ const videoData = [
   {
     id: 2,
     title: "Unpacking Video",
-    image: "/lovable-uploads/be05eb0d-d6ae-4c82-a3d9-671e71e89016.png",
+    image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80",
     rating: 5.0,
     reviews: 5,
     lessons: 0,
@@ -33,7 +32,7 @@ const videoData = [
   {
     id: 3,
     title: "Product Guide",
-    image: "/lovable-uploads/be05eb0d-d6ae-4c82-a3d9-671e71e89016.png",
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80",
     rating: 5.0,
     reviews: 5,
     lessons: 0,
