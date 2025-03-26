@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, Check } from 'lucide-react';
@@ -83,7 +82,7 @@ const Register = () => {
   const onSubmit = (data: FormValues) => {
     console.log(data);
     // In a real app, this would call an API to register the user
-    navigate("/shop-list");
+    navigate("/dashboard");
   };
   
   // Password match check
@@ -98,15 +97,15 @@ const Register = () => {
       <div className="bg-slate-50 py-3 border-b mt-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <a href="/" className="hover:text-primary">Home</a>
+            <Link to="/" className="hover:text-primary">Home</Link>
             <span>•</span>
             <span className="font-medium text-gray-800">Register</span>
           </div>
         </div>
       </div>
       
-      {/* Currency selector - fixed to right side */}
-      <div className="fixed right-0 top-1/3 z-40">
+      {/* Currency selector - fixed to right side, positioned higher */}
+      <div className="fixed right-0 top-1/4 z-40">
         <div className="flex flex-col">
           <button className="bg-blue-700 text-white py-2 px-4 font-medium">
             USD $

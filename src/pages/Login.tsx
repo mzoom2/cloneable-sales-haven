@@ -37,7 +37,7 @@ const Login = () => {
   const onSubmit = (data: FormValues) => {
     console.log(data);
     // In a real app, this would call an API to authenticate the user
-    navigate("/shop-list");
+    navigate("/dashboard");
   };
   
   return (
@@ -55,8 +55,8 @@ const Login = () => {
         </div>
       </div>
       
-      {/* Currency selector - fixed to right side */}
-      <div className="fixed right-0 top-1/3 z-40">
+      {/* Currency selector - fixed to right side, positioned higher */}
+      <div className="fixed right-0 top-1/4 z-40">
         <div className="flex flex-col">
           <button className="bg-blue-700 text-white py-2 px-4 font-medium">
             USD $
@@ -158,15 +158,6 @@ const Login = () => {
               </div>
             </form>
           </Form>
-          
-          {/* "We are here" image - bottom right */}
-          <div className="absolute -bottom-20 -right-20 z-0">
-            <img 
-              src="/lovable-uploads/be05eb0d-d6ae-4c82-a3d9-671e71e89016.png" 
-              alt="We are here" 
-              className="w-40 h-auto"
-            />
-          </div>
         </div>
       </div>
       
