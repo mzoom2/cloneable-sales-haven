@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye } from 'lucide-react';
@@ -158,15 +159,6 @@ const Account = () => {
               </div>
             </form>
           </Form>
-          
-          {/* "We are here" image - bottom right */}
-          <div className="absolute -bottom-20 -right-20 z-0">
-            <img 
-              src="/lovable-uploads/be05eb0d-d6ae-4c82-a3d9-671e71e89016.png" 
-              alt="We are here" 
-              className="w-40 h-auto"
-            />
-          </div>
         </div>
       </div>
       
