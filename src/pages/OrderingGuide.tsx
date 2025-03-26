@@ -13,370 +13,433 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const OrderingGuide = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeAccordion, setActiveAccordion] = useState("device-info");
+  const [deviceType, setDeviceType] = useState("");
+  
+  const handleAccordionChange = (value: string) => {
+    setActiveAccordion(value);
+  };
   
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-[#f5f5f7]">
       <Header />
       
-      {/* Breadcrumb */}
-      <div className="bg-[#f9f9fb] py-4 border-b">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center text-sm">
-            <a href="/" className="text-gray-600 hover:text-primary">Home</a>
-            <span className="mx-2 text-gray-400">•</span>
-            <span className="text-gray-800 font-medium">Ordering Guide</span>
-          </div>
-        </div>
-      </div>
-      
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">UE Ordering Guide</h1>
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <h1 className="text-3xl font-bold mb-8 text-center text-[#333]">Order Repair Guide</h1>
         
         {/* Search bar */}
-        <div className="mb-8">
-          <div className="relative max-w-xl">
+        <div className="mb-8 max-w-md mx-auto">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             <Input 
-              placeholder="Find order guide..." 
+              placeholder="Search for devices..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 border-gray-300 bg-white rounded-full shadow-sm"
             />
           </div>
         </div>
         
-        {/* Accordion sections */}
-        <Accordion type="single" collapsible className="space-y-4">
-          {/* Section 1 */}
-          <AccordionItem value="section-1" className="border rounded-lg overflow-hidden bg-white">
-            <AccordionTrigger className="px-6 py-4 bg-[#0c0027] text-white hover:no-underline hover:bg-[#1a0046] transition-colors">
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center">
-                  <span className="text-xl font-semibold">1. Select Device Model</span>
-                </div>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 py-4">
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Main content */}
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Left side - Step navigation */}
+          <div className="md:w-1/3">
+            <Card className="p-4 bg-white shadow-sm">
+              <h3 className="font-bold text-lg mb-4 text-[#333]">Repair Process</h3>
+              
+              <div className="space-y-3">
+                <div 
+                  className={`flex items-center p-3 rounded-lg cursor-pointer ${activeAccordion === "device-info" ? "bg-blue-50 border border-blue-200" : "hover:bg-gray-50"}`}
+                  onClick={() => handleAccordionChange("device-info")}
+                >
+                  <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-3">1</div>
                   <div>
-                    <Label htmlFor="brand" className="block mb-2">Brand</Label>
-                    <Select defaultValue="">
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select Brand" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="apple">Apple</SelectItem>
-                        <SelectItem value="samsung">Samsung</SelectItem>
-                        <SelectItem value="google">Google</SelectItem>
-                        <SelectItem value="oneplus">OnePlus</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="model" className="block mb-2">Model</Label>
-                    <Select defaultValue="">
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select Model" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="iphone15">iPhone 15</SelectItem>
-                        <SelectItem value="iphone14">iPhone 14</SelectItem>
-                        <SelectItem value="s23">Galaxy S23</SelectItem>
-                        <SelectItem value="pixel7">Pixel 7</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <p className="font-medium text-[#333]">Device Information</p>
+                    <p className="text-sm text-gray-500">Select your device type</p>
                   </div>
                 </div>
-                <div className="flex justify-end mt-4">
-                  <Button className="px-8 bg-green-500 hover:bg-green-600">Next</Button>
+                
+                <div 
+                  className={`flex items-center p-3 rounded-lg cursor-pointer ${activeAccordion === "issue" ? "bg-blue-50 border border-blue-200" : "hover:bg-gray-50"}`}
+                  onClick={() => handleAccordionChange("issue")}
+                >
+                  <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white font-bold mr-3">2</div>
+                  <div>
+                    <p className="font-medium text-[#333]">Issue Description</p>
+                    <p className="text-sm text-gray-500">Describe the problem</p>
+                  </div>
+                </div>
+                
+                <div 
+                  className={`flex items-center p-3 rounded-lg cursor-pointer ${activeAccordion === "services" ? "bg-blue-50 border border-blue-200" : "hover:bg-gray-50"}`}
+                  onClick={() => handleAccordionChange("services")}
+                >
+                  <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white font-bold mr-3">3</div>
+                  <div>
+                    <p className="font-medium text-[#333]">Service Selection</p>
+                    <p className="text-sm text-gray-500">Choose repair services</p>
+                  </div>
+                </div>
+                
+                <div 
+                  className={`flex items-center p-3 rounded-lg cursor-pointer ${activeAccordion === "details" ? "bg-blue-50 border border-blue-200" : "hover:bg-gray-50"}`}
+                  onClick={() => handleAccordionChange("details")}
+                >
+                  <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white font-bold mr-3">4</div>
+                  <div>
+                    <p className="font-medium text-[#333]">Contact Details</p>
+                    <p className="text-sm text-gray-500">Your information</p>
+                  </div>
+                </div>
+                
+                <div 
+                  className={`flex items-center p-3 rounded-lg cursor-pointer ${activeAccordion === "review" ? "bg-blue-50 border border-blue-200" : "hover:bg-gray-50"}`}
+                  onClick={() => handleAccordionChange("review")}
+                >
+                  <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white font-bold mr-3">5</div>
+                  <div>
+                    <p className="font-medium text-[#333]">Review & Submit</p>
+                    <p className="text-sm text-gray-500">Verify order details</p>
+                  </div>
                 </div>
               </div>
-            </AccordionContent>
-          </AccordionItem>
+            </Card>
+          </div>
           
-          {/* Section 2 */}
-          <AccordionItem value="section-2" className="border rounded-lg overflow-hidden bg-white">
-            <AccordionTrigger className="px-6 py-4 bg-[#0c0027] text-white hover:no-underline hover:bg-[#1a0046] transition-colors">
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center">
-                  <span className="text-xl font-semibold">2. Specify Device Condition</span>
-                </div>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 py-4">
-              <div className="space-y-4">
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-medium mb-3">Screen Condition</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">No cracks or major scratches</span>
-                      <Switch id="screen-good" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Minor scratches (visible when screen is off)</span>
-                      <Switch id="screen-scratches" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Cracked screen</span>
-                      <Switch id="screen-cracked" />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-medium mb-3">Battery Health</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Excellent (90-100%)</span>
-                      <Switch id="battery-excellent" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Good (70-89%)</span>
-                      <Switch id="battery-good" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Poor (below 70%)</span>
-                      <Switch id="battery-poor" />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-medium mb-3">Functional Issues</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Touch response issues</span>
-                      <Switch id="touch-issues" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Camera not working properly</span>
-                      <Switch id="camera-issues" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Speaker/microphone issues</span>
-                      <Switch id="audio-issues" />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex justify-end mt-4">
-                  <Button variant="outline" className="px-4 mr-2">Back</Button>
-                  <Button className="px-8 bg-green-500 hover:bg-green-600">Next</Button>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-          
-          {/* Section 3 */}
-          <AccordionItem value="section-3" className="border rounded-lg overflow-hidden bg-white">
-            <AccordionTrigger className="px-6 py-4 bg-[#0c0027] text-white hover:no-underline hover:bg-[#1a0046] transition-colors">
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center">
-                  <span className="text-xl font-semibold">3. Choose Services Required</span>
-                </div>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 py-4">
-              <div className="space-y-4">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gray-50">
-                      <TableHead className="w-1/2">Service</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead className="text-right">Select</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">Screen Replacement</TableCell>
-                      <TableCell>$129.99</TableCell>
-                      <TableCell className="text-right">
-                        <Switch id="service-screen" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Battery Replacement</TableCell>
-                      <TableCell>$69.99</TableCell>
-                      <TableCell className="text-right">
-                        <Switch id="service-battery" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Diagnostics & Testing</TableCell>
-                      <TableCell>$29.99</TableCell>
-                      <TableCell className="text-right">
-                        <Switch id="service-diagnostics" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Water Damage Repair</TableCell>
-                      <TableCell>$89.99</TableCell>
-                      <TableCell className="text-right">
-                        <Switch id="service-water" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Camera Replacement</TableCell>
-                      <TableCell>$79.99</TableCell>
-                      <TableCell className="text-right">
-                        <Switch id="service-camera" />
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-                
-                <div className="flex justify-end mt-4">
-                  <Button variant="outline" className="px-4 mr-2">Back</Button>
-                  <Button className="px-8 bg-green-500 hover:bg-green-600">Next</Button>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-          
-          {/* Section 4 */}
-          <AccordionItem value="section-4" className="border rounded-lg overflow-hidden bg-white">
-            <AccordionTrigger className="px-6 py-4 bg-[#0c0027] text-white hover:no-underline hover:bg-[#1a0046] transition-colors">
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center">
-                  <span className="text-xl font-semibold">4. Contact Information</span>
-                </div>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 py-4">
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName" className="block mb-2">First Name</Label>
-                    <Input id="firstName" placeholder="Enter your first name" />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName" className="block mb-2">Last Name</Label>
-                    <Input id="lastName" placeholder="Enter your last name" />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="email" className="block mb-2">Email Address</Label>
-                    <Input id="email" type="email" placeholder="Enter your email" />
-                  </div>
-                  <div>
-                    <Label htmlFor="phone" className="block mb-2">Phone Number</Label>
-                    <Input id="phone" placeholder="Enter your phone number" />
-                  </div>
-                </div>
-                
+          {/* Right side - Active step content */}
+          <div className="md:w-2/3">
+            <Card className="p-6 bg-white shadow-sm">
+              {activeAccordion === "device-info" && (
                 <div>
-                  <Label htmlFor="address" className="block mb-2">Address</Label>
-                  <Input id="address" placeholder="Enter your address" />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="city" className="block mb-2">City</Label>
-                    <Input id="city" placeholder="City" />
-                  </div>
-                  <div>
-                    <Label htmlFor="state" className="block mb-2">State/Province</Label>
-                    <Select defaultValue="">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select State" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ca">California</SelectItem>
-                        <SelectItem value="ny">New York</SelectItem>
-                        <SelectItem value="tx">Texas</SelectItem>
-                        <SelectItem value="fl">Florida</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="zip" className="block mb-2">Zip/Postal Code</Label>
-                    <Input id="zip" placeholder="Zip code" />
-                  </div>
-                </div>
-                
-                <div className="flex justify-end mt-4">
-                  <Button variant="outline" className="px-4 mr-2">Back</Button>
-                  <Button className="px-8 bg-green-500 hover:bg-green-600">Next</Button>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-          
-          {/* Section 5 */}
-          <AccordionItem value="section-5" className="border rounded-lg overflow-hidden bg-white">
-            <AccordionTrigger className="px-6 py-4 bg-[#0c0027] text-white hover:no-underline hover:bg-[#1a0046] transition-colors">
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center">
-                  <span className="text-xl font-semibold">5. Review & Submit</span>
-                </div>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-6 py-4">
-              <div className="space-y-6">
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold mb-3">Device Information</h3>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="text-gray-600">Brand:</div>
-                    <div>Apple</div>
-                    <div className="text-gray-600">Model:</div>
-                    <div>iPhone 14 Pro</div>
-                  </div>
-                </div>
-                
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold mb-3">Services Selected</h3>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Screen Replacement</span>
-                      <span>$129.99</span>
+                  <h2 className="text-xl font-bold mb-6 text-[#333]">Step 1: Device Information</h2>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <Label htmlFor="device-type" className="text-sm font-medium mb-1 block">Device Type</Label>
+                      <Select value={deviceType} onValueChange={setDeviceType}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select device type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="smartphone">Smartphone</SelectItem>
+                          <SelectItem value="tablet">Tablet</SelectItem>
+                          <SelectItem value="laptop">Laptop</SelectItem>
+                          <SelectItem value="desktop">Desktop</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Battery Replacement</span>
-                      <span>$69.99</span>
+                    
+                    {deviceType === "smartphone" && (
+                      <>
+                        <div>
+                          <Label htmlFor="brand" className="text-sm font-medium mb-1 block">Brand</Label>
+                          <Select>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select brand" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="apple">Apple</SelectItem>
+                              <SelectItem value="samsung">Samsung</SelectItem>
+                              <SelectItem value="google">Google</SelectItem>
+                              <SelectItem value="oneplus">OnePlus</SelectItem>
+                              <SelectItem value="xiaomi">Xiaomi</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="model" className="text-sm font-medium mb-1 block">Model</Label>
+                          <Select>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select model" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="iphone15">iPhone 15</SelectItem>
+                              <SelectItem value="iphone14">iPhone 14</SelectItem>
+                              <SelectItem value="iphone13">iPhone 13</SelectItem>
+                              <SelectItem value="iphone12">iPhone 12</SelectItem>
+                              <SelectItem value="iphonese">iPhone SE</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </>
+                    )}
+                    
+                    <div className="flex justify-between pt-4">
+                      <Button variant="outline">Back</Button>
+                      <Button onClick={() => handleAccordionChange("issue")}>Next</Button>
                     </div>
-                    <div className="border-t pt-2 mt-2">
-                      <div className="flex justify-between font-semibold">
-                        <span>Total</span>
-                        <span>$199.98</span>
+                  </div>
+                </div>
+              )}
+              
+              {activeAccordion === "issue" && (
+                <div>
+                  <h2 className="text-xl font-bold mb-6 text-[#333]">Step 2: Issue Description</h2>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <p className="text-sm font-medium mb-3">What issues are you experiencing?</p>
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox id="screen" />
+                          <Label htmlFor="screen" className="text-sm text-gray-700">Screen damage (cracks, lines, display issues)</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox id="battery" />
+                          <Label htmlFor="battery" className="text-sm text-gray-700">Battery problems (poor life, won't charge)</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox id="water" />
+                          <Label htmlFor="water" className="text-sm text-gray-700">Water damage</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox id="camera" />
+                          <Label htmlFor="camera" className="text-sm text-gray-700">Camera not working</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox id="power" />
+                          <Label htmlFor="power" className="text-sm text-gray-700">Won't power on</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox id="charging" />
+                          <Label htmlFor="charging" className="text-sm text-gray-700">Charging port issues</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox id="other" />
+                          <Label htmlFor="other" className="text-sm text-gray-700">Other</Label>
+                        </div>
                       </div>
                     </div>
+                    
+                    <div className="flex justify-between pt-4">
+                      <Button variant="outline" onClick={() => handleAccordionChange("device-info")}>Back</Button>
+                      <Button onClick={() => handleAccordionChange("services")}>Next</Button>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold mb-3">Contact Information</h3>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="text-gray-600">Name:</div>
-                    <div>John Doe</div>
-                    <div className="text-gray-600">Email:</div>
-                    <div>john.doe@example.com</div>
-                    <div className="text-gray-600">Phone:</div>
-                    <div>(555) 123-4567</div>
-                    <div className="text-gray-600">Address:</div>
-                    <div>123 Main St, San Francisco, CA 94103</div>
+              )}
+              
+              {activeAccordion === "services" && (
+                <div>
+                  <h2 className="text-xl font-bold mb-6 text-[#333]">Step 3: Service Selection</h2>
+                  
+                  <div className="space-y-6">
+                    <div className="divide-y">
+                      <div className="flex justify-between items-center py-3">
+                        <div>
+                          <p className="font-medium">Screen Replacement</p>
+                          <p className="text-sm text-gray-500">Replace damaged screen with new one</p>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="font-bold mr-4">$89.99</span>
+                          <Checkbox id="service-screen" />
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-3">
+                        <div>
+                          <p className="font-medium">Battery Replacement</p>
+                          <p className="text-sm text-gray-500">Install new battery</p>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="font-bold mr-4">$49.99</span>
+                          <Checkbox id="service-battery" />
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-3">
+                        <div>
+                          <p className="font-medium">Water Damage Repair</p>
+                          <p className="text-sm text-gray-500">Clean and repair internal components</p>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="font-bold mr-4">$79.99</span>
+                          <Checkbox id="service-water" />
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-3">
+                        <div>
+                          <p className="font-medium">Camera Repair</p>
+                          <p className="text-sm text-gray-500">Fix or replace camera module</p>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="font-bold mr-4">$59.99</span>
+                          <Checkbox id="service-camera" />
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-3">
+                        <div>
+                          <p className="font-medium">Diagnostic Service</p>
+                          <p className="text-sm text-gray-500">Complete device diagnostic</p>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="font-bold mr-4">$29.99</span>
+                          <Checkbox id="service-diagnostic" />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between pt-4">
+                      <Button variant="outline" onClick={() => handleAccordionChange("issue")}>Back</Button>
+                      <Button onClick={() => handleAccordionChange("details")}>Next</Button>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="flex justify-end mt-6">
-                  <Button variant="outline" className="px-4 mr-2">Back</Button>
-                  <Button className="px-8 bg-red-600 hover:bg-red-700 text-white">Submit Order</Button>
+              )}
+              
+              {activeAccordion === "details" && (
+                <div>
+                  <h2 className="text-xl font-bold mb-6 text-[#333]">Step 4: Contact Details</h2>
+                  
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="firstName" className="text-sm font-medium mb-1 block">First Name</Label>
+                        <Input id="firstName" placeholder="First name" />
+                      </div>
+                      <div>
+                        <Label htmlFor="lastName" className="text-sm font-medium mb-1 block">Last Name</Label>
+                        <Input id="lastName" placeholder="Last name" />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="email" className="text-sm font-medium mb-1 block">Email Address</Label>
+                      <Input id="email" type="email" placeholder="email@example.com" />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="phone" className="text-sm font-medium mb-1 block">Phone Number</Label>
+                      <Input id="phone" placeholder="(123) 456-7890" />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="address" className="text-sm font-medium mb-1 block">Address</Label>
+                      <Input id="address" placeholder="Street address" />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <div className="col-span-2 md:col-span-1">
+                        <Label htmlFor="city" className="text-sm font-medium mb-1 block">City</Label>
+                        <Input id="city" placeholder="City" />
+                      </div>
+                      <div>
+                        <Label htmlFor="state" className="text-sm font-medium mb-1 block">State</Label>
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="State" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ca">California</SelectItem>
+                            <SelectItem value="ny">New York</SelectItem>
+                            <SelectItem value="tx">Texas</SelectItem>
+                            <SelectItem value="fl">Florida</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="zip" className="text-sm font-medium mb-1 block">ZIP Code</Label>
+                        <Input id="zip" placeholder="ZIP" />
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between pt-4">
+                      <Button variant="outline" onClick={() => handleAccordionChange("services")}>Back</Button>
+                      <Button onClick={() => handleAccordionChange("review")}>Next</Button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+              )}
+              
+              {activeAccordion === "review" && (
+                <div>
+                  <h2 className="text-xl font-bold mb-6 text-[#333]">Step 5: Review & Submit</h2>
+                  
+                  <div className="space-y-6">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="font-semibold text-lg mb-3">Order Summary</h3>
+                      
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Device:</span>
+                          <span>iPhone 13 Pro</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Issues:</span>
+                          <span>Screen damage, Battery problems</span>
+                        </div>
+                        <div className="pt-2 border-t">
+                          <h4 className="font-medium mb-2">Selected Services:</h4>
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-sm">
+                              <span>Screen Replacement</span>
+                              <span>$89.99</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span>Battery Replacement</span>
+                              <span>$49.99</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="pt-2 border-t">
+                          <div className="flex justify-between font-medium">
+                            <span>Total:</span>
+                            <span>$139.98</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="font-semibold text-lg mb-3">Contact Information</h3>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Name:</span>
+                          <span>John Doe</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Email:</span>
+                          <span>john.doe@example.com</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Phone:</span>
+                          <span>(123) 456-7890</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Address:</span>
+                          <span>123 Main St, San Francisco, CA 94103</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="terms" />
+                      <Label htmlFor="terms" className="text-sm">I agree to the terms and conditions</Label>
+                    </div>
+                    
+                    <div className="flex justify-between pt-4">
+                      <Button variant="outline" onClick={() => handleAccordionChange("details")}>Back</Button>
+                      <Button className="bg-green-600 hover:bg-green-700">Submit Order</Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </Card>
+          </div>
+        </div>
       </div>
       
       <div className="mt-auto">
