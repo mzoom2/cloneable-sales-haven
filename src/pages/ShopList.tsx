@@ -93,6 +93,11 @@ const ShopList = () => {
     setChatEmail("");
     setChatQuestion("");
   };
+
+  const handleChatButtonClick = () => {
+    console.log("Chat button clicked");
+    setChatOpen(true);
+  };
   
   // Generate pagination items
   const renderPaginationItems = () => {
@@ -195,10 +200,7 @@ const ShopList = () => {
             <TooltipTrigger asChild>
               <button
                 className="bg-red-600 text-white p-3 flex items-center justify-center"
-                onClick={() => {
-                  console.log("Chat button clicked");
-                  setChatOpen(true);
-                }}
+                onClick={handleChatButtonClick}
               >
                 <MessageCircle size={24} />
               </button>
