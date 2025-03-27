@@ -1,12 +1,19 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Eye, Check } from 'lucide-react';
+import { Eye, ChevronDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea"; 
 import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,7 +48,6 @@ type FormValues = z.infer<typeof formSchema>;
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'medium' | 'strong' | ''>('');
   const navigate = useNavigate();
   const location = useLocation();
   const userType = location.state?.userType || 'personal';
@@ -64,46 +70,11 @@ const Register = () => {
     },
   });
   
-  const { watch } = form;
-  const password = useRef({});
-  password.current = watch("password", "");
-  
-  // Check password strength
-  useEffect(() => {
-    const currentPassword = password.current as string;
-    
-    if (!currentPassword) {
-      setPasswordStrength('');
-      return;
-    }
-    
-    const hasUppercase = /[A-Z]/.test(currentPassword);
-    const hasLowercase = /[a-z]/.test(currentPassword);
-    const hasNumber = /[0-9]/.test(currentPassword);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(currentPassword);
-    const isLongEnough = currentPassword.length >= 8;
-    
-    const strength = 
-      (hasUppercase ? 1 : 0) + 
-      (hasLowercase ? 1 : 0) + 
-      (hasNumber ? 1 : 0) + 
-      (hasSpecialChar ? 1 : 0) + 
-      (isLongEnough ? 1 : 0);
-    
-    if (strength <= 2) setPasswordStrength('weak');
-    else if (strength <= 4) setPasswordStrength('medium');
-    else setPasswordStrength('strong');
-  }, [watch]);
-  
   const onSubmit = (data: FormValues) => {
     console.log(data);
     // In a real app, this would call an API to register the user
     navigate("/dashboard");
   };
-  
-  // Password match check
-  const passwordsMatch = form.watch("password") === form.watch("confirmPassword") && 
-                         form.watch("confirmPassword") !== "";
                          
   // Handle Previous button click
   const handlePrevious = () => {
@@ -118,37 +89,12 @@ const Register = () => {
   ];
   
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
       
-      {/* Breadcrumb navigation */}
-      <div className="bg-slate-50 py-3 border-b mt-16">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link to="/" className="hover:text-primary">Home</Link>
-            <span>•</span>
-            <Link to="/pre-register" className="hover:text-primary">Pre-Registration</Link>
-            <span>•</span>
-            <span className="font-medium text-gray-800">Register</span>
-          </div>
-        </div>
-      </div>
-      
-      {/* Currency selector - fixed to right side, positioned higher */}
-      <div className="fixed right-0 top-1/4 z-40">
-        <div className="flex flex-col">
-          <button className="bg-blue-700 text-white py-2 px-4 font-medium">
-            USD $
-          </button>
-          <button className="bg-gray-800 text-white py-2 px-4 font-medium">
-            EUR €
-          </button>
-        </div>
-      </div>
-      
       {/* Main content */}
-      <div className="flex-grow container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="flex-grow container mx-auto px-4 py-8 mt-16">
+        <div className="max-w-6xl mx-auto">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -157,9 +103,13 @@ const Register = () => {
                   name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>First Name *</FormLabel>
+                      <FormLabel className="text-gray-600">First Name *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your first name" {...field} />
+                        <Input 
+                          placeholder="First Name" 
+                          className="border-0 border-b border-gray-300 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-b-2 focus-visible:border-gray-400" 
+                          {...field} 
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -170,9 +120,13 @@ const Register = () => {
                   name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Last Name *</FormLabel>
+                      <FormLabel className="text-gray-600">Last Name *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your last name" {...field} />
+                        <Input 
+                          placeholder="Last Name" 
+                          className="border-0 border-b border-gray-300 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-b-2 focus-visible:border-gray-400" 
+                          {...field} 
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -185,9 +139,13 @@ const Register = () => {
                   name="businessName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Business Name *</FormLabel>
+                      <FormLabel className="text-gray-600">Business Name *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your business name" {...field} />
+                        <Input 
+                          placeholder="Business Name" 
+                          className="border-0 border-b border-gray-300 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-b-2 focus-visible:border-gray-400" 
+                          {...field} 
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -198,11 +156,12 @@ const Register = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email *</FormLabel>
+                      <FormLabel className="text-gray-600">Email *</FormLabel>
                       <FormControl>
                         <Input 
                           type="email" 
-                          placeholder="Enter your email address" 
+                          placeholder="Email" 
+                          className="border-0 border-b border-gray-300 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-b-2 focus-visible:border-gray-400" 
                           {...field} 
                         />
                       </FormControl>
@@ -217,9 +176,13 @@ const Register = () => {
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number *</FormLabel>
+                      <FormLabel className="text-gray-600">Phone Number *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your phone number" {...field} />
+                        <Input 
+                          placeholder="Phone Number" 
+                          className="border-0 border-b border-gray-300 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-b-2 focus-visible:border-gray-400" 
+                          {...field} 
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -230,91 +193,70 @@ const Register = () => {
                   name="whatsappNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>WhatsApp Number</FormLabel>
+                      <FormLabel className="text-gray-600">WhatsApp Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your WhatsApp number (optional)" {...field} />
+                        <Input 
+                          placeholder="WhatsApp Number" 
+                          className="border-0 border-b border-gray-300 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-b-2 focus-visible:border-gray-400" 
+                          {...field} 
+                        />
                       </FormControl>
                     </FormItem>
                   )}
                 />
               </div>
+              
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-600">Country *</FormLabel>
+                    <div className="relative">
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="border-0 border-b border-gray-300 rounded-none px-0 py-2 focus-visible:ring-0 focus-visible:border-b-2 focus-visible:border-gray-400">
+                            <SelectValue placeholder="Select country" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {countries.map((country) => (
+                            <SelectItem key={country} value={country}>
+                              {country}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <ChevronDown size={16} className="absolute right-0 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    </div>
+                  </FormItem>
+                )}
+              />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Country *</FormLabel>
-                      <FormControl>
-                        <select 
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          {...field}
-                          defaultValue=""
-                        >
-                          <option value="" disabled>Select country</option>
-                          {countries.map((country) => (
-                            <option key={country} value={country}>
-                              {country}
-                            </option>
-                          ))}
-                        </select>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 gap-6">
                 <FormField
                   control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password *</FormLabel>
+                      <FormLabel className="text-gray-600">Password *</FormLabel>
                       <div className="relative">
                         <FormControl>
                           <Input 
                             type={showPassword ? "text" : "password"} 
-                            placeholder="Create a password" 
-                            className="pr-10" 
+                            placeholder="Password" 
+                            className="border-0 border-b border-gray-300 rounded-none px-0 py-2 pr-10 focus-visible:ring-0 focus-visible:border-b-2 focus-visible:border-gray-400" 
                             {...field} 
                           />
                         </FormControl>
                         <button 
                           type="button"
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           <Eye size={18} />
                         </button>
                       </div>
-                      
-                      {/* Password strength indicator */}
-                      {passwordStrength && (
-                        <div className="mt-2">
-                          <div className="flex gap-1 h-1 mt-1 mb-1">
-                            <div className={`h-full rounded-full flex-1 ${
-                              passwordStrength === 'weak' ? 'bg-red-500' : 
-                              passwordStrength === 'medium' ? 'bg-yellow-500' : 
-                              'bg-green-500'
-                            }`}></div>
-                            <div className={`h-full rounded-full flex-1 ${
-                              passwordStrength === 'medium' || passwordStrength === 'strong' ? 
-                              (passwordStrength === 'medium' ? 'bg-yellow-500' : 'bg-green-500') : 
-                              'bg-gray-200'
-                            }`}></div>
-                            <div className={`h-full rounded-full flex-1 ${
-                              passwordStrength === 'strong' ? 'bg-green-500' : 'bg-gray-200'
-                            }`}></div>
-                          </div>
-                          <div className="text-right text-xs text-gray-500">
-                            {passwordStrength === 'weak' ? 'Weak' : 
-                             passwordStrength === 'medium' ? 'Medium' : 
-                             'Strong'}
-                          </div>
-                        </div>
-                      )}
                     </FormItem>
                   )}
                 />
@@ -324,28 +266,23 @@ const Register = () => {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm Password *</FormLabel>
+                      <FormLabel className="text-gray-600">Confirm Password *</FormLabel>
                       <div className="relative">
                         <FormControl>
                           <Input 
                             type={showConfirmPassword ? "text" : "password"} 
-                            placeholder="Confirm your password" 
-                            className="pr-10" 
+                            placeholder="Confirm Password" 
+                            className="border-0 border-b border-gray-300 rounded-none px-0 py-2 pr-10 focus-visible:ring-0 focus-visible:border-b-2 focus-visible:border-gray-400" 
                             {...field} 
                           />
                         </FormControl>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                          {passwordsMatch && field.value && (
-                            <Check size={18} className="text-green-500" />
-                          )}
-                          <button 
-                            type="button"
-                            className="text-gray-500"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          >
-                            <Eye size={18} />
-                          </button>
-                        </div>
+                        <button 
+                          type="button"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                          <Eye size={18} />
+                        </button>
                       </div>
                     </FormItem>
                   )}
@@ -357,7 +294,7 @@ const Register = () => {
                 name="salesRep"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel>Have you spoken to a sales representative? *</FormLabel>
+                    <FormLabel className="text-gray-600">Have you spoken to a sales representative? *</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -387,7 +324,7 @@ const Register = () => {
                 name="customsClearance"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel>
+                    <FormLabel className="text-gray-600">
                       Do you have the ability to do customs clearance? (After the arrival of the goods in the country of destination, the customs clearance in the importing country needs to be completed by the buyer, e.g. import permit, documents required by customs and etc., including all customs duties and taxes) *
                     </FormLabel>
                     <FormControl>
@@ -425,21 +362,17 @@ const Register = () => {
                 name="buyingInterest"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>What are you interested in buying from us? and how many pcs do you need? *</FormLabel>
+                    <FormLabel className="text-gray-600">What are you interested in buying from us? and how many pcs do you need? *</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Tell us what you're looking for..."
-                        className="min-h-[120px]"
+                        placeholder="What are you interested in buying from us? and how many pcs do you need?"
+                        className="min-h-[120px] border-gray-300"
                         {...field}
                       />
                     </FormControl>
                   </FormItem>
                 )}
               />
-              
-              <div className="text-sm text-gray-600">
-                By signing up, I agree with the website's <a href="/terms" className="text-blue-600 hover:underline">Terms and Conditions</a>
-              </div>
               
               <div className="flex justify-between pt-4">
                 <Button 
@@ -452,13 +385,25 @@ const Register = () => {
                 
                 <Button 
                   type="submit" 
-                  className="bg-indigo-600 hover:bg-indigo-700"
+                  className="bg-purple-700 hover:bg-purple-800"
                 >
                   Register
                 </Button>
               </div>
             </form>
           </Form>
+        </div>
+      </div>
+      
+      {/* Currency selector - fixed to right side */}
+      <div className="fixed right-0 top-1/3 z-40">
+        <div className="flex flex-col">
+          <button className="bg-blue-700 text-white py-2 px-4 font-medium">
+            USD $
+          </button>
+          <button className="bg-gray-800 text-white py-2 px-4 font-medium">
+            EUR €
+          </button>
         </div>
       </div>
       
