@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Menu, UserCircle } from "lucide-react";
+import { ShoppingCart, Menu } from "lucide-react";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
 import { getCurrentUser, logoutUser } from '@/utils/localStorageUtils';
@@ -162,7 +162,6 @@ const Header = () => {
                   className={scrolled ? "bg-white text-black border-gray-200 hover:bg-gray-100" : ""}
                   onClick={handleAccount}
                 >
-                  <UserCircle className="mr-1" size={16} />
                   Dashboard
                 </Button>
                 <Button 
