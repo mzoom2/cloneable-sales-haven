@@ -23,11 +23,11 @@ const Profile = () => {
     firstName: "",
     lastName: "",
     email: "",
-    username: "",
-    registrationDate: "March 27, 2025 2:22 pm",
-    phoneNumber: "-",
-    occupation: "-",
-    biography: "-",
+    businessName: "",
+    phoneNumber: "",
+    whatsappNumber: "",
+    country: "",
+    registrationDate: "",
     initials: "",
   });
   
@@ -39,18 +39,28 @@ const Profile = () => {
       return;
     }
     
-    // In a real app, fetch user details from API
-    // For now, we'll use mock data
+    // Format registration date (assuming we don't have this info)
+    const formattedDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    // Get initials from first and last name
+    const initials = `${currentUser.firstName?.charAt(0) || ''}${currentUser.lastName?.charAt(0) || ''}`;
+    
     setUser({
-      firstName: "Adebayo",
-      lastName: "Musturpha",
-      email: "mzoomolabewazz@gmail.com",
-      username: "mzoomolabewagmailcomzz",
-      registrationDate: "March 27, 2025 2:22 pm",
-      phoneNumber: "-",
-      occupation: "-",
-      biography: "-",
-      initials: "AM",
+      firstName: currentUser.firstName || "",
+      lastName: currentUser.lastName || "",
+      email: currentUser.email || "",
+      businessName: currentUser.businessName || "",
+      phoneNumber: currentUser.phoneNumber || "-",
+      whatsappNumber: currentUser.whatsappNumber || "-",
+      country: currentUser.country || "-",
+      registrationDate: formattedDate,
+      initials: initials.toUpperCase(),
     });
   }, [navigate]);
   
@@ -165,8 +175,8 @@ const Profile = () => {
                   </div>
                   
                   <div>
-                    <p className="text-gray-500 mb-1">Username</p>
-                    <p className="font-medium">{user.username}</p>
+                    <p className="text-gray-500 mb-1">Business Name</p>
+                    <p className="font-medium">{user.businessName}</p>
                   </div>
                   
                   <div>
@@ -180,13 +190,13 @@ const Profile = () => {
                   </div>
                   
                   <div>
-                    <p className="text-gray-500 mb-1">Skill/Occupation</p>
-                    <p className="font-medium">{user.occupation}</p>
+                    <p className="text-gray-500 mb-1">WhatsApp Number</p>
+                    <p className="font-medium">{user.whatsappNumber}</p>
                   </div>
                   
-                  <div className="md:col-span-2">
-                    <p className="text-gray-500 mb-1">Biography</p>
-                    <p className="font-medium">{user.biography}</p>
+                  <div>
+                    <p className="text-gray-500 mb-1">Country</p>
+                    <p className="font-medium">{user.country}</p>
                   </div>
                 </div>
               </div>
