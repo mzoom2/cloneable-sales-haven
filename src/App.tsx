@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import ShopList from "./pages/ShopList";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import PreRegister from "./pages/PreRegister";
 import Videos from "./pages/Videos";
 import OrderingGuide from "./pages/OrderingGuide";
 import Account from "./pages/Account";
@@ -41,6 +42,7 @@ const AnimatedRoutes = () => {
           <Route path="/shop-list" element={<ShopList />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/pre-register" element={<PreRegister />} />
           <Route path="/videos" element={<Videos />} />
           <Route path="/ordering-guide" element={<OrderingGuide />} />
           <Route path="/account" element={<Account />} />

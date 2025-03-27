@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
   // Updated to use a different phone image
@@ -20,8 +21,11 @@ const Hero = () => {
           </p>
           
           <div className="pt-2 md:pt-4 flex justify-center lg:justify-start">
-            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6">
-              Register Now
+            <Button 
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6"
+              asChild
+            >
+              <Link to="/pre-register">Register Now</Link>
             </Button>
           </div>
           
