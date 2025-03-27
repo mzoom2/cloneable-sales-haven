@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Menu } from "lucide-react";
@@ -155,23 +154,13 @@ const Header = () => {
             </Button>
             
             {isLoggedIn ? (
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant={scrolled ? "outline" : "secondary"}
-                  size="sm" 
-                  className={scrolled ? "bg-white text-black border-gray-200 hover:bg-gray-100" : ""}
-                  onClick={handleAccount}
-                >
-                  Dashboard
-                </Button>
-                <Button 
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
-              </div>
+              <Button 
+                variant="destructive"
+                size="sm"
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
             ) : (
               <Button 
                 variant={scrolled ? "outline" : "secondary"}
