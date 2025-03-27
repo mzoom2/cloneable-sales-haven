@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -194,7 +195,10 @@ const ShopList = () => {
             <TooltipTrigger asChild>
               <button
                 className="bg-red-600 text-white p-3 flex items-center justify-center"
-                onClick={() => setChatOpen(true)}
+                onClick={() => {
+                  console.log("Chat button clicked");
+                  setChatOpen(true);
+                }}
               >
                 <MessageCircle size={24} />
               </button>
