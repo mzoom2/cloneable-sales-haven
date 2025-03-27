@@ -11,6 +11,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { validateLogin, setCurrentUser } from "@/utils/localStorageUtils";
+import { useToast } from "@/components/ui/use-toast";
 
 // Define form schema
 const formSchema = z.object({
@@ -23,7 +25,9 @@ type FormValues = z.infer<typeof formSchema>;
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -36,8 +40,34 @@ const Login = () => {
   
   const onSubmit = (data: FormValues) => {
     console.log(data);
-    // In a real app, this would call an API to authenticate the user
-    navigate("/dashboard");
+    
+    // Validate login against local storage
+    const isValid = validateLogin(data.email, data.password);
+    
+    if (isValid) {
+      // Set current logged in user
+      setCurrentUser(data.email);
+      
+      // Display success message
+      toast({
+        title: "Login successful!",
+        description: "Welcome back!",
+        duration: 3000,
+      });
+      
+      // Navigate to dashboard
+      navigate("/dashboard");
+    } else {
+      // Show error
+      setLoginError(true);
+      
+      toast({
+        title: "Login failed",
+        description: "Invalid email or password. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
   };
   
   return (
@@ -117,6 +147,12 @@ const Login = () => {
                   </FormItem>
                 )}
               />
+              
+              {loginError && (
+                <div className="text-red-600 text-sm">
+                  Invalid email or password. Please try again.
+                </div>
+              )}
               
               <div className="flex items-center justify-between">
                 <FormField

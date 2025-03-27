@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Eye, ChevronDown } from 'lucide-react';
@@ -19,6 +18,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { saveUser, setCurrentUser } from "@/utils/localStorageUtils";
+import { useToast } from "@/components/ui/use-toast";
 
 // Define form schema
 const formSchema = z.object({
@@ -51,6 +52,7 @@ const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const userType = location.state?.userType || 'personal';
+  const { toast } = useToast();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -72,7 +74,23 @@ const Register = () => {
   
   const onSubmit = (data: FormValues) => {
     console.log(data);
-    // In a real app, this would call an API to register the user
+    
+    // Save user data to local storage
+    // Omit confirmPassword as it's not needed for storage
+    const { confirmPassword, ...userData } = data;
+    saveUser(userData);
+    
+    // Set as current logged in user
+    setCurrentUser(userData.email);
+    
+    // Show success message
+    toast({
+      title: "Registration successful!",
+      description: "Your account has been created.",
+      duration: 3000,
+    });
+    
+    // Navigate to dashboard
     navigate("/dashboard");
   };
                          

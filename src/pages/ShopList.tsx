@@ -3,11 +3,18 @@ import { Button } from "@/components/ui/button";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/utils/localStorageUtils";
 
 const ShopList = () => {
-  // In a real app, this would be based on authentication state
-  const isLoggedIn = false;
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  
+  // Check if user is logged in
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    setIsLoggedIn(!!currentUser);
+  }, []);
   
   const handleLogin = () => {
     navigate('/login');
@@ -42,21 +49,33 @@ const ShopList = () => {
       
       {/* Main content */}
       <div className="flex-grow container mx-auto px-4 py-16">
-        <div className="max-w-xl mx-auto bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-center text-[#1a0050] mb-8">
-            Please login to view stock list.
-          </h1>
-          
-          <div className="flex justify-center">
-            <Button 
-              className="bg-indigo-600 hover:bg-indigo-700 text-white"
-              size="lg"
-              onClick={handleLogin}
-            >
-              Login
-            </Button>
+        {isLoggedIn ? (
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-3xl font-bold mb-6 text-gray-900">Stock List</h1>
+            <p className="mb-4 text-lg text-gray-700">Welcome to your exclusive stock list.</p>
+            
+            {/* This is where actual stock list content would go */}
+            <div className="bg-white rounded-lg shadow p-6 mt-4">
+              <p className="text-gray-500 italic">Your personalized stock list will appear here.</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="max-w-xl mx-auto bg-white rounded-lg shadow-md p-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-center text-[#1a0050] mb-8">
+              Please login to view stock list.
+            </h1>
+            
+            <div className="flex justify-center">
+              <Button 
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                size="lg"
+                onClick={handleLogin}
+              >
+                Login
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
       
       <Footer />
