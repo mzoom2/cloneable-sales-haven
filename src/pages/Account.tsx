@@ -1,12 +1,21 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { getCurrentUser } from "@/utils/localStorageUtils";
 
 const Account = () => {
   const navigate = useNavigate();
+  
+  // Check if user is logged in
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
   
   const handleLogin = () => {
     navigate('/login');

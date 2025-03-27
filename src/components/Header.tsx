@@ -1,16 +1,24 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Menu } from "lucide-react";
+import { ShoppingCart, Menu, UserCircle } from "lucide-react";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
+import { getCurrentUser, logoutUser } from '@/utils/localStorageUtils';
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   
+  // Check if user is logged in
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    setIsLoggedIn(!!currentUser);
+  }, [location]);
+
   useEffect(() => {
     const handleScroll = () => {
       const isScrolled = window.scrollY > 10;
@@ -43,6 +51,16 @@ const Header = () => {
 
   const handleLogin = () => {
     navigate('/login');
+  };
+
+  const handleLogout = () => {
+    logoutUser();
+    setIsLoggedIn(false);
+    navigate('/');
+  };
+
+  const handleAccount = () => {
+    navigate('/dashboard');
   };
 
   const toggleMobileMenu = () => {
@@ -113,9 +131,9 @@ const Header = () => {
               Ordering Guide
             </Link>
             <Link 
-              to="/account" 
+              to={isLoggedIn ? "/dashboard" : "/account"} 
               className={`px-4 py-2 font-medium transition-colors ${
-                isActive('/account') 
+                (isActive('/account') || isActive('/dashboard'))
                   ? 'text-white bg-[#2a2158] rounded' 
                   : (scrolled ? 'text-gray-700 hover:text-primary/80' : 'text-white hover:text-gray-200')
               }`}
@@ -135,14 +153,36 @@ const Header = () => {
                 368
               </span>
             </Button>
-            <Button 
-              variant={scrolled ? "outline" : "secondary"}
-              size="sm" 
-              className={scrolled ? "bg-white text-black border-gray-200 hover:bg-gray-100" : ""}
-              onClick={handleLogin}
-            >
-              Log in
-            </Button>
+            
+            {isLoggedIn ? (
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant={scrolled ? "outline" : "secondary"}
+                  size="sm" 
+                  className={scrolled ? "bg-white text-black border-gray-200 hover:bg-gray-100" : ""}
+                  onClick={handleAccount}
+                >
+                  <UserCircle className="mr-1" size={16} />
+                  Dashboard
+                </Button>
+                <Button 
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                variant={scrolled ? "outline" : "secondary"}
+                size="sm" 
+                className={scrolled ? "bg-white text-black border-gray-200 hover:bg-gray-100" : ""}
+                onClick={handleLogin}
+              >
+                Log in
+              </Button>
+            )}
             
             {/* Hamburger Menu Button - Visible only on mobile */}
             <Button
