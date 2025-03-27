@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 
@@ -52,6 +53,8 @@ const PaginationLink = ({
         variant: isActive ? "outline" : "ghost",
         size,
       }),
+      isActive && "bg-indigo-600 text-white hover:bg-indigo-700 hover:text-white border-indigo-600",
+      "cursor-pointer",
       className
     )}
     {...props}

@@ -1,14 +1,44 @@
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/utils/localStorageUtils";
+import { stockItems, StockItem } from "@/data/stockItems";
+import StockItemCard from "@/components/StockItemCard";
+import FilterSidebar from "@/components/FilterSidebar";
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious, 
+  PaginationEllipsis 
+} from "@/components/ui/pagination";
+
+const ITEMS_PER_PAGE = 10;
 
 const ShopList = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  
+  // Calculate total pages
+  const totalPages = Math.ceil(stockItems.length / ITEMS_PER_PAGE);
+  
+  // Filter items based on search query
+  const filteredItems = stockItems.filter(item => 
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  // Get current items for pagination
+  const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
   
   // Check if user is logged in
   useEffect(() => {
@@ -16,8 +46,80 @@ const ShopList = () => {
     setIsLoggedIn(!!currentUser);
   }, []);
   
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  };
+  
   const handleLogin = () => {
     navigate('/login');
+  };
+  
+  // Generate pagination items
+  const renderPaginationItems = () => {
+    const items = [];
+    
+    // Always show first page
+    items.push(
+      <PaginationItem key="page-1">
+        <PaginationLink 
+          onClick={() => handlePageChange(1)} 
+          isActive={currentPage === 1}
+        >
+          1
+        </PaginationLink>
+      </PaginationItem>
+    );
+    
+    // Add ellipsis if needed
+    if (currentPage > 3) {
+      items.push(
+        <PaginationItem key="ellipsis-1">
+          <PaginationEllipsis />
+        </PaginationItem>
+      );
+    }
+    
+    // Add pages around current page
+    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+      if (i === 1 || i === totalPages) continue; // Skip first and last page as they're always shown
+      
+      items.push(
+        <PaginationItem key={`page-${i}`}>
+          <PaginationLink 
+            onClick={() => handlePageChange(i)} 
+            isActive={currentPage === i}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    // Add ellipsis if needed
+    if (currentPage < totalPages - 2) {
+      items.push(
+        <PaginationItem key="ellipsis-2">
+          <PaginationEllipsis />
+        </PaginationItem>
+      );
+    }
+    
+    // Always show last page if there is more than one page
+    if (totalPages > 1) {
+      items.push(
+        <PaginationItem key={`page-${totalPages}`}>
+          <PaginationLink 
+            onClick={() => handlePageChange(totalPages)} 
+            isActive={currentPage === totalPages}
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    return items;
   };
   
   return (
@@ -48,17 +150,66 @@ const ShopList = () => {
       </div>
       
       {/* Main content */}
-      <div className="flex-grow container mx-auto px-4 py-16">
+      <div className="flex-grow container mx-auto px-4 py-8">
         {isLoggedIn ? (
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-6 text-gray-900">Stock List</h1>
-            <p className="mb-4 text-lg text-gray-700">Welcome to your exclusive stock list.</p>
-            
-            {/* This is where actual stock list content would go */}
-            <div className="bg-white rounded-lg shadow p-6 mt-4">
-              <p className="text-gray-500 italic">Your personalized stock list will appear here.</p>
+          <>
+            <div className="flex flex-col md:flex-row gap-8">
+              {/* Left sidebar with filters */}
+              <div className="md:w-64 shrink-0">
+                <FilterSidebar />
+              </div>
+              
+              {/* Main product listings */}
+              <div className="flex-1">
+                {/* Search and export header */}
+                <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+                  <div className="mb-4 md:mb-0 flex-1 max-w-md">
+                    <Input 
+                      placeholder="Search model, name..." 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full"
+                    />
+                    <p className="text-sm text-gray-500 mt-2">Items: {filteredItems.length}</p>
+                  </div>
+                  
+                  <Button variant="outline" className="whitespace-nowrap">
+                    Export
+                  </Button>
+                </div>
+                
+                {/* Product listings */}
+                <div className="space-y-4">
+                  {currentItems.map(item => (
+                    <StockItemCard key={item.id} item={item} />
+                  ))}
+                </div>
+                
+                {/* Pagination */}
+                <div className="mt-8">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                          className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                        />
+                      </PaginationItem>
+                      
+                      {renderPaginationItems()}
+                      
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              </div>
             </div>
-          </div>
+          </>
         ) : (
           <div className="max-w-xl mx-auto bg-white rounded-lg shadow-md p-8">
             <h1 className="text-2xl md:text-3xl font-bold text-center text-[#1a0050] mb-8">
