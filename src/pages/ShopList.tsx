@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -7,6 +6,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
@@ -155,6 +160,50 @@ const ShopList = () => {
     return items;
   };
   
+  // Chat Dialog
+  <Dialog open={chatOpen} onOpenChange={setChatOpen}>
+    <DialogContent className="bg-white p-0 border-none max-w-md">
+      <div className="bg-red-600 p-4 text-white">
+        <DialogTitle className="text-xl font-bold text-center">Live Chat</DialogTitle>
+      </div>
+      <div className="p-6 space-y-6">
+        <div className="space-y-4">
+          <div>
+            <Input
+              placeholder="Name"
+              value={chatName}
+              onChange={(e) => setChatName(e.target.value)}
+              className="border rounded-md p-2 w-full"
+            />
+          </div>
+          <div>
+            <Input
+              placeholder="Email"
+              type="email"
+              value={chatEmail}
+              onChange={(e) => setChatEmail(e.target.value)}
+              className="border rounded-md p-2 w-full"
+            />
+          </div>
+          <div>
+            <Input
+              placeholder="Question"
+              value={chatQuestion}
+              onChange={(e) => setChatQuestion(e.target.value)}
+              className="border rounded-md p-2 w-full"
+            />
+          </div>
+          <Button 
+            onClick={handleChatSubmit}
+            className="w-full bg-red-600 hover:bg-red-700 flex items-center justify-center gap-2"
+          >
+            <span className="text-white">▶</span> Start Chat
+          </Button>
+        </div>
+      </div>
+    </DialogContent>
+  </Dialog>
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -184,58 +233,23 @@ const ShopList = () => {
       
       {/* Chat button - fixed to right side, positioned lower */}
       <div className="fixed right-0 top-1/3 z-40">
-        <button
-          className="bg-red-600 text-white p-3 flex items-center justify-center"
-          onClick={() => setChatOpen(true)}
-        >
-          <MessageCircle size={24} />
-        </button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="bg-red-600 text-white p-3 flex items-center justify-center"
+                onClick={() => setChatOpen(true)}
+              >
+                <MessageCircle size={24} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              <p>Start a live chat</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
 
-      {/* Chat Dialog */}
-      <Dialog open={chatOpen} onOpenChange={setChatOpen}>
-        <DialogContent className="bg-white p-0 border-none max-w-md">
-          <div className="bg-red-600 p-4 text-white">
-            <DialogTitle className="text-xl font-bold text-center">Live Chat</DialogTitle>
-          </div>
-          <div className="p-6 space-y-6">
-            <div className="space-y-4">
-              <div>
-                <Input
-                  placeholder="Name"
-                  value={chatName}
-                  onChange={(e) => setChatName(e.target.value)}
-                  className="border rounded-md p-2 w-full"
-                />
-              </div>
-              <div>
-                <Input
-                  placeholder="Email"
-                  type="email"
-                  value={chatEmail}
-                  onChange={(e) => setChatEmail(e.target.value)}
-                  className="border rounded-md p-2 w-full"
-                />
-              </div>
-              <div>
-                <Input
-                  placeholder="Question"
-                  value={chatQuestion}
-                  onChange={(e) => setChatQuestion(e.target.value)}
-                  className="border rounded-md p-2 w-full"
-                />
-              </div>
-              <Button 
-                onClick={handleChatSubmit}
-                className="w-full bg-red-600 hover:bg-red-700 flex items-center justify-center gap-2"
-              >
-                <span className="text-white">▶</span> Start Chat
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
       {/* Main content */}
       <div className="flex-grow container mx-auto px-4 py-8">
         {isLoggedIn ? (
