@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Eye, ChevronDown } from 'lucide-react';
@@ -78,7 +79,13 @@ const Register = () => {
     // Save user data to local storage
     // Omit confirmPassword as it's not needed for storage
     const { confirmPassword, ...userData } = data;
-    saveUser(userData);
+    
+    // Ensure email and password are provided as required by the saveUser function type
+    saveUser({
+      ...userData,
+      email: userData.email,  // Explicitly assign to ensure it's not optional
+      password: userData.password  // Explicitly assign to ensure it's not optional
+    });
     
     // Set as current logged in user
     setCurrentUser(userData.email);
