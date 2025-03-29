@@ -3,7 +3,7 @@ import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Phone, Shield, Clock, Truck } from 'lucide-react';
+import { Phone, Shield, Clock, Truck, Award, Star } from 'lucide-react';
 
 const AboutPage = () => {
   return (
@@ -50,7 +50,7 @@ const AboutPage = () => {
             <div className="grid grid-cols-2 gap-6">
               <div className="bg-black bg-opacity-70 p-4 border border-gray-800 rounded-lg text-center text-white flex flex-col items-center">
                 <div className="mb-3 text-red-600">
-                  <img src="/lovable-uploads/8b0759ae-90d5-4f0a-9807-77c8d6da0e8d.png" alt="iPhone" className="w-20 h-auto mx-auto" />
+                  <img src="/lovable-uploads/be05eb0d-d6ae-4c82-a3d9-671e71e89016.png" alt="iPhone" className="w-20 h-auto mx-auto" />
                 </div>
                 <h3 className="font-medium mb-2">MOQ: 10 pcs for all phones</h3>
               </div>
@@ -98,7 +98,7 @@ const AboutPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
               <img 
-                src="/lovable-uploads/8b0759ae-90d5-4f0a-9807-77c8d6da0e8d.png" 
+                src="/lovable-uploads/069bfc37-98f5-479b-9c2b-2187e40c029e.png" 
                 alt="UEPHONE Warehouse" 
                 className="w-full h-auto rounded-lg shadow-lg" 
               />
@@ -127,7 +127,7 @@ const AboutPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center">
               <img 
-                src="/lovable-uploads/8b0759ae-90d5-4f0a-9807-77c8d6da0e8d.png" 
+                src="/lovable-uploads/2213ba6e-4049-4822-aec3-9945966ee6d5.png" 
                 alt="Quality Guarantee" 
                 className="w-full h-48 object-cover rounded-md mb-4" 
               />
@@ -139,7 +139,7 @@ const AboutPage = () => {
             
             <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center">
               <img 
-                src="/lovable-uploads/8b0759ae-90d5-4f0a-9807-77c8d6da0e8d.png" 
+                src="/lovable-uploads/391c0f05-6d37-4158-9461-c1682ffa41f7.png" 
                 alt="Fast Delivery" 
                 className="w-full h-48 object-cover rounded-md mb-4" 
               />
@@ -151,7 +151,7 @@ const AboutPage = () => {
             
             <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center">
               <img 
-                src="/lovable-uploads/8b0759ae-90d5-4f0a-9807-77c8d6da0e8d.png" 
+                src="/lovable-uploads/069bfc37-98f5-479b-9c2b-2187e40c029e.png" 
                 alt="Hassle Free Service" 
                 className="w-full h-48 object-cover rounded-md mb-4" 
               />
@@ -166,7 +166,7 @@ const AboutPage = () => {
       
       {/* CTA Section */}
       <div className="py-16 bg-[#002147] text-white relative">
-        <div className="absolute inset-0 bg-[url('/lovable-uploads/8b0759ae-90d5-4f0a-9807-77c8d6da0e8d.png')] bg-cover bg-center opacity-20"></div>
+        <div className="absolute inset-0 bg-[url('/lovable-uploads/391c0f05-6d37-4158-9461-c1682ffa41f7.png')] bg-cover bg-center opacity-20"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Are You Looking For Cell Phone Wholesale Supplier?</h2>
           <p className="mb-8 text-lg">Your inquiry will be replied to within 24 hours and we respect your privacy.</p>
@@ -221,7 +221,7 @@ const AboutPage = () => {
               </p>
               <div className="mt-4">
                 <img 
-                  src="/lovable-uploads/8b0759ae-90d5-4f0a-9807-77c8d6da0e8d.png" 
+                  src="/lovable-uploads/2213ba6e-4049-4822-aec3-9945966ee6d5.png" 
                   alt="QR Code" 
                   className="w-32 h-32" 
                 />
@@ -237,3 +237,4 @@ const AboutPage = () => {
 };
 
 export default AboutPage;
+
