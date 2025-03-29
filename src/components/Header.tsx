@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Menu } from "lucide-react";
@@ -6,6 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
 import { getCurrentUser, logoutUser } from '@/utils/localStorageUtils';
 import CartDropdown from './CartDropdown';
+import { useCart } from '@/contexts/CartContext';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -26,6 +26,7 @@ const Header = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { getTotalItems } = useCart();
   
   // Check if user is logged in
   useEffect(() => {
@@ -83,6 +84,10 @@ const Header = () => {
 
   const goToCart = () => {
     navigate('/cart');
+  };
+
+  const goToOffers = () => {
+    navigate('/offers');
   };
 
   // Check if we're on the contact page
@@ -326,7 +331,7 @@ const Header = () => {
                     >
                       <ShoppingCart size={20} />
                       <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                        1
+                        {getTotalItems()}
                       </span>
                     </Button>
                   </PopoverTrigger>
@@ -341,19 +346,19 @@ const Header = () => {
                         </button>
                         <button
                           className="py-3 px-6 font-medium flex-1 text-center"
-                          onClick={() => navigate('/offers')}
+                          onClick={goToOffers}
                         >
                           Offers
                         </button>
                       </div>
                       <div className="p-4 text-center">
-                        <p className="mb-4">You have 1 item in your cart</p>
+                        <p className="mb-4">You have {getTotalItems()} item(s) in your cart</p>
                         <div className="flex justify-between gap-2">
                           <Button variant="outline" className="flex-1" onClick={goToCart}>
                             View Cart
                           </Button>
-                          <Button className="flex-1" onClick={() => navigate('/checkout')}>
-                            Checkout
+                          <Button className="flex-1" onClick={goToOffers}>
+                            Offers
                           </Button>
                         </div>
                       </div>
