@@ -90,16 +90,11 @@ const Header = () => {
     navigate('/offers');
   };
 
-  // Check if we're on the contact page
-  const isContactPage = location.pathname === '/contact';
-
   return (
     <>
       <header 
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled || isContactPage
-            ? 'py-3 bg-white shadow-sm' 
-            : 'py-4 bg-[#0c0027]'
+          scrolled ? 'py-3 bg-white shadow-sm' : 'py-4 bg-[#0c0027]'
         }`}
       >
         <div className="container mx-auto px-4 flex items-center justify-between">
@@ -107,42 +102,62 @@ const Header = () => {
             <Link to="/" className="text-2xl font-bold tracking-tight">
               <span className="flex items-center">
                 <span className="text-red-600 font-bold mr-1">UE</span>
-                <span className={scrolled || isContactPage ? 'text-primary' : 'text-white'}>EPHONE</span>
+                <span className={scrolled ? 'text-primary' : 'text-white'}>EPHONE</span>
               </span>
             </Link>
           </div>
           
           <nav className="hidden md:flex space-x-4">
             <Link 
-              to="/" 
+              to="/shop-list" 
               className={`px-4 py-2 font-medium transition-colors ${
-                isActive('/') 
-                  ? (scrolled || isContactPage ? 'text-red-600' : 'text-white bg-[#2a2158] rounded') 
-                  : (scrolled || isContactPage ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-gray-200')
+                isActive('/shop-list') 
+                  ? (scrolled ? 'text-red-600' : 'text-white bg-[#2a2158] rounded') 
+                  : (scrolled ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-gray-200')
               }`}
             >
-              Home
+              Stock List
             </Link>
             <Link 
-              to="/about" 
+              to="/videos" 
               className={`px-4 py-2 font-medium transition-colors ${
-                isActive('/about') 
-                  ? (scrolled || isContactPage ? 'text-red-600' : 'text-white bg-[#2a2158] rounded') 
-                  : (scrolled || isContactPage ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-gray-200')
+                isActive('/videos') 
+                  ? (scrolled ? 'text-red-600' : 'text-white bg-[#2a2158] rounded') 
+                  : (scrolled ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-gray-200')
               }`}
             >
-              About Us
+              Videos
+            </Link>
+            <Link 
+              to="/ordering-guide" 
+              className={`px-4 py-2 font-medium transition-colors ${
+                isActive('/ordering-guide') 
+                  ? (scrolled ? 'text-red-600' : 'text-white bg-[#2a2158] rounded') 
+                  : (scrolled ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-gray-200')
+              }`}
+            >
+              Ordering Guide
+            </Link>
+            <Link 
+              to="/account" 
+              className={`px-4 py-2 font-medium transition-colors ${
+                isActive('/account') 
+                  ? (scrolled ? 'text-red-600' : 'text-white bg-[#2a2158] rounded') 
+                  : (scrolled ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-gray-200')
+              }`}
+            >
+              My Account
             </Link>
             
-            {/* Inventory Navigation Menu with Dropdown */}
+            {/* Inventory Navigation Menu with Dropdown - kept for product categories */}
             <NavigationMenu className="p-0">
               <NavigationMenuList className="space-x-0">
                 <NavigationMenuItem>
                   <NavigationMenuTrigger 
                     className={`p-0 px-4 py-2 bg-transparent font-medium hover:bg-transparent ${
                       isActive('/shop-list') 
-                        ? (scrolled || isContactPage ? 'text-red-600' : 'text-white bg-[#2a2158] rounded') 
-                        : (scrolled || isContactPage ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-gray-200')
+                        ? (scrolled ? 'text-red-600' : 'text-white bg-[#2a2158] rounded') 
+                        : (scrolled ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-gray-200')
                     }`}
                   >
                     Inventory
@@ -296,102 +311,77 @@ const Header = () => {
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
-            
-            <Link 
-              to="/ordering-guide" 
-              className={`px-4 py-2 font-medium transition-colors ${
-                isActive('/ordering-guide') 
-                  ? (scrolled || isContactPage ? 'text-red-600' : 'text-white bg-[#2a2158] rounded') 
-                  : (scrolled || isContactPage ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-gray-200')
-              }`}
-            >
-              Support
-            </Link>
-            <Link 
-              to="/contact" 
-              className={`px-4 py-2 font-medium transition-colors ${
-                isActive('/contact') 
-                  ? (scrolled || isContactPage ? 'text-red-600 font-bold' : 'text-white bg-[#2a2158] rounded') 
-                  : (scrolled || isContactPage ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-gray-200')
-              }`}
-            >
-              Contact Us
-            </Link>
           </nav>
           
           <div className="flex items-center space-x-4">
-            {isContactPage ? null : (
-              <>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className={`relative ${!scrolled && !isContactPage && 'text-white hover:bg-white/10'}`}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className={`relative ${!scrolled && 'text-white hover:bg-white/10'}`}
+                >
+                  <ShoppingCart size={20} />
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {getTotalItems()}
+                  </span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 border-none" align="end">
+                <div className="min-w-[300px]">
+                  <div className="flex border-b">
+                    <button
+                      className="py-3 px-6 font-medium flex-1 text-center border-b-2 border-purple-600"
+                      onClick={goToCart}
                     >
-                      <ShoppingCart size={20} />
-                      <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                        {getTotalItems()}
-                      </span>
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 border-none" align="end">
-                    <div className="min-w-[300px]">
-                      <div className="flex border-b">
-                        <button
-                          className="py-3 px-6 font-medium flex-1 text-center border-b-2 border-purple-600"
-                          onClick={goToCart}
-                        >
-                          Cart
-                        </button>
-                        <button
-                          className="py-3 px-6 font-medium flex-1 text-center"
-                          onClick={goToOffers}
-                        >
-                          Offers
-                        </button>
-                      </div>
-                      <div className="p-4 text-center">
-                        <p className="mb-4">You have {getTotalItems()} item(s) in your cart</p>
-                        <div className="flex justify-between gap-2">
-                          <Button variant="outline" className="flex-1" onClick={goToCart}>
-                            View Cart
-                          </Button>
-                          <Button className="flex-1" onClick={goToOffers}>
-                            Offers
-                          </Button>
-                        </div>
-                      </div>
+                      Cart
+                    </button>
+                    <button
+                      className="py-3 px-6 font-medium flex-1 text-center"
+                      onClick={goToOffers}
+                    >
+                      Offers
+                    </button>
+                  </div>
+                  <div className="p-4 text-center">
+                    <p className="mb-4">You have {getTotalItems()} item(s) in your cart</p>
+                    <div className="flex justify-between gap-2">
+                      <Button variant="outline" className="flex-1" onClick={goToCart}>
+                        View Cart
+                      </Button>
+                      <Button className="flex-1" onClick={goToOffers}>
+                        Offers
+                      </Button>
                     </div>
-                  </PopoverContent>
-                </Popover>
-                
-                {isLoggedIn ? (
-                  <Button 
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </Button>
-                ) : (
-                  <Button 
-                    variant={scrolled || isContactPage ? "outline" : "secondary"}
-                    size="sm" 
-                    className={scrolled || isContactPage ? "bg-white text-black border-gray-200 hover:bg-gray-100" : ""}
-                    onClick={handleLogin}
-                  >
-                    Log in
-                  </Button>
-                )}
-              </>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+            
+            {isLoggedIn ? (
+              <Button 
+                variant="destructive"
+                size="sm"
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            ) : (
+              <Button 
+                variant={scrolled ? "outline" : "secondary"}
+                size="sm" 
+                className={scrolled ? "bg-white text-black border-gray-200 hover:bg-gray-100" : ""}
+                onClick={handleLogin}
+              >
+                Log in
+              </Button>
             )}
             
             {/* Hamburger Menu Button - Visible only on mobile */}
             <Button
               variant="ghost"
               size="icon"
-              className={`md:hidden ${!scrolled && !isContactPage && 'text-white hover:bg-white/10'}`}
+              className={`md:hidden ${!scrolled && 'text-white hover:bg-white/10'}`}
               onClick={toggleMobileMenu}
             >
               <Menu size={24} />

@@ -1,14 +1,69 @@
 
+import { useState } from "react";
 import { Facebook, Linkedin, Instagram, Twitter, Youtube, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const Footer = () => {
+  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
+
   return (
     <footer className="bg-[#0c0027] text-white pt-8 pb-4">
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 mb-6 pt-4">
-          <Link to="/contact" className="text-sm hover:underline">Contact Us</Link>
+          {/* Open contact dialog when Contact Us is clicked */}
+          <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
+            <DialogTrigger asChild>
+              <button className="text-sm hover:underline">Contact Us</button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Navigation</DialogTitle>
+                <DialogDescription>
+                  Quick links to our main pages
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid grid-cols-2 gap-4 py-4">
+                <Link 
+                  to="/" 
+                  onClick={() => setIsContactDialogOpen(false)}
+                  className="flex items-center gap-2 hover:text-blue-500"
+                >
+                  Home
+                </Link>
+                <Link 
+                  to="/about" 
+                  onClick={() => setIsContactDialogOpen(false)}
+                  className="flex items-center gap-2 hover:text-blue-500"
+                >
+                  About Us
+                </Link>
+                <Link 
+                  to="/contact" 
+                  onClick={() => setIsContactDialogOpen(false)}
+                  className="flex items-center gap-2 hover:text-blue-500"
+                >
+                  Contact Us
+                </Link>
+                <Link 
+                  to="/ordering-guide" 
+                  onClick={() => setIsContactDialogOpen(false)}
+                  className="flex items-center gap-2 hover:text-blue-500"
+                >
+                  Support
+                </Link>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
           <Link to="/grading-scale" className="text-sm hover:underline">Grading Scale</Link>
           <Link to="/return-policy" className="text-sm hover:underline">Return Policy</Link>
           <Link to="/shipping-policy" className="text-sm hover:underline">Shipping Policy</Link>
