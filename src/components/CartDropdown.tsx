@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useNavigate } from 'react-router-dom';
 
 // Sample cart item type
 interface CartItem {
@@ -31,12 +32,23 @@ interface CartDropdownProps {
 const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState<'cart' | 'offers'>('cart');
   const [couponCode, setCouponCode] = useState('');
+  const navigate = useNavigate();
   
   // Mock data
   const cartItems: CartItem[] = [sampleCartItem];
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   
   if (!isOpen) return null;
+
+  const goToCart = () => {
+    onClose();
+    navigate('/cart');
+  };
+
+  const goToOffers = () => {
+    onClose();
+    navigate('/offers');
+  };
   
   return (
     <div className="fixed inset-0 z-50 flex justify-center" onClick={onClose}>
@@ -118,8 +130,8 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
                     Apply coupon
                   </Button>
                   <div className="ml-auto">
-                    <Button>
-                      Update cart
+                    <Button onClick={goToCart}>
+                      View Cart
                     </Button>
                   </div>
                 </div>
@@ -149,12 +161,19 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
                       <span>Total</span>
                       <span>{subtotal.toFixed(2)}$</span>
                     </div>
+                    
+                    <Button className="w-full" onClick={goToCart}>
+                      Proceed to Checkout
+                    </Button>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="p-6 text-center">
                 <p>No offers available at the moment.</p>
+                <Button className="mt-4" onClick={goToOffers}>
+                  View All Offers
+                </Button>
               </div>
             )}
           </CardContent>

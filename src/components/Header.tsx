@@ -13,6 +13,11 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -74,6 +79,10 @@ const Header = () => {
 
   const toggleCart = () => {
     setCartOpen(!cartOpen);
+  };
+
+  const goToCart = () => {
+    navigate('/cart');
   };
 
   // Check if we're on the contact page
@@ -308,17 +317,49 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             {isContactPage ? null : (
               <>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className={`relative ${!scrolled && !isContactPage && 'text-white hover:bg-white/10'}`}
-                  onClick={toggleCart}
-                >
-                  <ShoppingCart size={20} />
-                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    1
-                  </span>
-                </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className={`relative ${!scrolled && !isContactPage && 'text-white hover:bg-white/10'}`}
+                    >
+                      <ShoppingCart size={20} />
+                      <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        1
+                      </span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 border-none" align="end">
+                    <div className="min-w-[300px]">
+                      <div className="flex border-b">
+                        <button
+                          className="py-3 px-6 font-medium flex-1 text-center border-b-2 border-purple-600"
+                          onClick={goToCart}
+                        >
+                          Cart
+                        </button>
+                        <button
+                          className="py-3 px-6 font-medium flex-1 text-center"
+                          onClick={() => navigate('/offers')}
+                        >
+                          Offers
+                        </button>
+                      </div>
+                      <div className="p-4 text-center">
+                        <p className="mb-4">You have 1 item in your cart</p>
+                        <div className="flex justify-between gap-2">
+                          <Button variant="outline" className="flex-1" onClick={goToCart}>
+                            View Cart
+                          </Button>
+                          <Button className="flex-1" onClick={() => navigate('/checkout')}>
+                            Checkout
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 
                 {isLoggedIn ? (
                   <Button 
@@ -354,7 +395,7 @@ const Header = () => {
         </div>
       </header>
       
-      {/* Cart Dropdown */}
+      {/* Cart Dropdown - now only for the full view */}
       <CartDropdown isOpen={cartOpen} onClose={() => setCartOpen(false)} />
       
       {/* Mobile Menu */}
