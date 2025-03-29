@@ -5,6 +5,13 @@ import { ShoppingCart, Menu } from "lucide-react";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
 import { getCurrentUser, logoutUser } from '@/utils/localStorageUtils';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -106,16 +113,170 @@ const Header = () => {
             >
               About Us
             </Link>
-            <Link 
-              to="/shop-list" 
-              className={`px-4 py-2 font-medium transition-colors ${
-                isActive('/shop-list') 
-                  ? (scrolled || isContactPage ? 'text-red-600' : 'text-white bg-[#2a2158] rounded') 
-                  : (scrolled || isContactPage ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-gray-200')
-              }`}
-            >
-              Inventory
-            </Link>
+            
+            {/* Inventory Navigation Menu with Dropdown */}
+            <NavigationMenu className="p-0">
+              <NavigationMenuList className="space-x-0">
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger 
+                    className={`p-0 px-4 py-2 bg-transparent font-medium hover:bg-transparent ${
+                      isActive('/shop-list') 
+                        ? (scrolled || isContactPage ? 'text-red-600' : 'text-white bg-[#2a2158] rounded') 
+                        : (scrolled || isContactPage ? 'text-gray-700 hover:text-red-600' : 'text-white hover:text-gray-200')
+                    }`}
+                  >
+                    Inventory
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <div className="grid grid-cols-4 gap-0 min-w-[800px] p-4">
+                      {/* Used iPhones Column */}
+                      <div className="p-4">
+                        <h3 className="text-lg font-semibold mb-3">Used iPhones</h3>
+                        <ul className="space-y-2">
+                          <li>
+                            <Link to="/shop-list?category=iphone&model=16" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> iPhone 16/16 Plus/16 Pro/16 Pro Max
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=iphone&model=15" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> iPhone 15/15 Plus/15 Pro/15 Pro Max
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=iphone&model=14" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> iPhone 14/14 Plus/14 Pro/14 Pro Max
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=iphone&model=13" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> iPhone 13/13 Mini/13 Pro/13 Pro Max
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=iphone&model=12" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> iPhone 12/12 Mini/12 Pro/12 Pro Max
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=iphone&model=11" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> iPhone 11/11 Pro/11 Pro Max
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=iphone&model=X" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> iPhone X/XR/XS/XS Max
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=iphone&model=8" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> iPhone 8/8 Plus
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=iphone&model=europe" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Wholesale iPhone from Europe
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=ipad" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Used iPads
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                      
+                      {/* Samsung Phones Column */}
+                      <div className="p-4">
+                        <h3 className="text-lg font-semibold mb-3">Samsung Phones</h3>
+                        <ul className="space-y-2">
+                          <li>
+                            <Link to="/shop-list?category=samsung&model=s24" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Samsung Galaxy S24/S24+/S24 Ultra
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=samsung&model=s23" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Samsung Galaxy S23/S23+/S23 Ultra
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=samsung&model=s22" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Samsung Galaxy S22/S22+/S22 Ultra
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=samsung&model=s21" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Samsung Galaxy S21/S21+/S21 Ultra
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=samsung&model=s20" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Samsung Galaxy S20/S20+/S20 Ultra
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=samsung&model=s10" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Samsung Galaxy S10/S10+/S10e
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=samsung&model=s9" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Samsung Galaxy S9/S9+
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=samsung&model=s8" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Samsung Galaxy S8/S8+
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=samsung&model=note" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Samsung Galaxy Note 10/Note 10+
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                      
+                      {/* Cell Phone Accessories Column */}
+                      <div className="p-4">
+                        <h3 className="text-lg font-semibold mb-3">Cell Phone Accessories</h3>
+                        <ul className="space-y-2">
+                          <li>
+                            <Link to="/shop-list?category=accessories&type=iphone-parts" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> iPhone Parts
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=accessories&type=samsung-parts" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Samsung Parts
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                      
+                      {/* Services Column */}
+                      <div className="p-4">
+                        <h3 className="text-lg font-semibold mb-3">Service</h3>
+                        <ul className="space-y-2">
+                          <li>
+                            <Link to="/shop-list?category=service&type=repair" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Cell Phone Repairing
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="/shop-list?category=service&type=recycling" className="text-sm hover:text-red-600 flex items-center">
+                              <span className="text-red-600 mr-2">►</span> Cell Phone Recycling
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+            
             <Link 
               to="/ordering-guide" 
               className={`px-4 py-2 font-medium transition-colors ${
