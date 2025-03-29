@@ -1,44 +1,41 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 interface Offer {
   id: string;
-  title: string;
-  description: string;
-  discount: string;
-  expiryDate: string;
-  code: string;
+  product: string;
+  offeredPrice: string;
+  offeredQuantity: number;
+  status: "pending" | "accepted" | "rejected";
 }
 
 // Sample offers data
 const sampleOffers: Offer[] = [
   {
     id: '1',
-    title: 'Summer Sale',
-    description: 'Get 15% off on all iPhone models',
-    discount: '15% off',
-    expiryDate: '2023-08-31',
-    code: 'SUMMER15'
+    product: 'Unlocked iPhone 15 Pro 256GB Mix Color (e-sim) (A+/A Grade)',
+    offeredPrice: '$6.00',
+    offeredQuantity: 1,
+    status: 'pending'
   },
   {
     id: '2',
-    title: 'Back to School',
-    description: 'Buy a phone, get a case free',
-    discount: 'Free case',
-    expiryDate: '2023-09-15',
-    code: 'SCHOOL23'
+    product: 'iPhone 14 Pro Max 128GB Unlocked (A Grade)',
+    offeredPrice: '$550.00',
+    offeredQuantity: 2,
+    status: 'accepted'
   },
   {
     id: '3',
-    title: 'Bulk Purchase Discount',
-    description: 'Buy 10 or more phones and get 20% off',
-    discount: '20% off',
-    expiryDate: '2023-12-31',
-    code: 'BULK20'
+    product: 'Samsung Galaxy S22 Ultra 256GB (B+ Grade)',
+    offeredPrice: '$320.00',
+    offeredQuantity: 3,
+    status: 'rejected'
   }
 ];
 
@@ -46,42 +43,81 @@ const OffersPage = () => {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-20">
-        <h1 className="text-3xl font-bold mb-10 mt-10">Special Offers</h1>
+      <div className="container mx-auto px-4 py-8">
+        {/* Tab navigation */}
+        <div className="flex mb-8 border-b">
+          <Link 
+            to="/cart" 
+            className="py-3 px-6 text-gray-600 hover:text-gray-800"
+          >
+            Cart
+          </Link>
+          <Link 
+            to="/offers" 
+            className="py-3 px-6 text-purple-600 font-medium border-b-2 border-purple-600"
+          >
+            Offers
+          </Link>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sampleOffers.length > 0 ? (
-            sampleOffers.map((offer) => (
-              <Card key={offer.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle>{offer.title}</CardTitle>
-                  <CardDescription>{offer.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="font-medium">Discount:</span>
-                      <span className="text-green-600 font-bold">{offer.discount}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Code:</span>
-                      <span className="bg-gray-100 px-2 py-1 rounded">{offer.code}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium">Expires:</span>
-                      <span>{new Date(offer.expiryDate).toLocaleDateString()}</span>
-                    </div>
-                    <Button className="w-full mt-4">Apply to Cart</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <h3 className="text-xl font-semibold mb-2">No offers available</h3>
-              <p className="text-gray-500">Check back later for new discounts and promotions.</p>
-            </div>
-          )}
+        <h1 className="text-3xl font-bold text-[#1a0050] mb-8">Your Offers</h1>
+        
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50">
+              <TableHead className="font-semibold text-gray-700">Product</TableHead>
+              <TableHead className="font-semibold text-gray-700 text-right">Offered Price</TableHead>
+              <TableHead className="font-semibold text-gray-700 text-center">Offered Quantity</TableHead>
+              <TableHead className="font-semibold text-gray-700 text-center">Offer Status</TableHead>
+              <TableHead className="font-semibold text-gray-700 text-center">Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sampleOffers.length > 0 ? (
+              sampleOffers.map((offer) => (
+                <TableRow key={offer.id} className="border-t border-b hover:bg-gray-50">
+                  <TableCell className="font-medium py-4">{offer.product}</TableCell>
+                  <TableCell className="text-right">{offer.offeredPrice}</TableCell>
+                  <TableCell className="text-center">{offer.offeredQuantity}</TableCell>
+                  <TableCell className="text-center">
+                    <span 
+                      className={`inline-block py-1 px-3 rounded-full text-sm font-medium ${
+                        offer.status === 'pending' ? 'bg-amber-100 text-amber-800' : 
+                        offer.status === 'accepted' ? 'bg-green-100 text-green-800' : 
+                        'bg-red-100 text-red-800'
+                      }`}
+                    >
+                      {offer.status}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Button 
+                      variant="destructive"
+                      size="sm"
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      Remove
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-8">
+                  <p className="text-gray-500 text-lg">You haven't made any offers yet.</p>
+                  <Link to="/shop-list">
+                    <Button className="mt-4">Browse Products</Button>
+                  </Link>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        
+        {/* Currency selector */}
+        <div className="fixed right-0 top-32 bg-white shadow-lg rounded-l-md overflow-hidden">
+          <div className="bg-[#1a5089] text-white p-3 font-medium">USD $</div>
+          <div className="bg-[#1a0050] text-white p-3 font-medium">EUR €</div>
         </div>
       </div>
       <Footer />
