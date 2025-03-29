@@ -17,6 +17,7 @@ import Account from "./pages/Account";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import ContactPage from "./pages/ContactPage";
+import AboutPage from "./pages/AboutPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const AnimatedRoutes = () => {
           <Route path="/pre-register" element={<PreRegister />} />
           <Route path="/videos" element={<Videos />} />
           <Route path="/ordering-guide" element={<OrderingGuide />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/account" element={<Account />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
