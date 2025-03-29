@@ -12,10 +12,17 @@ interface StockItemCardProps {
 
 const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
   const [buyDialogOpen, setBuyDialogOpen] = useState(false);
+  const [offerDialogOpen, setOfferDialogOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [offerQuantity, setOfferQuantity] = useState(1);
+  const [offerPrice, setOfferPrice] = useState('');
 
   const handleBuyClick = () => {
     setBuyDialogOpen(true);
+  };
+
+  const handleOfferClick = () => {
+    setOfferDialogOpen(true);
   };
 
   const handleBuy = () => {
@@ -25,6 +32,16 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
       description: `You have purchased ${quantity} x ${item.name}`,
     });
     setBuyDialogOpen(false);
+  };
+
+  const handleOffer = () => {
+    // Here you would implement the actual offer logic
+    toast({
+      title: "Offer submitted",
+      description: `Your offer for ${offerQuantity} x ${item.name} at $${offerPrice} has been added to cart`,
+    });
+    setOfferDialogOpen(false);
+    setOfferPrice('');
   };
 
   return (
@@ -62,7 +79,13 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
               >
                 Buy
               </Button>
-              <Button variant="outline" className="bg-gray-100">Offer</Button>
+              <Button 
+                variant="outline" 
+                className="bg-gray-100"
+                onClick={handleOfferClick}
+              >
+                Offer
+              </Button>
             </div>
             
             <p className="text-sm text-right self-end">{item.location}</p>
@@ -122,6 +145,81 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
               <Button 
                 variant="outline" 
                 onClick={() => setBuyDialogOpen(false)}
+                className="w-full border-2 border-gray-300 text-black font-medium py-3"
+              >
+                CANCEL
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Offer Dialog */}
+      <Dialog open={offerDialogOpen} onOpenChange={setOfferDialogOpen}>
+        <DialogContent className="bg-white p-6 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-[#1a0050] mb-3">Make an offer</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-[#1a0050]">
+              {item.name}
+            </h2>
+            
+            <p className="text-lg font-semibold">
+              GSM Unlocked
+            </p>
+            
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <p className="text-gray-600">Available Quantity</p>
+                <p className="text-lg font-medium">{item.quantity}</p>
+              </div>
+              <div>
+                <p className="text-gray-600">List Price</p>
+                <p className="text-lg font-medium">${item.price.toFixed(2)}</p>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="offerQuantity" className="block text-gray-700 font-medium">
+                Offer Quantity:
+              </label>
+              <Input
+                id="offerQuantity"
+                type="number"
+                min="1"
+                max={item.quantity}
+                value={offerQuantity}
+                onChange={(e) => setOfferQuantity(Number(e.target.value))}
+                className="w-full p-3 border rounded-md"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="offerPrice" className="block text-gray-700 font-medium">
+                Offer Price:
+              </label>
+              <Input
+                id="offerPrice"
+                type="text"
+                placeholder="Offer price"
+                value={offerPrice}
+                onChange={(e) => setOfferPrice(e.target.value)}
+                className="w-full p-3 border rounded-md"
+              />
+            </div>
+            
+            <div className="flex flex-col space-y-3 pt-4">
+              <Button 
+                onClick={handleOffer}
+                className="w-full bg-[#8B5CF6] hover:bg-[#7c4ef3] text-white font-medium py-3"
+              >
+                ADD OFFER TO CART
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setOfferDialogOpen(false)}
                 className="w-full border-2 border-gray-300 text-black font-medium py-3"
               >
                 CANCEL
