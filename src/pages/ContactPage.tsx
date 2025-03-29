@@ -2,7 +2,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
 
 const ContactPage = () => {
   return (
@@ -10,17 +10,14 @@ const ContactPage = () => {
       <Header />
       
       {/* Hero Section with Background */}
-      <div className="relative bg-[#0c0027] pt-24 pb-16">
-        <div className="absolute inset-0 overflow-hidden opacity-30">
-          <div className="bg-[url('/lovable-uploads/391c0f05-6d37-4158-9461-c1682ffa41f7.png')] bg-cover bg-center h-full w-full"></div>
+      <div className="relative bg-[#002147] pt-24 pb-16">
+        <div className="absolute inset-0 overflow-hidden opacity-40">
+          <div className="bg-[url('/lovable-uploads/5638b9bf-b3f9-4e48-8583-c302a6bc5bb1.png')] bg-cover bg-center h-full w-full"></div>
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-5xl md:text-7xl font-bold text-white text-center mt-16 mb-8">
+          <h1 className="text-6xl md:text-8xl font-bold text-white text-center mt-16 mb-8 opacity-30">
             CONTACT US
           </h1>
-          <p className="text-xl text-white text-center mb-8 max-w-3xl mx-auto">
-            Our team is ready to answer your questions and help with your needs
-          </p>
         </div>
       </div>
       
@@ -28,7 +25,7 @@ const ContactPage = () => {
       <div className="py-12">
         <div className="container mx-auto px-4">
           {/* Red Contact Card */}
-          <div className="bg-red-600 text-white rounded-lg shadow-xl p-8 md:p-12 mb-16 relative overflow-hidden">
+          <div className="bg-red-600 text-white rounded-lg shadow-xl p-8 md:p-12 mb-16 relative overflow-hidden -mt-24">
             <h2 className="text-3xl font-bold mb-6">Contact With Us</h2>
             <p className="text-xl mb-10">We will give you the help you need</p>
             
@@ -62,8 +59,15 @@ const ContactPage = () => {
             {/* We are here badge */}
             <div className="absolute top-10 right-10">
               <div className="text-white text-center">
-                <div className="text-xl font-script mb-1">We are</div>
+                <div className="italic text-xl mb-1">We are</div>
                 <div className="text-2xl font-bold">here!</div>
+              </div>
+            </div>
+            
+            {/* Chat Icon */}
+            <div className="absolute bottom-10 right-10">
+              <div className="bg-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg">
+                <MessageCircle className="text-red-600" size={28} />
               </div>
             </div>
           </div>
