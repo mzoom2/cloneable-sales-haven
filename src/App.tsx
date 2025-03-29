@@ -16,6 +16,7 @@ import OrderingGuide from "./pages/OrderingGuide";
 import Account from "./pages/Account";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const AnimatedRoutes = () => {
           <Route path="/account" element={<Account />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </motion.div>
