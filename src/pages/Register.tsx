@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -71,7 +72,7 @@ const Register = () => {
     // Save user data to local storage
     saveUser({
       ...data,
-      userName: data.businessName, // Keep username field for compatibility
+      // Remove the userName field as it's not in the User type
     });
     
     // Set as current logged in user
