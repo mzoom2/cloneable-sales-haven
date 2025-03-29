@@ -18,6 +18,9 @@ const ContactPage = () => {
           <h1 className="text-5xl md:text-7xl font-bold text-white text-center mt-16 mb-8">
             CONTACT US
           </h1>
+          <p className="text-xl text-white text-center mb-8 max-w-3xl mx-auto">
+            Our team is ready to answer your questions and help with your needs
+          </p>
         </div>
       </div>
       
