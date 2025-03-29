@@ -6,7 +6,7 @@ export interface Offer {
   product: string;
   offeredPrice: string;
   offeredQuantity: number;
-  productId: string;
+  productId: string; // This is defined as string in the interface
   status: "pending" | "accepted" | "rejected";
   createdAt: Date;
 }
@@ -30,7 +30,7 @@ export const addOffer = (stockItem: StockItem, quantity: number, price: string):
   const newOffer: Offer = {
     id: generateId(),
     product: stockItem.name,
-    productId: stockItem.id,
+    productId: stockItem.id.toString(), // Convert number to string to match the interface
     offeredPrice: price,
     offeredQuantity: quantity,
     status: "pending",
