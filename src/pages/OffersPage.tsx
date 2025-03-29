@@ -1,45 +1,31 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-
-interface Offer {
-  id: string;
-  product: string;
-  offeredPrice: string;
-  offeredQuantity: number;
-  status: "pending" | "accepted" | "rejected";
-}
-
-// Sample offers data
-const sampleOffers: Offer[] = [
-  {
-    id: '1',
-    product: 'Unlocked iPhone 15 Pro 256GB Mix Color (e-sim) (A+/A Grade)',
-    offeredPrice: '$6.00',
-    offeredQuantity: 1,
-    status: 'pending'
-  },
-  {
-    id: '2',
-    product: 'iPhone 14 Pro Max 128GB Unlocked (A Grade)',
-    offeredPrice: '$550.00',
-    offeredQuantity: 2,
-    status: 'accepted'
-  },
-  {
-    id: '3',
-    product: 'Samsung Galaxy S22 Ultra 256GB (B+ Grade)',
-    offeredPrice: '$320.00',
-    offeredQuantity: 3,
-    status: 'rejected'
-  }
-];
+import { getOffers, removeOffer, Offer } from '@/services/OfferService';
+import { toast } from '@/hooks/use-toast';
 
 const OffersPage = () => {
+  const [offers, setOffers] = useState<Offer[]>([]);
+
+  useEffect(() => {
+    // Load offers from localStorage
+    const userOffers = getOffers();
+    setOffers(userOffers);
+  }, []);
+
+  const handleRemoveOffer = (offerId: string) => {
+    removeOffer(offerId);
+    setOffers(offers.filter(offer => offer.id !== offerId));
+    toast({
+      title: "Offer removed",
+      description: "Your offer has been removed successfully"
+    });
+  };
+
   return (
     <>
       <Header />
@@ -73,11 +59,11 @@ const OffersPage = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sampleOffers.length > 0 ? (
-              sampleOffers.map((offer) => (
+            {offers.length > 0 ? (
+              offers.map((offer) => (
                 <TableRow key={offer.id} className="border-t border-b hover:bg-gray-50">
                   <TableCell className="font-medium py-4">{offer.product}</TableCell>
-                  <TableCell className="text-right">{offer.offeredPrice}</TableCell>
+                  <TableCell className="text-right">${offer.offeredPrice}</TableCell>
                   <TableCell className="text-center">{offer.offeredQuantity}</TableCell>
                   <TableCell className="text-center">
                     <span 
@@ -95,6 +81,7 @@ const OffersPage = () => {
                       variant="destructive"
                       size="sm"
                       className="bg-red-600 hover:bg-red-700 text-white"
+                      onClick={() => handleRemoveOffer(offer.id)}
                     >
                       Remove
                     </Button>

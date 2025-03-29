@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { StockItem } from '@/data/stockItems';
 import { toast } from '@/hooks/use-toast';
 import { useCart } from '@/contexts/CartContext';
+import { addOffer } from '@/services/OfferService';
 
 interface StockItemCardProps {
   item: StockItem;
@@ -37,12 +38,23 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
   };
 
   const handleOffer = () => {
-    // For now, we'll just add the item to cart at the offered price
-    // In a real application, this would likely involve a different flow
+    if (!offerPrice || parseFloat(offerPrice) <= 0) {
+      toast({
+        title: "Invalid price",
+        description: "Please enter a valid price for your offer",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Add the offer to localStorage
+    addOffer(item, offerQuantity, offerPrice);
+
     toast({
       title: "Offer submitted",
-      description: `Your offer for ${offerQuantity} x ${item.name} at $${offerPrice} has been added to cart`,
+      description: `Your offer for ${offerQuantity} x ${item.name} at $${offerPrice} has been submitted`,
     });
+    
     setOfferDialogOpen(false);
     setOfferPrice('');
     setOfferQuantity(1);
