@@ -22,7 +22,7 @@ const Account = () => {
   };
   
   const handleRegister = () => {
-    navigate('/register');
+    navigate('/pre-register');
   };
   
   return (
