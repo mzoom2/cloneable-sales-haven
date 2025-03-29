@@ -19,7 +19,7 @@ const CartPage = () => {
   const shipping = cartItems.length > 0 ? 25 : 0; // Fixed shipping for now
   const total = subtotal + shipping;
   
-  const handleRemoveItem = (itemId: string) => {
+  const handleRemoveItem = (itemId: number) => {
     removeFromCart(itemId);
     toast({
       title: "Item removed",
@@ -27,7 +27,7 @@ const CartPage = () => {
     });
   };
 
-  const handleDecreaseQuantity = (itemId: string, currentQuantity: number) => {
+  const handleDecreaseQuantity = (itemId: number, currentQuantity: number) => {
     if (currentQuantity > 1) {
       updateQuantity(itemId, currentQuantity - 1);
     } else {
@@ -35,7 +35,7 @@ const CartPage = () => {
     }
   };
 
-  const handleIncreaseQuantity = (itemId: string, currentQuantity: number, maxQuantity: number) => {
+  const handleIncreaseQuantity = (itemId: number, currentQuantity: number, maxQuantity: number) => {
     if (currentQuantity < maxQuantity) {
       updateQuantity(itemId, currentQuantity + 1);
     } else {
