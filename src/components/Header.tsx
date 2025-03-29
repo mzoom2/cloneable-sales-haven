@@ -5,6 +5,7 @@ import { ShoppingCart, Menu } from "lucide-react";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
 import { getCurrentUser, logoutUser } from '@/utils/localStorageUtils';
+import CartDropdown from './CartDropdown';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -17,6 +18,7 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -68,6 +70,10 @@ const Header = () => {
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const toggleCart = () => {
+    setCartOpen(!cartOpen);
   };
 
   // Check if we're on the contact page
@@ -306,10 +312,11 @@ const Header = () => {
                   variant="ghost" 
                   size="icon"
                   className={`relative ${!scrolled && !isContactPage && 'text-white hover:bg-white/10'}`}
+                  onClick={toggleCart}
                 >
                   <ShoppingCart size={20} />
                   <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    368
+                    1
                   </span>
                 </Button>
                 
@@ -346,6 +353,9 @@ const Header = () => {
           </div>
         </div>
       </header>
+      
+      {/* Cart Dropdown */}
+      <CartDropdown isOpen={cartOpen} onClose={() => setCartOpen(false)} />
       
       {/* Mobile Menu */}
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
