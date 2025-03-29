@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Eye } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,13 +19,19 @@ import { useToast } from "@/components/ui/use-toast";
 const formSchema = z.object({
   firstName: z.string().min(2, 'First name is required'),
   lastName: z.string().min(2, 'Last name is required'),
-  userName: z.string().min(2, 'Username is required'),
+  businessName: z.string().min(2, 'Business name is required'),
   email: z.string().email('Invalid email address'),
+  phoneNumber: z.string().min(6, 'Phone number is required'),
+  whatsappNumber: z.string().optional(),
+  country: z.string().min(2, 'Country is required'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string(),
-  agreeTerms: z.boolean().refine(val => val === true, {
-    message: 'You must agree to the terms and conditions',
-  }),
+  salesRep: z.enum(['Jared', 'Ben', 'No / Cannot Remember']),
+  customsClearance: z.enum([
+    'Yes, I am able to handle customs clearance.',
+    'No, I need you to handle customs clearance and I am willing to pay a little extra.'
+  ]),
+  buyingInterest: z.string().min(2, 'Please tell us what you are interested in buying'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -36,44 +43,39 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+  
+  // Get the user type from location state
+  const userType = location.state?.userType || 'personal';
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
-      userName: "",
+      businessName: "",
       email: "",
+      phoneNumber: "",
+      whatsappNumber: "",
+      country: "",
       password: "",
       confirmPassword: "",
-      agreeTerms: false,
+      salesRep: "No / Cannot Remember",
+      customsClearance: "Yes, I am able to handle customs clearance.",
+      buyingInterest: "",
     },
   });
   
   const onSubmit = (data: FormValues) => {
-    console.log(data);
-    
     // Save user data to local storage
-    // Omit confirmPassword and agreeTerms as they're not needed for storage
-    const { confirmPassword, agreeTerms, ...userData } = data;
-    
-    // Save user with required fields
     saveUser({
-      ...userData,
-      email: userData.email,
-      password: userData.password,
-      // Add default values for required fields in User interface
-      businessName: userData.userName,
-      phoneNumber: "",
-      country: "",
-      salesRep: "No / Cannot Remember",
-      customsClearance: "Yes, I am able to handle customs clearance.",
-      buyingInterest: "",
+      ...data,
+      userName: data.businessName, // Keep username field for compatibility
     });
     
     // Set as current logged in user
-    setCurrentUser(userData.email);
+    setCurrentUser(data.email);
     
     // Show success message
     toast({
@@ -86,6 +88,10 @@ const Register = () => {
     navigate("/dashboard");
   };
   
+  const handlePrevious = () => {
+    navigate('/pre-register');
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -95,6 +101,8 @@ const Register = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Link to="/" className="hover:text-primary">Home</Link>
+            <span>•</span>
+            <Link to="/pre-register" className="hover:text-primary">Pre-Registration</Link>
             <span>•</span>
             <span className="font-medium text-gray-800">Register</span>
           </div>
@@ -114,57 +122,67 @@ const Register = () => {
       </div>
       
       {/* Main content */}
-      <div className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
-        <div className="w-full max-w-md bg-white rounded-lg shadow-sm p-8 border border-gray-100">
+      <div className="flex-grow container mx-auto px-4 py-8">
+        <div className="w-full max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-8 border border-gray-100">
+          <h1 className="text-2xl font-bold text-center text-[#1a0050] mb-8">
+            Register an Account
+          </h1>
+          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">First Name</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="First Name" 
-                        className="border border-gray-300" 
-                        {...field} 
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              {/* Personal Information */}
+              <div className="grid md:grid-cols-2 gap-5">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">First Name *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="First Name" 
+                          className="border border-gray-300" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">Last Name *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Last Name" 
+                          className="border border-gray-300" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               
               <FormField
                 control={form.control}
-                name="lastName"
+                name="businessName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-600">Last Name</FormLabel>
+                    <FormLabel className="text-gray-600">Business Name *</FormLabel>
                     <FormControl>
                       <Input 
-                        placeholder="Last Name" 
+                        placeholder="Business Name" 
                         className="border border-gray-300" 
                         {...field} 
                       />
                     </FormControl>
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="userName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">User Name</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="User Name" 
-                        className="border border-gray-300" 
-                        {...field} 
-                      />
-                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -174,104 +192,232 @@ const Register = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-600">E-Mail</FormLabel>
+                    <FormLabel className="text-gray-600">Email *</FormLabel>
                     <FormControl>
                       <Input 
                         type="email" 
-                        placeholder="E-Mail" 
+                        placeholder="E.g. john@doe.com" 
                         className="border border-gray-300" 
                         {...field} 
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
               
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">Password</FormLabel>
-                    <div className="relative">
+              <div className="grid md:grid-cols-2 gap-5">
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">Phone Number *</FormLabel>
                       <FormControl>
                         <Input 
-                          type={showPassword ? "text" : "password"} 
-                          placeholder="Password" 
-                          className="border border-gray-300 pr-10" 
+                          placeholder="E.g. +1 300 400 5000" 
+                          className="border border-gray-300" 
                           {...field} 
                         />
                       </FormControl>
-                      <button 
-                        type="button"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        <Eye size={18} />
-                      </button>
-                    </div>
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">Password confirmation</FormLabel>
-                    <div className="relative">
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="whatsappNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">WhatsApp Number</FormLabel>
                       <FormControl>
                         <Input 
-                          type={showConfirmPassword ? "text" : "password"} 
-                          placeholder="Password Confirmation" 
-                          className="border border-gray-300 pr-10" 
+                          placeholder="E.g. +1 300 400 5000" 
+                          className="border border-gray-300" 
                           {...field} 
                         />
                       </FormControl>
-                      <button 
-                        type="button"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      >
-                        <Eye size={18} />
-                      </button>
-                    </div>
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               
               <FormField
                 control={form.control}
-                name="agreeTerms"
+                name="country"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 py-2">
+                  <FormItem>
+                    <FormLabel className="text-gray-600">Country *</FormLabel>
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
+                      <Input 
+                        placeholder="Country" 
+                        className="border border-gray-300" 
+                        {...field} 
                       />
                     </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel className="text-sm font-normal">
-                        By signing up, I agree with the website's <Link to="/terms" className="text-blue-600 hover:underline">Terms and Conditions</Link>
-                      </FormLabel>
-                    </div>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
               
-              <Button 
-                type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-base py-5"
-              >
-                Register
-              </Button>
+              {/* Password Information */}
+              <div className="grid md:grid-cols-2 gap-5">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">Password *</FormLabel>
+                      <div className="relative">
+                        <FormControl>
+                          <Input 
+                            type={showPassword ? "text" : "password"} 
+                            placeholder="Enter your password" 
+                            className="border border-gray-300 pr-10" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <button 
+                          type="button"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          <Eye size={18} />
+                        </button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">Confirm Password *</FormLabel>
+                      <div className="relative">
+                        <FormControl>
+                          <Input 
+                            type={showConfirmPassword ? "text" : "password"} 
+                            placeholder="Confirm password" 
+                            className="border border-gray-300 pr-10" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <button 
+                          type="button"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                          <Eye size={18} />
+                        </button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               
-              <div className="text-center mt-4">
-                <p className="text-gray-600">
-                  Already have an account? <Link to="/login" className="text-blue-600 hover:underline">Log in here</Link>
-                </p>
+              {/* Sales Representative */}
+              <FormField
+                control={form.control}
+                name="salesRep"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-gray-600">Have you spoken to a sales representative? *</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="space-y-3"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Jared" id="salesRep-jared" />
+                          <Label htmlFor="salesRep-jared">Jared</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Ben" id="salesRep-ben" />
+                          <Label htmlFor="salesRep-ben">Ben</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="No / Cannot Remember" id="salesRep-none" />
+                          <Label htmlFor="salesRep-none">No / Cannot Remember</Label>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {/* Customs Clearance */}
+              <FormField
+                control={form.control}
+                name="customsClearance"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-gray-600">
+                      Do you have the ability to do customs clearance? (After the arrival of the goods in the country of destination, the customs clearance in the importing country needs to be completed by the buyer, e.g. import permit, documents required by customs and etc., including all customs duties and taxes) *
+                    </FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="space-y-3"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Yes, I am able to handle customs clearance." id="customs-yes" />
+                          <Label htmlFor="customs-yes">Yes, I am able to handle customs clearance.</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="No, I need you to handle customs clearance and I am willing to pay a little extra." id="customs-no" />
+                          <Label htmlFor="customs-no">No, I need you to handle customs clearance and I am willing to pay a little extra.</Label>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {/* Buying Interest */}
+              <FormField
+                control={form.control}
+                name="buyingInterest"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-600">What are you interested in buying from us? and how many pcs do you need? *</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        className="min-h-[100px] border border-gray-300" 
+                        placeholder="Tell us about your buying interests..." 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {/* Form Navigation */}
+              <div className="flex justify-between pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={handlePrevious}
+                >
+                  Previous
+                </Button>
+                
+                <Button 
+                  type="submit" 
+                  className="bg-blue-600 hover:bg-blue-700 px-8"
+                >
+                  Register
+                </Button>
               </div>
             </form>
           </Form>
