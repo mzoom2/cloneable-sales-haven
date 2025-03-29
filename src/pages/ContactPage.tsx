@@ -12,7 +12,7 @@ const ContactPage = () => {
       {/* Hero Section with Background */}
       <div className="relative bg-[#0c0027] pt-24 pb-16">
         <div className="absolute inset-0 overflow-hidden opacity-30">
-          <div className="bg-[url('/lovable-uploads/8f85d920-b883-43f4-a401-252afb6bc570.png')] bg-cover bg-center h-full w-full"></div>
+          <div className="bg-[url('/lovable-uploads/391c0f05-6d37-4158-9461-c1682ffa41f7.png')] bg-cover bg-center h-full w-full"></div>
         </div>
         <div className="container mx-auto px-4 relative z-10">
           <h1 className="text-5xl md:text-7xl font-bold text-white text-center mt-16 mb-8">
