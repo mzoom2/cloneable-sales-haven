@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,45 +7,45 @@ import { AlertCircle, X } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-
-// Sample cart item type
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
-
-// Sample cart data - in a real app this would come from state or context
-const sampleCartItems: CartItem[] = [
-  {
-    id: '1',
-    name: 'Unlocked iPhone 15 Pro 256GB Mix Color (e-sim) (A+/A Grade)',
-    price: 697.20,
-    quantity: 1,
-    image: '/placeholder.svg'
-  },
-  {
-    id: '2',
-    name: 'Unlocked Samsung Galaxy S23 Ultra 512GB (e-sim) (A Grade)',
-    price: 849.99,
-    quantity: 2,
-    image: '/placeholder.svg'
-  }
-];
+import { useCart } from '@/contexts/CartContext';
+import { toast } from '@/hooks/use-toast';
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const [couponCode, setCouponCode] = React.useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const { cartItems, removeFromCart, updateQuantity, getTotalPrice } = useCart();
   
-  const subtotal = sampleCartItems.reduce(
-    (sum, item) => sum + (item.price * item.quantity), 
-    0
-  );
-  
-  const shipping = 25; // Fixed shipping for now
+  const subtotal = getTotalPrice();
+  const shipping = cartItems.length > 0 ? 25 : 0; // Fixed shipping for now
   const total = subtotal + shipping;
+  
+  const handleRemoveItem = (itemId: string) => {
+    removeFromCart(itemId);
+    toast({
+      title: "Item removed",
+      description: "The item has been removed from your cart"
+    });
+  };
+
+  const handleDecreaseQuantity = (itemId: string, currentQuantity: number) => {
+    if (currentQuantity > 1) {
+      updateQuantity(itemId, currentQuantity - 1);
+    } else {
+      handleRemoveItem(itemId);
+    }
+  };
+
+  const handleIncreaseQuantity = (itemId: string, currentQuantity: number, maxQuantity: number) => {
+    if (currentQuantity < maxQuantity) {
+      updateQuantity(itemId, currentQuantity + 1);
+    } else {
+      toast({
+        title: "Maximum quantity reached",
+        description: "You cannot add more of this item",
+        variant: "destructive"
+      });
+    }
+  };
   
   return (
     <>
@@ -76,105 +76,126 @@ const CartPage = () => {
                 </div>
                 
                 {/* Cart items */}
-                {sampleCartItems.map((item) => (
-                  <div key={item.id} className="grid grid-cols-6 gap-4 p-4 border-b items-center">
-                    <div className="col-span-1">
-                      <div className="w-16 h-16 bg-gray-200 flex items-center justify-center">
-                        <img src={item.image} alt={item.name} className="max-w-full max-h-full" />
+                {cartItems.length > 0 ? (
+                  cartItems.map((item) => (
+                    <div key={item.id} className="grid grid-cols-6 gap-4 p-4 border-b items-center">
+                      <div className="col-span-1">
+                        <div className="w-16 h-16 bg-gray-200 flex items-center justify-center">
+                          <img src="/placeholder.svg" alt={item.name} className="max-w-full max-h-full" />
+                        </div>
+                      </div>
+                      <div className="col-span-2 font-medium">{item.name}</div>
+                      <div className="col-span-1 text-center">{item.price.toFixed(2)}$</div>
+                      <div className="col-span-1 text-center">
+                        <div className="flex items-center justify-center">
+                          <Button 
+                            variant="outline" 
+                            size="icon" 
+                            className="h-8 w-8 rounded-r-none"
+                            onClick={() => handleDecreaseQuantity(item.id, item.quantity)}
+                          >
+                            -
+                          </Button>
+                          <Input 
+                            type="number" 
+                            className="h-8 w-12 rounded-none text-center" 
+                            value={item.quantity}
+                            readOnly
+                          />
+                          <Button 
+                            variant="outline" 
+                            size="icon" 
+                            className="h-8 w-8 rounded-l-none"
+                            onClick={() => handleIncreaseQuantity(item.id, item.quantity, item.quantity + 10)}
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="col-span-1 text-right flex justify-end items-center">
+                        <span className="mr-2">{(item.price * item.quantity).toFixed(2)}$</span>
+                        <button 
+                          className="text-gray-400 hover:text-red-500"
+                          onClick={() => handleRemoveItem(item.id)}
+                        >
+                          <X size={18} />
+                        </button>
                       </div>
                     </div>
-                    <div className="col-span-2 font-medium">{item.name}</div>
-                    <div className="col-span-1 text-center">{item.price.toFixed(2)}$</div>
-                    <div className="col-span-1 text-center">
-                      <div className="flex items-center justify-center">
-                        <Button 
-                          variant="outline" 
-                          size="icon" 
-                          className="h-8 w-8 rounded-r-none"
-                        >
-                          -
-                        </Button>
-                        <Input 
-                          type="number" 
-                          className="h-8 w-12 rounded-none text-center" 
-                          value={item.quantity}
-                          readOnly
-                        />
-                        <Button 
-                          variant="outline" 
-                          size="icon" 
-                          className="h-8 w-8 rounded-l-none"
-                        >
-                          +
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="col-span-1 text-right flex justify-end items-center">
-                      <span className="mr-2">{(item.price * item.quantity).toFixed(2)}$</span>
-                      <button className="text-gray-400 hover:text-red-500">
-                        <X size={18} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                
-                {/* Coupon section */}
-                <div className="p-4 border-b flex items-center gap-4 flex-wrap">
-                  <div className="font-medium">Coupon:</div>
-                  <div className="flex-1 max-w-xs">
-                    <Input 
-                      placeholder="Coupon code" 
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                    />
-                  </div>
-                  <Button variant="outline" className="text-purple-600">
-                    Apply coupon
-                  </Button>
-                  <div className="ml-auto">
-                    <Button>
-                      Update cart
+                  ))
+                ) : (
+                  <div className="p-8 text-center">
+                    <p className="text-gray-500 mb-4">Your cart is empty</p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => navigate('/shop-list')}
+                    >
+                      Continue Shopping
                     </Button>
                   </div>
-                </div>
+                )}
+                
+                {/* Coupon section */}
+                {cartItems.length > 0 && (
+                  <div className="p-4 border-b flex items-center gap-4 flex-wrap">
+                    <div className="font-medium">Coupon:</div>
+                    <div className="flex-1 max-w-xs">
+                      <Input 
+                        placeholder="Coupon code" 
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                      />
+                    </div>
+                    <Button variant="outline" className="text-purple-600">
+                      Apply coupon
+                    </Button>
+                    <div className="ml-auto">
+                      <Button>
+                        Update cart
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
           
-          <div className="lg:col-span-1">
-            <Card>
-              <CardHeader className="border-b p-4">
-                <CardTitle className="text-xl">Cart Totals</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex justify-between py-2 border-b">
-                    <span>Subtotal</span>
-                    <span>{subtotal.toFixed(2)}$</span>
-                  </div>
-                  
-                  <div className="flex justify-between py-2 border-b">
-                    <span>Shipping</span>
-                    <div className="text-right">
-                      <p className="text-sm">Flat rate: {shipping.toFixed(2)}$</p>
-                      <Button variant="link" className="text-sm p-0 h-auto text-blue-600">
-                        Calculate shipping
-                      </Button>
+          {cartItems.length > 0 && (
+            <div className="lg:col-span-1">
+              <Card>
+                <CardHeader className="border-b p-4">
+                  <CardTitle className="text-xl">Cart Totals</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex justify-between py-2 border-b">
+                      <span>Subtotal</span>
+                      <span>{subtotal.toFixed(2)}$</span>
+                    </div>
+                    
+                    <div className="flex justify-between py-2 border-b">
+                      <span>Shipping</span>
+                      <div className="text-right">
+                        <p className="text-sm">Flat rate: {shipping.toFixed(2)}$</p>
+                        <Button variant="link" className="text-sm p-0 h-auto text-blue-600">
+                          Calculate shipping
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between py-4 font-bold">
+                      <span>Total</span>
+                      <span>{total.toFixed(2)}$</span>
                     </div>
                   </div>
                   
-                  <div className="flex justify-between py-4 font-bold">
-                    <span>Total</span>
-                    <span>{total.toFixed(2)}$</span>
-                  </div>
-                </div>
-                
-                <Button className="w-full mt-4">
-                  Proceed to Checkout
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+                  <Button className="w-full mt-4">
+                    Proceed to Checkout
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
       <Footer />

@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StockItem } from '@/data/stockItems';
 import { toast } from '@/hooks/use-toast';
+import { useCart } from '@/contexts/CartContext';
 
 interface StockItemCardProps {
   item: StockItem;
@@ -16,6 +16,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
   const [quantity, setQuantity] = useState(1);
   const [offerQuantity, setOfferQuantity] = useState(1);
   const [offerPrice, setOfferPrice] = useState('');
+  const { addToCart } = useCart();
 
   const handleBuyClick = () => {
     setBuyDialogOpen(true);
@@ -26,22 +27,25 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
   };
 
   const handleBuy = () => {
-    // Here you would implement the actual purchase logic
+    addToCart(item, quantity);
     toast({
-      title: "Purchase successful",
-      description: `You have purchased ${quantity} x ${item.name}`,
+      title: "Added to cart",
+      description: `${quantity} x ${item.name} has been added to your cart`,
     });
     setBuyDialogOpen(false);
+    setQuantity(1); // Reset quantity for next time
   };
 
   const handleOffer = () => {
-    // Here you would implement the actual offer logic
+    // For now, we'll just add the item to cart at the offered price
+    // In a real application, this would likely involve a different flow
     toast({
       title: "Offer submitted",
       description: `Your offer for ${offerQuantity} x ${item.name} at $${offerPrice} has been added to cart`,
     });
     setOfferDialogOpen(false);
     setOfferPrice('');
+    setOfferQuantity(1);
   };
 
   return (

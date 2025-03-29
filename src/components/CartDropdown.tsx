@@ -1,28 +1,11 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, X } from "lucide-react";
+import { AlertCircle, X, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from 'react-router-dom';
-
-// Sample cart item type
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
-
-// Sample cart data - in a real app this would come from state or context
-const sampleCartItem: CartItem = {
-  id: '1',
-  name: 'Unlocked iPhone 15 Pro 256GB Mix Color (e-sim) (A+/A Grade)',
-  price: 697.20,
-  quantity: 1,
-  image: '/placeholder.svg'
-};
+import { useCart } from '@/contexts/CartContext';
 
 interface CartDropdownProps {
   isOpen: boolean;
@@ -33,10 +16,9 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState<'cart' | 'offers'>('cart');
   const [couponCode, setCouponCode] = useState('');
   const navigate = useNavigate();
+  const { cartItems, removeFromCart, getTotalPrice } = useCart();
   
-  // Mock data
-  const cartItems: CartItem[] = [sampleCartItem];
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = getTotalPrice();
   
   if (!isOpen) return null;
 
@@ -97,76 +79,101 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
                 </div>
                 
                 {/* Cart items */}
-                {cartItems.map((item) => (
-                  <div key={item.id} className="grid grid-cols-6 gap-4 p-4 border-b items-center">
-                    <div className="col-span-1">
-                      <div className="w-16 h-16 bg-gray-200 flex items-center justify-center">
-                        <img src={item.image} alt={item.name} className="max-w-full max-h-full" />
+                {cartItems.length > 0 ? (
+                  cartItems.map((item) => (
+                    <div key={item.id} className="grid grid-cols-6 gap-4 p-4 border-b items-center">
+                      <div className="col-span-1">
+                        <div className="w-16 h-16 bg-gray-200 flex items-center justify-center">
+                          <img src="/placeholder.svg" alt={item.name} className="max-w-full max-h-full" />
+                        </div>
+                      </div>
+                      <div className="col-span-2 font-medium">{item.name}</div>
+                      <div className="col-span-1 text-center">{item.price.toFixed(2)}$</div>
+                      <div className="col-span-1 text-center">{item.quantity}</div>
+                      <div className="col-span-1 text-right flex justify-end items-center">
+                        <span className="mr-2">{(item.price * item.quantity).toFixed(2)}$</span>
+                        <button 
+                          className="text-gray-400 hover:text-red-500"
+                          onClick={() => removeFromCart(item.id)}
+                        >
+                          <X size={18} />
+                        </button>
                       </div>
                     </div>
-                    <div className="col-span-2 font-medium">{item.name}</div>
-                    <div className="col-span-1 text-center">{item.price.toFixed(2)}$</div>
-                    <div className="col-span-1 text-center">{item.quantity}</div>
-                    <div className="col-span-1 text-right flex justify-end items-center">
-                      <span className="mr-2">{(item.price * item.quantity).toFixed(2)}$</span>
-                      <button className="text-gray-400 hover:text-red-500">
-                        <X size={18} />
-                      </button>
+                  ))
+                ) : (
+                  <div className="p-8 text-center">
+                    <div className="flex justify-center mb-4">
+                      <ShoppingCart size={48} className="text-gray-300" />
                     </div>
+                    <p className="text-gray-500 mb-4">Your cart is empty</p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        onClose();
+                        navigate('/shop-list');
+                      }}
+                    >
+                      Continue Shopping
+                    </Button>
                   </div>
-                ))}
+                )}
                 
                 {/* Coupon section */}
-                <div className="p-4 border-b flex items-center gap-4">
-                  <div className="font-medium">Coupon:</div>
-                  <div className="flex-1 max-w-xs">
-                    <Input 
-                      placeholder="Coupon code" 
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                    />
-                  </div>
-                  <Button variant="link" className="text-purple-600">
-                    Apply coupon
-                  </Button>
-                  <div className="ml-auto">
-                    <Button onClick={goToCart}>
-                      View Cart
+                {cartItems.length > 0 && (
+                  <div className="p-4 border-b flex items-center gap-4">
+                    <div className="font-medium">Coupon:</div>
+                    <div className="flex-1 max-w-xs">
+                      <Input 
+                        placeholder="Coupon code" 
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                      />
+                    </div>
+                    <Button variant="link" className="text-purple-600">
+                      Apply coupon
                     </Button>
+                    <div className="ml-auto">
+                      <Button onClick={goToCart}>
+                        View Cart
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                )}
                 
                 {/* Cart totals */}
-                <div className="flex">
-                  <div className="flex-1"></div>
-                  <div className="w-80 p-6 bg-gray-50">
-                    <h3 className="text-lg font-bold mb-4">Cart totals</h3>
-                    
-                    <div className="flex justify-between py-2 border-b">
-                      <span>Subtotal</span>
-                      <span>{subtotal.toFixed(2)}$</span>
-                    </div>
-                    
-                    <div className="flex justify-between py-2 border-b">
-                      <span>Shipping</span>
-                      <div className="text-right">
-                        <p className="text-sm">Enter your address to view shipping options.</p>
-                        <Button variant="link" className="text-sm p-0 h-auto text-blue-600">
-                          Calculate shipping
-                        </Button>
+                {cartItems.length > 0 && (
+                  <div className="flex">
+                    <div className="flex-1"></div>
+                    <div className="w-80 p-6 bg-gray-50">
+                      <h3 className="text-lg font-bold mb-4">Cart totals</h3>
+                      
+                      <div className="flex justify-between py-2 border-b">
+                        <span>Subtotal</span>
+                        <span>{subtotal.toFixed(2)}$</span>
                       </div>
+                      
+                      <div className="flex justify-between py-2 border-b">
+                        <span>Shipping</span>
+                        <div className="text-right">
+                          <p className="text-sm">Enter your address to view shipping options.</p>
+                          <Button variant="link" className="text-sm p-0 h-auto text-blue-600">
+                            Calculate shipping
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between py-4 font-bold">
+                        <span>Total</span>
+                        <span>{subtotal.toFixed(2)}$</span>
+                      </div>
+                      
+                      <Button className="w-full" onClick={goToCart}>
+                        Proceed to Checkout
+                      </Button>
                     </div>
-                    
-                    <div className="flex justify-between py-4 font-bold">
-                      <span>Total</span>
-                      <span>{subtotal.toFixed(2)}$</span>
-                    </div>
-                    
-                    <Button className="w-full" onClick={goToCart}>
-                      Proceed to Checkout
-                    </Button>
                   </div>
-                </div>
+                )}
               </div>
             ) : (
               <div className="p-6 text-center">
