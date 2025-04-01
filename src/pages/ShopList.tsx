@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -21,8 +20,9 @@ import { getCurrentUser } from "@/utils/localStorageUtils";
 import { stockItems } from "@/data/stockItems";
 import StockItemCard from "@/components/StockItemCard";
 import FilterSidebar from "@/components/FilterSidebar";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Filter } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   Pagination, 
   PaginationContent, 
@@ -43,7 +43,9 @@ const ShopList = () => {
   const [chatName, setChatName] = useState("");
   const [chatEmail, setChatEmail] = useState("");
   const [chatQuestion, setChatQuestion] = useState("");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   // Calculate total pages
   const totalPages = Math.ceil(stockItems.length / ITEMS_PER_PAGE);
@@ -97,6 +99,10 @@ const ShopList = () => {
   const handleChatButtonClick = () => {
     console.log("Chat button clicked");
     setChatOpen(true);
+  };
+  
+  const toggleMobileFilters = () => {
+    setShowMobileFilters(!showMobileFilters);
   };
   
   // Generate pagination items
@@ -182,39 +188,64 @@ const ShopList = () => {
       </div>
       
       {/* Currency selector - fixed to right side, positioned higher */}
-      <div className="fixed right-0 top-1/4 z-40">
-        <div className="flex flex-col">
-          <button className="bg-blue-700 text-white py-2 px-4 font-medium">
-            USD $
-          </button>
-          <button className="bg-gray-800 text-white py-2 px-4 font-medium">
-            EUR €
-          </button>
+      {!isMobile && (
+        <div className="fixed right-0 top-1/4 z-40">
+          <div className="flex flex-col">
+            <button className="bg-blue-700 text-white py-2 px-4 font-medium">
+              USD $
+            </button>
+            <button className="bg-gray-800 text-white py-2 px-4 font-medium">
+              EUR €
+            </button>
+          </div>
         </div>
-      </div>
+      )}
       
       {/* Chat button - fixed to right side, positioned lower */}
-      <div className="fixed right-0 top-1/3 z-40">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                className="bg-red-600 text-white p-3 flex items-center justify-center"
-                onClick={handleChatButtonClick}
-              >
-                <MessageCircle size={24} />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="left">
-              <p>Start a live chat</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+      {!isMobile && (
+        <div className="fixed right-0 top-1/3 z-40">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  className="bg-red-600 text-white p-3 flex items-center justify-center"
+                  onClick={handleChatButtonClick}
+                >
+                  <MessageCircle size={24} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                <p>Start a live chat</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      )}
+
+      {/* Mobile floating buttons */}
+      {isMobile && (
+        <div className="fixed bottom-4 right-4 flex flex-col gap-3 z-40">
+          {/* Chat button */}
+          <button
+            className="bg-red-600 text-white p-3 rounded-full shadow-lg flex items-center justify-center"
+            onClick={handleChatButtonClick}
+          >
+            <MessageCircle size={24} />
+          </button>
+          
+          {/* Filter button */}
+          <button
+            className="bg-blue-600 text-white p-3 rounded-full shadow-lg flex items-center justify-center"
+            onClick={toggleMobileFilters}
+          >
+            <Filter size={24} />
+          </button>
+        </div>
+      )}
 
       {/* Chat Dialog */}
       <Dialog open={chatOpen} onOpenChange={setChatOpen}>
-        <DialogContent className="bg-white p-0 border-none max-w-md">
+        <DialogContent className="bg-white p-0 border-none max-w-md mx-4">
           <div className="bg-red-600 p-4 text-white">
             <DialogTitle className="text-xl font-bold text-center">Live Chat</DialogTitle>
           </div>
@@ -261,16 +292,40 @@ const ShopList = () => {
         {isLoggedIn ? (
           <>
             <div className="flex flex-col md:flex-row gap-8">
-              {/* Left sidebar with filters */}
-              <div className="md:w-64 shrink-0">
-                <FilterSidebar />
-              </div>
+              {/* Mobile filter sidebar (shows as a dialog) */}
+              {isMobile && (
+                <Dialog open={showMobileFilters} onOpenChange={setShowMobileFilters}>
+                  <DialogContent className="bg-white p-0 border-none max-w-md mx-4 h-[80vh] overflow-auto">
+                    <div className="bg-blue-600 p-4 text-white">
+                      <DialogTitle className="text-xl font-bold">Filters</DialogTitle>
+                    </div>
+                    <div className="p-4">
+                      <FilterSidebar />
+                      <div className="mt-6">
+                        <Button 
+                          onClick={() => setShowMobileFilters(false)}
+                          className="w-full bg-blue-600"
+                        >
+                          Apply Filters
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
+              
+              {/* Left sidebar with filters - desktop only */}
+              {!isMobile && (
+                <div className="md:w-64 shrink-0">
+                  <FilterSidebar />
+                </div>
+              )}
               
               {/* Main product listings */}
               <div className="flex-1">
                 {/* Search and export header */}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-                  <div className="mb-4 md:mb-0 flex-1 max-w-md">
+                  <div className="mb-4 md:mb-0 flex-1 max-w-md w-full">
                     <Input 
                       placeholder="Search model, name..." 
                       value={searchQuery}
@@ -292,10 +347,10 @@ const ShopList = () => {
                   ))}
                 </div>
                 
-                {/* Pagination */}
-                <div className="mt-8">
+                {/* Pagination - simplified on mobile */}
+                <div className="mt-8 overflow-x-auto">
                   <Pagination>
-                    <PaginationContent>
+                    <PaginationContent className={isMobile ? "justify-center gap-1" : ""}>
                       <PaginationItem>
                         <PaginationPrevious 
                           onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
@@ -303,7 +358,15 @@ const ShopList = () => {
                         />
                       </PaginationItem>
                       
-                      {renderPaginationItems()}
+                      {isMobile ? (
+                        <PaginationItem>
+                          <PaginationLink isActive={true}>
+                            {currentPage} / {totalPages}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ) : (
+                        renderPaginationItems()
+                      )}
                       
                       <PaginationItem>
                         <PaginationNext 

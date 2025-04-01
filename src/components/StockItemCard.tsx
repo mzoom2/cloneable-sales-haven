@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,6 +7,7 @@ import { StockItem } from '@/data/stockItems';
 import { toast } from '@/hooks/use-toast';
 import { useCart } from '@/contexts/CartContext';
 import { addOffer } from '@/services/OfferService';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface StockItemCardProps {
   item: StockItem;
@@ -18,6 +20,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
   const [offerQuantity, setOfferQuantity] = useState(1);
   const [offerPrice, setOfferPrice] = useState('');
   const { addToCart } = useCart();
+  const isMobile = useIsMobile();
 
   const handleBuyClick = () => {
     setBuyDialogOpen(true);
@@ -67,7 +70,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
           <div className="flex-1 p-4">
             <h3 className="text-lg font-medium mb-4">{item.name}</h3>
             
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Item</p>
                 <p className="font-medium">GSM Unlocked</p>
@@ -83,8 +86,8 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
             </div>
           </div>
           
-          <div className="flex flex-row md:flex-col md:w-40 p-4 items-center justify-end gap-3">
-            <div className="mb-auto text-right">
+          <div className={`flex ${isMobile ? 'flex-row justify-between items-center' : 'flex-col md:w-40'} p-4 gap-3 bg-gray-50 md:bg-transparent`}>
+            <div className={`${isMobile ? '' : 'mb-auto'} text-right`}>
               <span className="font-medium text-blue-700">{item.grade}</span>
             </div>
             
@@ -92,6 +95,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
               <Button 
                 className="bg-indigo-600 hover:bg-indigo-700"
                 onClick={handleBuyClick}
+                size={isMobile ? "sm" : "default"}
               >
                 Buy
               </Button>
@@ -99,6 +103,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
                 variant="outline" 
                 className="bg-gray-100"
                 onClick={handleOfferClick}
+                size={isMobile ? "sm" : "default"}
               >
                 Offer
               </Button>
@@ -111,7 +116,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
 
       {/* Buy Dialog */}
       <Dialog open={buyDialogOpen} onOpenChange={setBuyDialogOpen}>
-        <DialogContent className="bg-white p-6 max-w-md">
+        <DialogContent className="bg-white p-6 max-w-md mx-4">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-[#1a0050] mb-3">Buy</DialogTitle>
           </DialogHeader>
@@ -172,7 +177,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
 
       {/* Offer Dialog */}
       <Dialog open={offerDialogOpen} onOpenChange={setOfferDialogOpen}>
-        <DialogContent className="bg-white p-6 max-w-md">
+        <DialogContent className="bg-white p-6 max-w-md mx-4">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-[#1a0050] mb-3">Make an offer</DialogTitle>
           </DialogHeader>
