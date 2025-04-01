@@ -2,9 +2,16 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { getCurrentUser, logoutUser } from '@/utils/localStorageUtils';
 
+// Adjust User interface to match what's in localStorageUtils
 interface User {
   email: string;
-  name: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  businessName?: string;
+  phoneNumber?: string;
+  whatsappNumber?: string;
+  country?: string;
 }
 
 interface AuthContextType {
