@@ -128,9 +128,9 @@ const OfferAcceptedDialog: React.FC = () => {
       id: parseInt(offer.productId),
       name: offer.product,
       price: parseFloat(offer.offeredPrice),
-      quantity: offer.offeredQuantity,
-      location: "HongKong", // Default location
-      grade: "A+/A" // Default grade
+      description: `Accepted offer: ${offer.product}`,
+      available: offer.offeredQuantity,
+      category: "" // Add the missing category property with an empty string
     };
     
     // Add the accepted offer to cart
