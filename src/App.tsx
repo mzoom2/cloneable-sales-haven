@@ -24,6 +24,7 @@ import OfferAcceptedDialog from './components/OfferAcceptedDialog';
 import TrackingPage from './pages/TrackingPage';
 import TrackingDetailsPage from './pages/TrackingDetailsPage';
 import AdminPage from './pages/AdminPage';
+import PaymentPage from './pages/PaymentPage';
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
               <Route path="/videos" element={<Videos />} />
               <Route path="/ordering-guide" element={<OrderingGuide />} />
               <Route path="/cart" element={<CartPage />} />
+              <Route path="/payment" element={<PaymentPage />} />
               <Route path="/shop-list" element={<ShopList />} />
               <Route path="/offers" element={<OffersPage />} />
               <Route path="/track" element={<TrackingPage />} />

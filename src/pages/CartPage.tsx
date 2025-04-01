@@ -21,7 +21,7 @@ import {
 const CartPage = () => {
   const navigate = useNavigate();
   const [couponCode, setCouponCode] = useState('');
-  const { cartItems, removeFromCart, updateQuantity, getTotalPrice } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, getTotalPrice, getTotalItems } = useCart();
   const [shipping, setShipping] = useState(0); // Default shipping cost
   const [addressExpanded, setAddressExpanded] = useState(false);
   const { isAuthenticated } = useAuth();
@@ -71,6 +71,26 @@ const CartPage = () => {
   };
 
   const handleCheckout = () => {
+    // Check if cart is empty
+    if (cartItems.length === 0) {
+      toast({
+        title: "Empty cart",
+        description: "Your cart is empty. Add items before checkout.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check minimum order quantity
+    if (getTotalItems() < 5) {
+      toast({
+        title: "Minimum order quantity not met",
+        description: "Please add at least 5 items to proceed with checkout.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     // Check if shipping address exists
     const savedAddress = localStorage.getItem('shippingAddress');
     if (!savedAddress) {
@@ -94,13 +114,8 @@ const CartPage = () => {
       return;
     }
 
-    // Proceed with checkout
-    toast({
-      title: "Proceeding to checkout",
-      description: "Redirecting to payment page"
-    });
-    // This would typically navigate to a checkout page
-    // navigate('/checkout');
+    // Proceed with checkout - navigate to payment page
+    navigate('/payment');
   };
   
   return (
