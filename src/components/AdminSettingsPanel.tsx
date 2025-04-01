@@ -5,14 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
-
-interface StoreSettings {
-  bankName: string;
-  accountNumber: string;
-  accountName: string;
-  routingNumber: string;
-  swiftCode: string;
-}
+import { getStoreSettings, updateStoreSettings, StoreSettings } from '@/services/AdminService';
 
 const AdminSettingsPanel: React.FC = () => {
   const [settings, setSettings] = useState<StoreSettings>({
@@ -22,13 +15,27 @@ const AdminSettingsPanel: React.FC = () => {
     routingNumber: '',
     swiftCode: ''
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load settings from localStorage (in a real app, this would be from your API)
-    const storedSettings = localStorage.getItem('storeSettings');
-    if (storedSettings) {
-      setSettings(JSON.parse(storedSettings));
-    }
+    // Fetch settings from the API
+    const fetchSettings = async () => {
+      try {
+        const data = await getStoreSettings();
+        setSettings(data);
+      } catch (error) {
+        console.error('Failed to fetch store settings:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load store settings. Using cached data if available.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchSettings();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,15 +46,28 @@ const AdminSettingsPanel: React.FC = () => {
     }));
   };
 
-  const handleSaveSettings = () => {
-    // In a real app, this would be an API call to save settings
-    localStorage.setItem('storeSettings', JSON.stringify(settings));
-    
-    toast({
-      title: "Settings Saved",
-      description: "Your store settings have been updated successfully",
-    });
+  const handleSaveSettings = async () => {
+    try {
+      // Update settings via API
+      await updateStoreSettings(settings);
+      
+      toast({
+        title: "Settings Saved",
+        description: "Your store settings have been updated successfully",
+      });
+    } catch (error) {
+      console.error('Failed to update store settings:', error);
+      toast({
+        title: "Save Failed",
+        description: "There was an error saving your settings. Changes may not be saved to the server.",
+        variant: "destructive"
+      });
+    }
   };
+
+  if (loading) {
+    return <div className="flex justify-center py-10">Loading...</div>;
+  }
 
   return (
     <div>

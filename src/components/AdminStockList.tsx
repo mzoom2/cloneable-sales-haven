@@ -11,12 +11,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { stockItems, StockItem } from '@/data/stockItems';
+import { StockItem } from '@/data/stockItems';
 import { toast } from '@/hooks/use-toast';
 import { Save, X } from 'lucide-react';
+import { getStockItems, updateStockItem } from '@/services/AdminService';
 
 const AdminStockList: React.FC = () => {
-  // In a real app, this would fetch from your backend API
   const [items, setItems] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState<StockItem | null>(null);
@@ -25,23 +25,25 @@ const AdminStockList: React.FC = () => {
   const [editedQuantity, setEditedQuantity] = useState("");
 
   useEffect(() => {
-    // In a real app, this would be an API call
-    // For now, we'll use the local stockItems data
-    const storedItems = localStorage.getItem('adminStockItems');
-    if (storedItems) {
-      setItems(JSON.parse(storedItems));
-    } else {
-      setItems(stockItems);
-    }
-    setLoading(false);
+    // Fetch stock items from the API
+    const fetchItems = async () => {
+      try {
+        const data = await getStockItems();
+        setItems(data);
+      } catch (error) {
+        console.error('Failed to fetch stock items:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load stock items. Using cached data if available.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchItems();
   }, []);
-
-  useEffect(() => {
-    // Save changes to localStorage whenever items change
-    if (!loading) {
-      localStorage.setItem('adminStockItems', JSON.stringify(items));
-    }
-  }, [items, loading]);
 
   const handleEditClick = (item: StockItem) => {
     setEditingItem(item);
@@ -50,7 +52,7 @@ const AdminStockList: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     if (!editingItem) return;
 
     const newPrice = parseFloat(editedPrice);
@@ -74,20 +76,38 @@ const AdminStockList: React.FC = () => {
       return;
     }
 
-    // Update the item in the list
-    const updatedItems = items.map(item => 
-      item.id === editingItem.id 
-        ? { ...item, price: newPrice, quantity: newQuantity } 
-        : item
-    );
-
-    setItems(updatedItems);
-    setIsDialogOpen(false);
+    // Create updated item
+    const updatedItem = { 
+      ...editingItem,
+      price: newPrice,
+      quantity: newQuantity
+    };
     
-    toast({
-      title: "Item Updated",
-      description: `${editingItem.name} has been updated successfully`,
-    });
+    try {
+      // Update the item via API
+      await updateStockItem(updatedItem);
+      
+      // Update local state
+      setItems(prevItems => 
+        prevItems.map(item => 
+          item.id === editingItem.id ? updatedItem : item
+        )
+      );
+      
+      setIsDialogOpen(false);
+      
+      toast({
+        title: "Item Updated",
+        description: `${editingItem.name} has been updated successfully`,
+      });
+    } catch (error) {
+      console.error('Failed to update item:', error);
+      toast({
+        title: "Update Failed",
+        description: "There was an error updating the item. Changes may not be saved to the server.",
+        variant: "destructive"
+      });
+    }
   };
 
   if (loading) {
