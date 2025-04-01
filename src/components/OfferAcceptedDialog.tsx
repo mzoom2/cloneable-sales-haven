@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -123,14 +122,14 @@ const OfferAcceptedDialog: React.FC = () => {
       localStorage.setItem('shippingAddress', JSON.stringify(shippingAddress));
     }
     
-    // Create a mock stock item from the offer to add to cart
+    // Create a mock stock item from the offer to add to cart - fixed to match StockItem interface
     const stockItem: StockItem = {
       id: parseInt(offer.productId),
       name: offer.product,
       price: parseFloat(offer.offeredPrice),
-      category: "",
-      description: `Accepted offer: ${offer.product}`,
-      available: offer.offeredQuantity
+      quantity: offer.offeredQuantity,
+      location: 'HongKong', // Default location since it's required
+      grade: 'A+/A' // Default grade since it's required
     };
     
     // Add the accepted offer to cart
