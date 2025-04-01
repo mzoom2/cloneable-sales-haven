@@ -18,10 +18,11 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
   const [couponCode, setCouponCode] = useState('');
   const [shipping, setShipping] = useState(0);
   const navigate = useNavigate();
-  const { cartItems, removeFromCart, getTotalPrice } = useCart();
+  const { cartItems, removeFromCart, getTotalPrice, getTotalItems } = useCart();
   
   const subtotal = getTotalPrice();
   const total = subtotal + shipping;
+  const itemCount = getTotalItems();
   
   if (!isOpen) return null;
 

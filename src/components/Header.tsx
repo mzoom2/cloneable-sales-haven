@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Menu } from "lucide-react";
@@ -26,7 +27,7 @@ const Header = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { getTotalItems } = useCart();
+  const { cartItems, getTotalItems } = useCart();
   
   // Check if user is logged in
   useEffect(() => {
@@ -89,6 +90,9 @@ const Header = () => {
   const goToOffers = () => {
     navigate('/offers');
   };
+
+  // Force re-render when cart items change
+  const cartItemsCount = getTotalItems();
 
   return (
     <>
@@ -323,7 +327,7 @@ const Header = () => {
                 >
                   <ShoppingCart size={20} />
                   <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {getTotalItems()}
+                    {cartItemsCount}
                   </span>
                 </Button>
               </PopoverTrigger>
@@ -344,7 +348,7 @@ const Header = () => {
                     </button>
                   </div>
                   <div className="p-4 text-center">
-                    <p className="mb-4">You have {getTotalItems()} item(s) in your cart</p>
+                    <p className="mb-4">You have {cartItemsCount} item(s) in your cart</p>
                     <div className="flex justify-between gap-2">
                       <Button variant="outline" className="flex-1" onClick={goToCart}>
                         View Cart
