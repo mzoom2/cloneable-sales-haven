@@ -72,6 +72,19 @@ class StoreSettings(db.Model):
             'swiftCode': self.swiftCode
         }
 
+# Define PaymentSettings model for storing all payment methods
+class PaymentSettings(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    setting_type = db.Column(db.String(50), nullable=False)  # Type of payment setting
+    settings_json = db.Column(db.Text, nullable=True)  # JSON string containing settings
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'setting_type': self.setting_type,
+            'settings_json': self.settings_json
+        }
+
 # Define new Order and Payment model
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -252,6 +265,81 @@ def update_store_settings():
         db.session.rollback()
         return jsonify({"error": "Failed to update store settings"}), 500
 
+@app.route('/api/payment-settings', methods=['GET'])
+def get_payment_settings():
+    try:
+        # Create a response with all payment details
+        response = {}
+        
+        # Get bank transfer details from StoreSettings
+        bank_transfer = StoreSettings.query.first()
+        if bank_transfer:
+            response['bank_transfer'] = {
+                'bankName': bank_transfer.bankName,
+                'accountNumber': bank_transfer.accountNumber,
+                'accountName': bank_transfer.accountName,
+                'routingNumber': bank_transfer.routingNumber,
+                'swiftCode': bank_transfer.swiftCode
+            }
+        
+        # Get other payment settings from PaymentSettings
+        payment_settings = PaymentSettings.query.all()
+        for setting in payment_settings:
+            if setting.settings_json:
+                import json
+                try:
+                    response[setting.setting_type] = json.loads(setting.settings_json)
+                except:
+                    logger.error(f"Error parsing JSON for {setting.setting_type}")
+        
+        return jsonify(response), 200
+    except Exception as e:
+        logger.error(f"Error fetching payment settings: {str(e)}")
+        return jsonify({"error": "Failed to fetch payment settings"}), 500
+
+@app.route('/api/payment-settings', methods=['PUT'])
+def update_payment_settings():
+    try:
+        data = request.json
+        
+        # Update bank transfer details in StoreSettings
+        if 'bank_transfer' in data:
+            bank_data = data['bank_transfer']
+            settings = StoreSettings.query.first()
+            if not settings:
+                settings = StoreSettings()
+                db.session.add(settings)
+            
+            if 'bankName' in bank_data:
+                settings.bankName = bank_data['bankName']
+            if 'accountNumber' in bank_data:
+                settings.accountNumber = bank_data['accountNumber']
+            if 'accountName' in bank_data:
+                settings.accountName = bank_data['accountName']
+            if 'routingNumber' in bank_data:
+                settings.routingNumber = bank_data['routingNumber']
+            if 'swiftCode' in bank_data:
+                settings.swiftCode = bank_data['swiftCode']
+        
+        # Update other payment settings in PaymentSettings
+        for key, value in data.items():
+            if key != 'bank_transfer' and value:
+                import json
+                
+                setting = PaymentSettings.query.filter_by(setting_type=key).first()
+                if not setting:
+                    setting = PaymentSettings(setting_type=key)
+                    db.session.add(setting)
+                
+                setting.settings_json = json.dumps(value)
+        
+        db.session.commit()
+        return jsonify({"message": "Payment settings updated successfully"}), 200
+    except Exception as e:
+        logger.error(f"Error updating payment settings: {str(e)}")
+        db.session.rollback()
+        return jsonify({"error": f"Failed to update payment settings: {str(e)}"}), 500
+
 @app.route('/api/import-stock', methods=['POST'])
 def import_stock_items():
     # ... keep existing code (import_stock_items function)
@@ -285,10 +373,25 @@ def import_stock_items():
 @app.route('/api/orders', methods=['POST'])
 def create_order():
     try:
+        logger.debug("Received order creation request")
         data = request.json
+        logger.debug(f"Order data: {data}")
+        
         user_id = data.get('user_id')
         total_amount = data.get('total_amount')
         items = data.get('items', [])
+        
+        if not user_id:
+            logger.error("Missing user_id in order data")
+            return jsonify({"error": "User ID is required"}), 400
+            
+        if not total_amount:
+            logger.error("Missing total_amount in order data")
+            return jsonify({"error": "Total amount is required"}), 400
+            
+        if not items or len(items) == 0:
+            logger.error("Missing items in order data")
+            return jsonify({"error": "Order items are required"}), 400
         
         # Create new order
         order = Order(
@@ -298,21 +401,43 @@ def create_order():
         )
         db.session.add(order)
         db.session.flush()  # Get the order ID
+        logger.debug(f"Created order with ID: {order.id}")
         
         # Add order items
         for item in items:
+            item_id = item.get('id')
+            quantity = item.get('quantity')
+            price = item.get('price')
+            
+            if not all([item_id, quantity, price]):
+                logger.error(f"Invalid item data: {item}")
+                db.session.rollback()
+                return jsonify({"error": "Invalid item data"}), 400
+            
+            # Verify item exists
+            stock_item = StockItem.query.get(item_id)
+            if not stock_item:
+                logger.error(f"Stock item not found: {item_id}")
+                db.session.rollback()
+                return jsonify({"error": f"Stock item with ID {item_id} not found"}), 404
+            
             order_item = OrderItem(
                 order_id=order.id,
-                stock_item_id=item.get('id'),
-                quantity=item.get('quantity'),
-                price=item.get('price')
+                stock_item_id=item_id,
+                quantity=quantity,
+                price=price
             )
             db.session.add(order_item)
+            logger.debug(f"Added order item: {order_item.to_dict()}")
             
             # Update stock quantity
-            stock_item = StockItem.query.get(item.get('id'))
-            if stock_item:
-                stock_item.quantity -= item.get('quantity')
+            if stock_item.quantity < quantity:
+                logger.error(f"Insufficient stock for item {item_id}: {stock_item.quantity} < {quantity}")
+                db.session.rollback()
+                return jsonify({"error": f"Insufficient stock for item {stock_item.name}"}), 400
+                
+            stock_item.quantity -= quantity
+            logger.debug(f"Updated stock quantity for item {item_id}: {stock_item.quantity}")
         
         db.session.commit()
         return jsonify({"order_id": order.id}), 201
@@ -328,6 +453,14 @@ def create_payment():
         order_id = data.get('order_id')
         payment_method = data.get('payment_method')
         amount = data.get('amount')
+        
+        if not all([order_id, payment_method, amount]):
+            return jsonify({"error": "Missing required payment data"}), 400
+        
+        # Verify order exists
+        order = Order.query.get(order_id)
+        if not order:
+            return jsonify({"error": "Order not found"}), 404
         
         # Create new payment
         payment = Payment(

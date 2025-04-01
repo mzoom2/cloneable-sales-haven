@@ -279,6 +279,17 @@ const filterPaymentDetailsByMethod = (allDetails: PaymentDetails, method: Paymen
 // Create an order
 export const createOrder = async (cartItems: CartItem[], userEmail: string, totalAmount: number) => {
   try {
+    // Log the data being sent to help debug
+    console.log('Creating order with data:', {
+      userEmail,
+      totalAmount,
+      items: cartItems.map(item => ({
+        id: item.id,
+        quantity: item.quantity,
+        price: item.price
+      }))
+    });
+    
     const orderData: CreateOrderRequest = {
       user_id: userEmail, // Using email as the identifier
       total_amount: totalAmount,
@@ -298,7 +309,9 @@ export const createOrder = async (cartItems: CartItem[], userEmail: string, tota
     });
     
     if (!response.ok) {
-      throw new Error('Failed to create order');
+      const errorText = await response.text();
+      console.error('Error response from server:', errorText);
+      throw new Error(`Failed to create order: ${response.status} ${errorText}`);
     }
     
     return await response.json();
@@ -311,6 +324,12 @@ export const createOrder = async (cartItems: CartItem[], userEmail: string, tota
 // Create a payment
 export const createPayment = async (orderId: number, paymentMethod: PaymentMethod, amount: number) => {
   try {
+    console.log('Creating payment with data:', {
+      orderId,
+      paymentMethod,
+      amount
+    });
+    
     const paymentData: CreatePaymentRequest = {
       order_id: orderId,
       payment_method: paymentMethod,
@@ -326,7 +345,9 @@ export const createPayment = async (orderId: number, paymentMethod: PaymentMetho
     });
     
     if (!response.ok) {
-      throw new Error('Failed to create payment');
+      const errorText = await response.text();
+      console.error('Error response from server:', errorText);
+      throw new Error(`Failed to create payment: ${response.status} ${errorText}`);
     }
     
     return await response.json();
@@ -347,7 +368,9 @@ export const confirmPayment = async (paymentId: number) => {
     });
     
     if (!response.ok) {
-      throw new Error('Failed to confirm payment');
+      const errorText = await response.text();
+      console.error('Error response from server:', errorText);
+      throw new Error(`Failed to confirm payment: ${response.status} ${errorText}`);
     }
     
     return await response.json();
