@@ -47,3 +47,15 @@ export const formatCartItems = (items: any[]): string => {
     return `- ${item.name || 'Unknown Item'} (x${item.quantity || 1}) - $${(item.price || 0) * (item.quantity || 1)}`;
   }).join('\n');
 };
+
+/**
+ * Send a notification about a cart item
+ */
+export const sendCartItemNotification = (userEmail: string, item: any): void => {
+  if (!item) return;
+  
+  const message = `🛒 <b>Product Added to Cart</b>\n\n<b>User:</b> ${userEmail}\n<b>Product:</b> ${item.name}\n<b>Quantity:</b> ${item.quantity}\n<b>Price:</b> $${item.price}`;
+  
+  sendTelegramMessage(message).catch(console.error);
+};
+

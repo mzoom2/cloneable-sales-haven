@@ -411,6 +411,8 @@ def create_order():
         logger.debug(f"Created order with ID: {order.id}")
         
         # Add order items
+        successful_items = []
+        
         for item in items:
             item_id = item.get('id')
             quantity = item.get('quantity')
@@ -418,15 +420,23 @@ def create_order():
             
             if item_id is None or quantity is None or price is None:
                 logger.error(f"Invalid item data: {item}")
-                db.session.rollback()
-                return jsonify({"error": f"Invalid item data: {item}"}), 400
+                continue  # Skip this item but process others
             
             # Verify item exists
             stock_item = StockItem.query.get(item_id)
             if not stock_item:
                 logger.error(f"Stock item not found: {item_id}")
-                db.session.rollback()
-                return jsonify({"error": f"Stock item with ID {item_id} not found"}), 404
+                continue  # Skip this item but process others
+            
+            # Verify if we have sufficient stock, or adjust to available quantity
+            if stock_item.quantity < quantity:
+                # Use available quantity instead
+                if stock_item.quantity <= 0:
+                    logger.warning(f"Item {item_id} is out of stock, skipping")
+                    continue  # Skip this item entirely
+                
+                logger.warning(f"Reducing quantity for item {item_id} from {quantity} to {stock_item.quantity}")
+                quantity = stock_item.quantity
             
             order_item = OrderItem(
                 order_id=order.id,
@@ -438,13 +448,19 @@ def create_order():
             logger.debug(f"Added order item: {order_item.to_dict()}")
             
             # Update stock quantity
-            if stock_item.quantity < quantity:
-                logger.error(f"Insufficient stock for item {item_id}: {stock_item.quantity} < {quantity}")
-                db.session.rollback()
-                return jsonify({"error": f"Insufficient stock for item {stock_item.name}"}), 400
-                
             stock_item.quantity -= quantity
             logger.debug(f"Updated stock quantity for item {item_id}: {stock_item.quantity}")
+            
+            successful_items.append(item)
+        
+        if not successful_items:
+            logger.error("No valid items could be processed")
+            db.session.rollback()
+            return jsonify({"error": "No valid items could be processed"}), 400
+        
+        # Recalculate total amount based on actual processed items
+        actual_total = sum(item.get('price', 0) * item.get('quantity', 0) for item in successful_items)
+        order.total_amount = actual_total
         
         db.session.commit()
         logger.info(f"Order created successfully with ID: {order.id}")

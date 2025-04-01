@@ -308,10 +308,56 @@ export const createOrder = async (cartItems: CartItem[], userEmail: string, tota
       throw new Error('Invalid cart items');
     }
     
+    // First, check stock availability for each item
+    const itemsWithAvailability = await Promise.all(
+      cartItems.map(async (item) => {
+        try {
+          // Get current stock
+          const response = await fetch(`http://localhost:5000/api/stock/${item.id}`);
+          
+          if (!response.ok) {
+            console.warn(`Could not check stock for item ${item.id}, proceeding with requested quantity`);
+            return item;
+          }
+          
+          const stockItem = await response.json();
+          const availableQuantity = stockItem.quantity;
+          
+          // If requested quantity exceeds available, adjust it
+          if (item.quantity > availableQuantity) {
+            console.warn(`Adjusting quantity for ${item.name} from ${item.quantity} to ${availableQuantity}`);
+            return {
+              ...item,
+              quantity: Math.max(availableQuantity, 0),
+              originalQuantity: item.quantity // Keep track of original request
+            };
+          }
+          
+          return item;
+        } catch (error) {
+          console.error(`Error checking stock for item ${item.id}:`, error);
+          return item; // Proceed with original quantity if check fails
+        }
+      })
+    );
+    
+    // Filter out items with zero stock
+    const validOrderItems = itemsWithAvailability.filter(item => item.quantity > 0);
+    
+    if (validOrderItems.length === 0) {
+      throw new Error('No items available in requested quantities');
+    }
+    
+    // Recalculate total if quantities were adjusted
+    const adjustedTotal = validOrderItems.reduce(
+      (sum, item) => sum + (item.price * item.quantity), 
+      0
+    );
+    
     const orderData = {
       user_id: userEmail, // Using email as the identifier
-      total_amount: totalAmount,
-      items: cartItems.map(item => ({
+      total_amount: adjustedTotal, // Use adjusted total
+      items: validOrderItems.map(item => ({
         id: item.id,
         quantity: item.quantity,
         price: item.price
@@ -339,7 +385,13 @@ export const createOrder = async (cartItems: CartItem[], userEmail: string, tota
 
     // Send Telegram notification
     try {
-      const message = `💰 <b>New Order Created</b>\n\n<b>User:</b> ${userEmail}\n<b>Order ID:</b> ${orderResult.order_id}\n<b>Total Amount:</b> $${totalAmount.toFixed(2)}\n\n<b>Items:</b>\n${formatCartItems(cartItems)}`;
+      // Include information about adjusted quantities
+      const adjustmentInfo = itemsWithAvailability
+        .filter(item => 'originalQuantity' in item && item.originalQuantity !== item.quantity)
+        .map(item => `Note: ${item.name} quantity adjusted from ${item.originalQuantity} to ${item.quantity} due to stock limitations.`)
+        .join('\n');
+      
+      const message = `💰 <b>New Order Created</b>\n\n<b>User:</b> ${userEmail}\n<b>Order ID:</b> ${orderResult.order_id}\n<b>Total Amount:</b> $${adjustedTotal.toFixed(2)}\n\n<b>Items:</b>\n${formatCartItems(validOrderItems)}${adjustmentInfo ? '\n\n' + adjustmentInfo : ''}`;
       
       await sendTelegramMessage(message);
       console.log('Telegram notification sent for order creation');
