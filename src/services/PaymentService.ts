@@ -138,10 +138,10 @@ export const paymentOptions: PaymentOption[] = [
 // Get all payment details from the backend
 export const getAllPaymentDetails = async (): Promise<PaymentDetails> => {
   try {
-    const response = await fetch('/api/payment-settings');
+    const response = await fetch('http://localhost:5000/api/payment-settings');
     
     if (!response.ok) {
-      throw new Error('Failed to fetch payment details');
+      throw new Error(`Failed to fetch payment details: ${response.status}`);
     }
     
     return await response.json();
@@ -155,7 +155,7 @@ export const getAllPaymentDetails = async (): Promise<PaymentDetails> => {
 // Update payment details
 export const updatePaymentDetails = async (details: PaymentDetails): Promise<void> => {
   try {
-    const response = await fetch('/api/payment-settings', {
+    const response = await fetch('http://localhost:5000/api/payment-settings', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -164,7 +164,7 @@ export const updatePaymentDetails = async (details: PaymentDetails): Promise<voi
     });
     
     if (!response.ok) {
-      throw new Error('Failed to update payment details');
+      throw new Error(`Failed to update payment details: ${response.status}`);
     }
   } catch (error) {
     console.error('Error updating payment details:', error);
@@ -300,7 +300,7 @@ export const createOrder = async (cartItems: CartItem[], userEmail: string, tota
       }))
     };
     
-    const response = await fetch('/api/orders', {
+    const response = await fetch('http://localhost:5000/api/orders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -336,7 +336,7 @@ export const createPayment = async (orderId: number, paymentMethod: PaymentMetho
       amount: amount
     };
     
-    const response = await fetch('/api/payments', {
+    const response = await fetch('http://localhost:5000/api/payments', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -360,7 +360,7 @@ export const createPayment = async (orderId: number, paymentMethod: PaymentMetho
 // Confirm a payment
 export const confirmPayment = async (paymentId: number) => {
   try {
-    const response = await fetch(`/api/payments/${paymentId}/confirm`, {
+    const response = await fetch(`http://localhost:5000/api/payments/${paymentId}/confirm`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

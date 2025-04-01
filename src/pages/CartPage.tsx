@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +23,7 @@ const CartPage = () => {
   const { cartItems, removeFromCart, updateQuantity, getTotalPrice, getTotalItems } = useCart();
   const [shipping, setShipping] = useState(0); // Default shipping cost
   const [addressExpanded, setAddressExpanded] = useState(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { isAuthenticated } = useAuth();
   
   const subtotal = getTotalPrice();
@@ -114,8 +114,19 @@ const CartPage = () => {
       return;
     }
 
+    // Set loading state
+    setIsCheckingOut(true);
+
     // Proceed with checkout - navigate to payment page
-    navigate('/payment');
+    toast({
+      title: "Redirecting to payment",
+      description: "Please wait while we prepare your checkout"
+    });
+    
+    setTimeout(() => {
+      setIsCheckingOut(false);
+      navigate('/payment');
+    }, 1000);
   };
   
   return (
@@ -280,8 +291,12 @@ const CartPage = () => {
                     </div>
                   </div>
                   
-                  <Button className="w-full mt-4" onClick={handleCheckout}>
-                    Proceed to Checkout
+                  <Button 
+                    className="w-full mt-4" 
+                    onClick={handleCheckout}
+                    disabled={isCheckingOut}
+                  >
+                    {isCheckingOut ? 'Processing...' : 'Proceed to Checkout'}
                   </Button>
                 </CardContent>
               </Card>
