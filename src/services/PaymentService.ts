@@ -1,8 +1,7 @@
-
 import { CartItem } from '@/contexts/CartContext';
 
 export interface CreateOrderRequest {
-  user_id: string;
+  user_id: string; // This will now be the user's email
   total_amount: number;
   items: {
     id: number;
@@ -198,10 +197,10 @@ export const getPaymentDetails = (method: PaymentMethod): PaymentDetails => {
 };
 
 // Create an order
-export const createOrder = async (cartItems: CartItem[], userId: string, totalAmount: number) => {
+export const createOrder = async (cartItems: CartItem[], userEmail: string, totalAmount: number) => {
   try {
     const orderData: CreateOrderRequest = {
-      user_id: userId,
+      user_id: userEmail, // Using email as the identifier
       total_amount: totalAmount,
       items: cartItems.map(item => ({
         id: item.id,
@@ -295,9 +294,9 @@ export const getOrder = async (orderId: number) => {
 };
 
 // Get orders by user
-export const getOrdersByUser = async (userId: string) => {
+export const getOrdersByUser = async (userEmail: string) => {
   try {
-    const response = await fetch(`/api/orders/by-user/${userId}`);
+    const response = await fetch(`/api/orders/by-user/${userEmail}`);
     
     if (!response.ok) {
       throw new Error('Failed to fetch orders');

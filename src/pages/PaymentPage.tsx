@@ -44,14 +44,15 @@ const PaymentPage = () => {
   // Create order on component mount
   useEffect(() => {
     const createNewOrder = async () => {
-      if (!user?.id || cartItems.length === 0) {
+      if (!user?.email || cartItems.length === 0) {
         navigate('/cart');
         return;
       }
       
       setIsCreatingOrder(true);
       try {
-        const result = await createOrder(cartItems, user.id, totalAmount);
+        // Using email as the user identifier instead of id
+        const result = await createOrder(cartItems, user.email, totalAmount);
         setOrderId(result.order_id);
       } catch (error) {
         console.error('Failed to create order:', error);
