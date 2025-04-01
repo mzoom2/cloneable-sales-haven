@@ -36,23 +36,23 @@ const ProductDisplay = () => {
         <div className={`grid ${isMobile ? 'grid-cols-1 gap-6' : 'md:grid-cols-2 lg:grid-cols-3 gap-8'} max-w-4xl mx-auto`}>
           <ProductCard 
             title="Used iPhones, A Grade" 
-            imageSrc="https://images.unsplash.com/photo-1591337676887-a217a6970a8a?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80"
+            imageSrc="/lovable-uploads/f38cab13-f016-49bf-b6b8-985824c7bf99.png"
           />
           
           <ProductCard 
             title="Used iPhones, A/A-mix Grade" 
-            imageSrc="https://images.unsplash.com/photo-1556656793-08538906a9f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80"
+            imageSrc="/lovable-uploads/6b84953c-3f6f-4c0d-9196-0026598d3afe.png"
           />
           
           <ProductCard 
-            title="A++ Grade iPhones" 
-            imageSrc="https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80"
+            title="Premium iPhone Collection" 
+            imageSrc="/lovable-uploads/75d557cf-c547-4786-ba5b-3857b2022bcd.png"
           />
         </div>
         
         <hr className="my-10 md:my-16 border-gray-200" />
         
-        <h2 className="text-xl md:text-2xl font-bold text-center mb-6 md:mb-8">Order Shipment Videos/Photos</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-center mb-6 md:mb-8">iPhone Accessories</h2>
         
         <div className="flex justify-center mb-6 md:mb-8">
           <Button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6">
@@ -64,8 +64,8 @@ const ProductDisplay = () => {
           <div className="mb-6">
             <div className="rounded-lg overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80" 
-                alt="Shipment package" 
+                src="/lovable-uploads/f38cab13-f016-49bf-b6b8-985824c7bf99.png" 
+                alt="iPhone accessories" 
                 className="w-full h-56 object-cover hover:scale-105 transition-transform"
               />
             </div>
@@ -74,22 +74,22 @@ const ProductDisplay = () => {
           <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
             <div className="rounded-lg overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80" 
-                alt="Shipment package" 
+                src="/lovable-uploads/f38cab13-f016-49bf-b6b8-985824c7bf99.png" 
+                alt="iPhone accessories" 
                 className="w-full h-64 object-cover hover:scale-105 transition-transform"
               />
             </div>
             <div className="rounded-lg overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1560343090-f0409e92791a?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80" 
-                alt="Shipping process" 
+                src="/lovable-uploads/6b84953c-3f6f-4c0d-9196-0026598d3afe.png" 
+                alt="iPhone models" 
                 className="w-full h-64 object-cover hover:scale-105 transition-transform"
               />
             </div>
             <div className="rounded-lg overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1577563908411-5077b6dc7624?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80" 
-                alt="Delivery packages" 
+                src="/lovable-uploads/75d557cf-c547-4786-ba5b-3857b2022bcd.png" 
+                alt="iPhone retail display" 
                 className="w-full h-64 object-cover hover:scale-105 transition-transform"
               />
             </div>
@@ -107,29 +107,29 @@ const ProductDisplay = () => {
         
         <hr className="my-10 md:my-16 border-gray-200" />
         
-        <h2 className="text-xl md:text-2xl font-bold text-center mb-8 md:mb-12">Product Testing Videos</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-center mb-8 md:mb-12">Featured iPhone Models</h2>
         
         <div className={`grid ${isMobile ? 'grid-cols-1 gap-8' : 'md:grid-cols-2 gap-12'} max-w-4xl mx-auto`}>
           <div className="flex flex-col items-center">
-            <div className="w-32 h-32 md:w-40 md:h-40 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <div className="w-32 h-32 md:w-40 md:h-40 bg-gray-100 rounded-full flex items-center justify-center mb-4 overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1586953208448-b95a79798f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80" 
-                alt="iPhone" 
-                className="w-20 md:w-24 h-auto"
+                src="/lovable-uploads/f38cab13-f016-49bf-b6b8-985824c7bf99.png" 
+                alt="iPhone 12" 
+                className="w-full h-full object-cover"
               />
             </div>
-            <h3 className="text-xl font-medium">iPhone</h3>
+            <h3 className="text-xl font-medium">iPhone 12 Series</h3>
           </div>
           
           <div className="flex flex-col items-center">
-            <div className="w-32 h-32 md:w-40 md:h-40 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <div className="w-32 h-32 md:w-40 md:h-40 bg-gray-100 rounded-full flex items-center justify-center mb-4 overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80" 
-                alt="Samsung Phones" 
-                className="w-20 md:w-24 h-auto"
+                src="/lovable-uploads/6b84953c-3f6f-4c0d-9196-0026598d3afe.png" 
+                alt="iPhone Pro Models" 
+                className="w-full h-full object-cover"
               />
             </div>
-            <h3 className="text-xl font-medium">Samsung Phones</h3>
+            <h3 className="text-xl font-medium">iPhone Pro Models</h3>
           </div>
         </div>
       </div>

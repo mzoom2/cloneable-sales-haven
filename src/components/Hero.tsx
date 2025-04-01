@@ -4,8 +4,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "react-router-dom";
 
 const Hero = () => {
-  // Updated to use a different phone image
-  const PHONE_IMAGE_URL = "https://images.unsplash.com/photo-1605236453806-6ff36851218e?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80";
+  // Updated to use the uploaded iPhone image
+  const PHONE_IMAGE_URL = "/lovable-uploads/6b84953c-3f6f-4c0d-9196-0026598d3afe.png";
   const isMobile = useIsMobile();
 
   return (
@@ -25,7 +25,7 @@ const Hero = () => {
               className="bg-indigo-600 hover:bg-indigo-700 text-white px-6"
               asChild
             >
-              <Link to="/pre-register">Register Now</Link>
+              <Link to="/preregister">Register Now</Link>
             </Button>
           </div>
           
@@ -92,8 +92,8 @@ const Hero = () => {
           <div className="w-full lg:w-1/2 flex justify-center pt-8 lg:pt-0 z-10">
             <img 
               src={PHONE_IMAGE_URL} 
-              alt="Smartphone preview" 
-              className="w-full max-w-md h-auto object-contain"
+              alt="iPhone product display" 
+              className="w-full max-w-md h-auto object-contain rounded-lg"
             />
           </div>
         )}
