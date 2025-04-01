@@ -67,6 +67,7 @@ const Footer = () => {
           <Link to="/grading-scale" className="text-sm hover:underline">Grading Scale</Link>
           <Link to="/return-policy" className="text-sm hover:underline">Return Policy</Link>
           <Link to="/shipping-policy" className="text-sm hover:underline">Shipping Policy</Link>
+          <Link to="/track" className="text-sm hover:underline">Track Order</Link>
           <Link to="/faq" className="text-sm hover:underline">FAQ</Link>
           <Link to="/blog" className="text-sm hover:underline">Blog</Link>
           <Link to="/become-agent" className="text-sm hover:underline">Become an Agent</Link>

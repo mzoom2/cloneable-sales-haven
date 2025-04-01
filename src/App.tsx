@@ -21,6 +21,8 @@ import CartPage from './pages/CartPage';
 import ShopList from './pages/ShopList';
 import OffersPage from './pages/OffersPage';
 import OfferAcceptedDialog from './components/OfferAcceptedDialog';
+import TrackingPage from './pages/TrackingPage';
+import TrackingDetailsPage from './pages/TrackingDetailsPage';
 
 function App() {
   return (
@@ -43,6 +45,8 @@ function App() {
               <Route path="/cart" element={<CartPage />} />
               <Route path="/shop-list" element={<ShopList />} />
               <Route path="/offers" element={<OffersPage />} />
+              <Route path="/track" element={<TrackingPage />} />
+              <Route path="/tracking-details/:trackingNumber" element={<TrackingDetailsPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />
