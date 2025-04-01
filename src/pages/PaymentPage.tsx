@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -14,7 +13,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
-import { PaymentMethod, paymentOptions, getPaymentDetails, createOrder, createPayment, confirmPayment } from '@/services/PaymentService';
+import { PaymentMethod, paymentOptions, getPaymentDetails, createOrder, createPayment, confirmPayment, PaymentDetails } from '@/services/PaymentService';
 import { 
   ArrowRight, 
   Check, 
@@ -38,6 +37,8 @@ const PaymentPage = () => {
   const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [trackingNumber, setTrackingNumber] = useState<string | null>(null);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({});
+  const [isLoadingPaymentDetails, setIsLoadingPaymentDetails] = useState(false);
   
   const totalAmount = getTotalPrice();
   
@@ -69,6 +70,30 @@ const PaymentPage = () => {
     
     createNewOrder();
   }, []);
+  
+  // Load payment details when payment method changes
+  useEffect(() => {
+    const loadPaymentDetails = async () => {
+      if (!selectedPaymentMethod) return;
+      
+      setIsLoadingPaymentDetails(true);
+      try {
+        const details = await getPaymentDetails(selectedPaymentMethod);
+        setPaymentDetails(details);
+      } catch (error) {
+        console.error('Failed to load payment details:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load payment details. Using default values.',
+          variant: 'destructive'
+        });
+      } finally {
+        setIsLoadingPaymentDetails(false);
+      }
+    };
+    
+    loadPaymentDetails();
+  }, [selectedPaymentMethod]);
   
   const handlePaymentMethodSelect = (method: PaymentMethod) => {
     setSelectedPaymentMethod(method);
@@ -130,7 +155,13 @@ const PaymentPage = () => {
 
   // Render payment details based on selected method
   const renderPaymentDetails = () => {
-    const details = getPaymentDetails(selectedPaymentMethod);
+    if (isLoadingPaymentDetails) {
+      return (
+        <div className="py-10 flex justify-center">
+          <Loader2 size={24} className="animate-spin text-indigo-600" />
+        </div>
+      );
+    }
     
     switch (selectedPaymentMethod) {
       case 'bank_transfer':
@@ -139,11 +170,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Bank Name</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.bank_transfer?.bankName}</p>
+                <p>{paymentDetails.bank_transfer?.bankName}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.bank_transfer?.bankName || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.bank_transfer?.bankName || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -153,11 +184,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Account Number</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.bank_transfer?.accountNumber}</p>
+                <p>{paymentDetails.bank_transfer?.accountNumber}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.bank_transfer?.accountNumber || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.bank_transfer?.accountNumber || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -167,11 +198,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Account Name</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.bank_transfer?.accountName}</p>
+                <p>{paymentDetails.bank_transfer?.accountName}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.bank_transfer?.accountName || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.bank_transfer?.accountName || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -181,11 +212,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Routing Number</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.bank_transfer?.routingNumber}</p>
+                <p>{paymentDetails.bank_transfer?.routingNumber}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.bank_transfer?.routingNumber || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.bank_transfer?.routingNumber || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -195,11 +226,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Swift Code</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.bank_transfer?.swiftCode}</p>
+                <p>{paymentDetails.bank_transfer?.swiftCode}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.bank_transfer?.swiftCode || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.bank_transfer?.swiftCode || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -214,11 +245,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Recipient Name</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.western_union?.recipientName}</p>
+                <p>{paymentDetails.western_union?.recipientName}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.western_union?.recipientName || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.western_union?.recipientName || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -228,11 +259,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">City</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.western_union?.city}</p>
+                <p>{paymentDetails.western_union?.city}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.western_union?.city || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.western_union?.city || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -242,11 +273,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Country</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.western_union?.country}</p>
+                <p>{paymentDetails.western_union?.country}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.western_union?.country || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.western_union?.country || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -266,12 +297,12 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Address</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md overflow-auto">
-                <p className="text-xs md:text-sm break-all">{details.crypto?.address}</p>
+                <p className="text-xs md:text-sm break-all">{paymentDetails.crypto?.address}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
                   className="ml-2 flex-shrink-0"
-                  onClick={() => handleCopyToClipboard(details.crypto?.address || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.crypto?.address || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -281,11 +312,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Network</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.crypto?.network}</p>
+                <p>{paymentDetails.crypto?.network}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.crypto?.network || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.crypto?.network || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -304,11 +335,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">PayPal Email</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.paypal?.email}</p>
+                <p>{paymentDetails.paypal?.email}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.paypal?.email || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.paypal?.email || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -331,11 +362,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Recipient Name</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.ria?.recipientName}</p>
+                <p>{paymentDetails.ria?.recipientName}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.ria?.recipientName || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.ria?.recipientName || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -345,11 +376,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Address</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.ria?.address}</p>
+                <p>{paymentDetails.ria?.address}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.ria?.address || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.ria?.address || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -368,11 +399,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Phone Number (FPS ID)</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.fps?.phoneNumber}</p>
+                <p>{paymentDetails.fps?.phoneNumber}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.fps?.phoneNumber || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.fps?.phoneNumber || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -382,11 +413,11 @@ const PaymentPage = () => {
             <div className="space-y-2">
               <p className="text-sm font-medium">Account Name</p>
               <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                <p>{details.fps?.accountName}</p>
+                <p>{paymentDetails.fps?.accountName}</p>
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  onClick={() => handleCopyToClipboard(details.fps?.accountName || '')}
+                  onClick={() => handleCopyToClipboard(paymentDetails.fps?.accountName || '')}
                 >
                   <Copy size={16} />
                 </Button>
@@ -401,7 +432,7 @@ const PaymentPage = () => {
         
       case 'alipay':
       case 'wechat':
-        const qrDetails = selectedPaymentMethod === 'alipay' ? details.alipay : details.wechat;
+        const qrDetails = selectedPaymentMethod === 'alipay' ? paymentDetails.alipay : paymentDetails.wechat;
         return (
           <div className="space-y-4">
             <div className="flex justify-center">

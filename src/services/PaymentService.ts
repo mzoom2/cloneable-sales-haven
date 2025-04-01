@@ -1,3 +1,4 @@
+
 import { CartItem } from '@/contexts/CartContext';
 
 export interface CreateOrderRequest {
@@ -134,60 +135,139 @@ export const paymentOptions: PaymentOption[] = [
   }
 ];
 
-// Mock payment details for demonstration
-export const getPaymentDetails = (method: PaymentMethod): PaymentDetails => {
+// Get all payment details from the backend
+export const getAllPaymentDetails = async (): Promise<PaymentDetails> => {
+  try {
+    const response = await fetch('/api/payment-settings');
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch payment details');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching payment details:', error);
+    // Return mock data as fallback
+    return getDefaultPaymentDetails();
+  }
+};
+
+// Update payment details
+export const updatePaymentDetails = async (details: PaymentDetails): Promise<void> => {
+  try {
+    const response = await fetch('/api/payment-settings', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(details)
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to update payment details');
+    }
+  } catch (error) {
+    console.error('Error updating payment details:', error);
+    throw error;
+  }
+};
+
+// Mock default payment details for demonstration
+export const getDefaultPaymentDetails = (): PaymentDetails => {
+  return {
+    bank_transfer: {
+      bankName: 'UEPhone Bank',
+      accountNumber: '1234567890',
+      accountName: 'UEPhone Ltd',
+      routingNumber: '987654321',
+      swiftCode: 'UEPHNK22'
+    },
+    western_union: {
+      recipientName: 'UEPhone Limited',
+      city: 'Hong Kong',
+      country: 'China'
+    },
+    crypto: {
+      address: '0x1a2b3c4d5e6f7g8h9i0j',
+      network: 'Bitcoin/Ethereum (ERC-20)'
+    },
+    paypal: {
+      email: 'payments@uephones.com'
+    },
+    ria: {
+      recipientName: 'UEPhone Limited',
+      address: '123 Tech Street, Hong Kong'
+    },
+    fps: {
+      phoneNumber: '+85246297806',
+      accountName: 'UEPhone Limited'
+    },
+    alipay: {
+      qrCodeUrl: 'https://placeholder.com/alipay-qr'
+    },
+    wechat: {
+      qrCodeUrl: 'https://placeholder.com/wechat-qr'
+    }
+  };
+};
+
+// Get payment details for a specific method (first tries to fetch from backend, fallbacks to default)
+export const getPaymentDetails = async (method: PaymentMethod): Promise<PaymentDetails> => {
+  try {
+    const allDetails = await getAllPaymentDetails();
+    return filterPaymentDetailsByMethod(allDetails, method);
+  } catch (error) {
+    console.error('Error getting payment details, using defaults:', error);
+    const defaultDetails = getDefaultPaymentDetails();
+    return filterPaymentDetailsByMethod(defaultDetails, method);
+  }
+};
+
+// Helper function to filter payment details by method
+const filterPaymentDetailsByMethod = (allDetails: PaymentDetails, method: PaymentMethod): PaymentDetails => {
   const details: PaymentDetails = {};
   
   switch (method) {
     case 'bank_transfer':
-      details.bank_transfer = {
-        bankName: 'UEPhone Bank',
-        accountNumber: '1234567890',
-        accountName: 'UEPhone Ltd',
-        routingNumber: '987654321',
-        swiftCode: 'UEPHNK22'
-      };
+      if (allDetails.bank_transfer) {
+        details.bank_transfer = allDetails.bank_transfer;
+      }
       break;
     case 'western_union':
-      details.western_union = {
-        recipientName: 'UEPhone Limited',
-        city: 'Hong Kong',
-        country: 'China'
-      };
+      if (allDetails.western_union) {
+        details.western_union = allDetails.western_union;
+      }
       break;
     case 'bitcoin':
     case 'usdt':
-      details.crypto = {
-        address: '0x1a2b3c4d5e6f7g8h9i0j',
-        network: method === 'bitcoin' ? 'Bitcoin' : 'Ethereum (ERC-20)'
-      };
+      if (allDetails.crypto) {
+        details.crypto = allDetails.crypto;
+      }
       break;
     case 'paypal':
-      details.paypal = {
-        email: 'payments@uephones.com'
-      };
+      if (allDetails.paypal) {
+        details.paypal = allDetails.paypal;
+      }
       break;
     case 'ria':
-      details.ria = {
-        recipientName: 'UEPhone Limited',
-        address: '123 Tech Street, Hong Kong'
-      };
+      if (allDetails.ria) {
+        details.ria = allDetails.ria;
+      }
       break;
     case 'fps':
-      details.fps = {
-        phoneNumber: '+85246297806',
-        accountName: 'UEPhone Limited'
-      };
+      if (allDetails.fps) {
+        details.fps = allDetails.fps;
+      }
       break;
     case 'alipay':
-      details.alipay = {
-        qrCodeUrl: 'https://placeholder.com/alipay-qr'
-      };
+      if (allDetails.alipay) {
+        details.alipay = allDetails.alipay;
+      }
       break;
     case 'wechat':
-      details.wechat = {
-        qrCodeUrl: 'https://placeholder.com/wechat-qr'
-      };
+      if (allDetails.wechat) {
+        details.wechat = allDetails.wechat;
+      }
       break;
     default:
       break;
