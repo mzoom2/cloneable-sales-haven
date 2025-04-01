@@ -114,3 +114,23 @@ export const updateStoreSettings = async (settings: StoreSettings): Promise<Stor
     return settings;
   }
 };
+
+// Import stock items from frontend data to backend
+export const importStockItems = async (items: StockItem[]): Promise<void> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/import-stock`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(items)
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to import stock items');
+    }
+  } catch (error) {
+    console.error('Error importing stock items:', error);
+    throw error;
+  }
+};

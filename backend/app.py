@@ -167,26 +167,34 @@ def update_store_settings():
         db.session.rollback()
         return jsonify({"error": "Failed to update store settings"}), 500
 
-# Initialize the database and seed with some data
-@app.before_first_request
-def initialize_database():
-    with app.app_context():
-        # Create all tables
-        db.create_all()
+# Import stock items from the frontend data
+@app.route('/api/import-stock', methods=['POST'])
+def import_stock_items():
+    try:
+        # Clear existing stock items
+        StockItem.query.delete()
         
-        # Check if we already have stock items
-        if StockItem.query.count() == 0:
-            # Add some initial stock items
-            initial_items = [
-                StockItem(name="iPhone 13", price=699.99, quantity=25, grade="A+/A", location="HongKong"),
-                StockItem(name="iPhone 12", price=599.99, quantity=30, grade="A+/A", location="USA"),
-                StockItem(name="Samsung S21", price=649.99, quantity=20, grade="A", location="Japan"),
-                StockItem(name="Google Pixel 6", price=549.99, quantity=15, grade="A+", location="Singapore"),
-                StockItem(name="OnePlus 9", price=529.99, quantity=10, grade="B+", location="China")
-            ]
-            db.session.add_all(initial_items)
-            db.session.commit()
-            logger.info("Database initialized with sample stock items")
+        # Get stock items from request
+        items = request.json
+        
+        # Add new stock items
+        for item_data in items:
+            item = StockItem(
+                id=item_data.get('id'),
+                name=item_data.get('name'),
+                price=item_data.get('price'),
+                quantity=item_data.get('quantity'),
+                grade=item_data.get('grade'),
+                location=item_data.get('location')
+            )
+            db.session.add(item)
+            
+        db.session.commit()
+        return jsonify({"message": "Stock items imported successfully"}), 200
+    except Exception as e:
+        logger.error(f"Error importing stock items: {str(e)}")
+        db.session.rollback()
+        return jsonify({"error": f"Failed to import stock items: {str(e)}"}), 500
 
 if __name__ == '__main__':
     with app.app_context():

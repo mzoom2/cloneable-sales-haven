@@ -11,10 +11,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { StockItem } from '@/data/stockItems';
+import { StockItem, stockItems } from '@/data/stockItems';
 import { toast } from '@/hooks/use-toast';
-import { Save, X } from 'lucide-react';
-import { getStockItems, updateStockItem } from '@/services/AdminService';
+import { Save, X, Upload } from 'lucide-react';
+import { getStockItems, updateStockItem, importStockItems } from '@/services/AdminService';
 
 const AdminStockList: React.FC = () => {
   const [items, setItems] = useState<StockItem[]>([]);
@@ -23,6 +23,7 @@ const AdminStockList: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editedPrice, setEditedPrice] = useState("");
   const [editedQuantity, setEditedQuantity] = useState("");
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     // Fetch stock items from the API
@@ -50,6 +51,31 @@ const AdminStockList: React.FC = () => {
     setEditedPrice(item.price.toString());
     setEditedQuantity(item.quantity.toString());
     setIsDialogOpen(true);
+  };
+
+  const handleImportStock = async () => {
+    try {
+      setImporting(true);
+      await importStockItems(stockItems);
+      
+      toast({
+        title: "Import Successful",
+        description: "Stock items have been imported from the frontend data.",
+      });
+      
+      // Refresh the stock items
+      const data = await getStockItems();
+      setItems(data);
+    } catch (error) {
+      console.error('Failed to import stock items:', error);
+      toast({
+        title: "Import Failed",
+        description: "There was an error importing the stock items.",
+        variant: "destructive"
+      });
+    } finally {
+      setImporting(false);
+    }
   };
 
   const handleSaveChanges = async () => {
@@ -119,42 +145,61 @@ const AdminStockList: React.FC = () => {
       <h2 className="text-xl font-semibold mb-4">Stock Management</h2>
       <p className="text-gray-500 mb-6">Update prices and inventory for your products</p>
       
-      <div className="rounded-md border mb-6">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">#</TableHead>
-              <TableHead>Product Name</TableHead>
-              <TableHead className="w-[100px] text-right">Price</TableHead>
-              <TableHead className="w-[100px] text-right">Quantity</TableHead>
-              <TableHead className="w-[100px] text-right">Grade</TableHead>
-              <TableHead className="w-[100px] text-right">Location</TableHead>
-              <TableHead className="w-[100px]">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {items.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>{item.id}</TableCell>
-                <TableCell className="font-medium">{item.name}</TableCell>
-                <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
-                <TableCell className="text-right">{item.quantity}</TableCell>
-                <TableCell className="text-right">{item.grade}</TableCell>
-                <TableCell className="text-right">{item.location}</TableCell>
-                <TableCell>
-                  <Button 
-                    onClick={() => handleEditClick(item)}
-                    variant="outline" 
-                    size="sm"
-                  >
-                    Edit
-                  </Button>
-                </TableCell>
+      {items.length === 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md mb-6">
+          <h3 className="font-medium text-yellow-800 mb-2">No Stock Items Found</h3>
+          <p className="text-sm text-yellow-600 mb-4">
+            Your database is empty. You can import the stock items from the frontend data.
+          </p>
+          <Button 
+            onClick={handleImportStock}
+            disabled={importing}
+            className="bg-yellow-600 hover:bg-yellow-700"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            {importing ? 'Importing...' : 'Import Stock Items'}
+          </Button>
+        </div>
+      )}
+      
+      {items.length > 0 && (
+        <div className="rounded-md border mb-6">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[50px]">#</TableHead>
+                <TableHead>Product Name</TableHead>
+                <TableHead className="w-[100px] text-right">Price</TableHead>
+                <TableHead className="w-[100px] text-right">Quantity</TableHead>
+                <TableHead className="w-[100px] text-right">Grade</TableHead>
+                <TableHead className="w-[100px] text-right">Location</TableHead>
+                <TableHead className="w-[100px]">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {items.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.id}</TableCell>
+                  <TableCell className="font-medium">{item.name}</TableCell>
+                  <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">{item.quantity}</TableCell>
+                  <TableCell className="text-right">{item.grade}</TableCell>
+                  <TableCell className="text-right">{item.location}</TableCell>
+                  <TableCell>
+                    <Button 
+                      onClick={() => handleEditClick(item)}
+                      variant="outline" 
+                      size="sm"
+                    >
+                      Edit
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       {/* Edit dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
