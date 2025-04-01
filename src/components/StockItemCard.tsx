@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,7 +64,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
 
   return (
     <>
-      <div className="border rounded-md mb-4 overflow-hidden">
+      <div className="border rounded-md mb-4 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
         <div className="flex flex-col md:flex-row">
           <div className="flex-1 p-4">
             <h3 className="text-lg font-medium mb-4">{item.name}</h3>
@@ -86,14 +85,14 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
             </div>
           </div>
           
-          <div className={`flex ${isMobile ? 'flex-row justify-between items-center' : 'flex-col md:w-40'} p-4 gap-3 bg-gray-50 md:bg-transparent`}>
+          <div className={`flex ${isMobile ? 'flex-row justify-between' : 'flex-col md:w-48'} p-4 gap-3 bg-gray-50 md:bg-transparent`}>
             <div className={`${isMobile ? '' : 'mb-auto'} text-right`}>
               <span className="font-medium text-blue-700">{item.grade}</span>
             </div>
             
-            <div className="flex flex-row gap-2">
+            <div className={`flex ${isMobile ? 'flex-row' : 'flex-col'} gap-2`}>
               <Button 
-                className="bg-indigo-600 hover:bg-indigo-700"
+                className="bg-indigo-600 hover:bg-indigo-700 w-full"
                 onClick={handleBuyClick}
                 size={isMobile ? "sm" : "default"}
               >
@@ -101,7 +100,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
               </Button>
               <Button 
                 variant="outline" 
-                className="bg-gray-100"
+                className="bg-gray-100 w-full"
                 onClick={handleOfferClick}
                 size={isMobile ? "sm" : "default"}
               >
