@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +22,22 @@ const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({ onUpdateShippin
   const [town, setTown] = useState<string>('');
   const [zipCode, setZipCode] = useState<string>('');
 
+  // Load saved shipping address if available
+  useEffect(() => {
+    const savedAddress = localStorage.getItem('shippingAddress');
+    if (savedAddress) {
+      try {
+        const { country, region, town, zipCode } = JSON.parse(savedAddress);
+        setCountry(country || '');
+        setRegion(region || '');
+        setTown(town || '');
+        setZipCode(zipCode || '');
+      } catch (error) {
+        console.error('Failed to parse saved shipping address', error);
+      }
+    }
+  }, []);
+
   const handleUpdate = () => {
     if (!country || !region || !town) {
       toast({
@@ -31,6 +47,14 @@ const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({ onUpdateShippin
       });
       return;
     }
+
+    // Save shipping address for future use
+    localStorage.setItem('shippingAddress', JSON.stringify({
+      country,
+      region,
+      town,
+      zipCode
+    }));
 
     // Calculate shipping cost based on country
     // In a real app, this would be more dynamic based on various factors

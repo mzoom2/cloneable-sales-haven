@@ -1,82 +1,57 @@
 
+import React from 'react';
+import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Index from './pages/Index';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
+import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import PreRegister from './pages/PreRegister';
+import Register from './pages/Register';
+import NotFound from './pages/NotFound';
+import OrderingGuide from './pages/OrderingGuide';
+import Profile from './pages/Profile';
+import Account from './pages/Account';
+import Videos from './pages/Videos';
+import { CartProvider } from './contexts/CartContext';
+import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { CartProvider } from "./contexts/CartContext";
-import Index from "./pages/Index";
-import ShopList from "./pages/ShopList";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import PreRegister from "./pages/PreRegister";
-import Videos from "./pages/Videos";
-import OrderingGuide from "./pages/OrderingGuide";
-import Account from "./pages/Account";
-import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
-import ContactPage from "./pages/ContactPage";
-import AboutPage from "./pages/AboutPage";
-import CartPage from "./pages/CartPage";
-import OffersPage from "./pages/OffersPage";
-import NotFound from "./pages/NotFound";
+import CartPage from './pages/CartPage';
+import ShopList from './pages/ShopList';
+import OffersPage from './pages/OffersPage';
+import OfferAcceptedDialog from './components/OfferAcceptedDialog';
 
-const queryClient = new QueryClient();
-
-// Animation wrapper component
-const AnimatedRoutes = () => {
-  const location = useLocation();
-  
-  // Scroll to top on route change
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
-  
+function App() {
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.3 }}
-      >
-        <Routes location={location}>
-          <Route path="/" element={<Index />} />
-          <Route path="/shop-list" element={<ShopList />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/pre-register" element={<PreRegister />} />
-          <Route path="/videos" element={<Videos />} />
-          <Route path="/ordering-guide" element={<OrderingGuide />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/offers" element={<OffersPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </motion.div>
-    </AnimatePresence>
-  );
-};
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+    <div className="App">
       <CartProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AnimatedRoutes />
-        </BrowserRouter>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/preregister" element={<PreRegister />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="/videos" element={<Videos />} />
+              <Route path="/ordering-guide" element={<OrderingGuide />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/shop-list" element={<ShopList />} />
+              <Route path="/offers" element={<OffersPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Toaster />
+            <OfferAcceptedDialog />
+          </BrowserRouter>
+        </AuthProvider>
       </CartProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+    </div>
+  );
+}
 
 export default App;
