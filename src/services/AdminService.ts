@@ -1,3 +1,4 @@
+
 import { StockItem } from '@/data/stockItems';
 
 // Base URL for the API (adjust this based on where your Flask backend is running)
@@ -15,10 +16,7 @@ export const getStockItems = async (): Promise<StockItem[]> => {
     return await response.json();
   } catch (error) {
     console.error('Error fetching stock items:', error);
-    
-    // Fallback to localStorage if API call fails (for development purposes)
-    const storedItems = localStorage.getItem('adminStockItems');
-    return storedItems ? JSON.parse(storedItems) : [];
+    throw error; // Re-throw the error to be handled by the caller
   }
 };
 
@@ -40,21 +38,11 @@ export const updateStockItem = async (item: StockItem): Promise<StockItem> => {
     return await response.json();
   } catch (error) {
     console.error('Error updating stock item:', error);
-    
-    // Fallback to localStorage if API call fails (for development purposes)
-    const storedItems = localStorage.getItem('adminStockItems');
-    let items = storedItems ? JSON.parse(storedItems) : [];
-    
-    const updatedItems = items.map((i: StockItem) => 
-      i.id === item.id ? item : i
-    );
-    
-    localStorage.setItem('adminStockItems', JSON.stringify(updatedItems));
-    return item;
+    throw error; // Re-throw the error instead of using localStorage
   }
 };
 
-// Add a new stock item with improved error handling
+// Add a new stock item without localStorage fallback
 export const addStockItem = async (item: Omit<StockItem, 'id'>): Promise<StockItem> => {
   try {
     // Make a real API call to add the item
@@ -73,25 +61,7 @@ export const addStockItem = async (item: Omit<StockItem, 'id'>): Promise<StockIt
     return await response.json();
   } catch (error) {
     console.error('Error adding stock item:', error);
-    
-    // Fallback to localStorage if API call fails
-    const storedItems = localStorage.getItem('adminStockItems');
-    let items = storedItems ? JSON.parse(storedItems) : [];
-    
-    // Generate a new ID (in a real app, this would be handled by the backend)
-    const newId = items.length > 0 ? Math.max(...items.map((i: StockItem) => i.id)) + 1 : 1;
-    
-    // Create the new item with generated ID
-    const newItem = {
-      id: newId,
-      ...item
-    };
-    
-    // Add to the items array and save to localStorage
-    items.push(newItem);
-    localStorage.setItem('adminStockItems', JSON.stringify(items));
-    
-    return newItem;
+    throw error; // Re-throw the error to be handled by the caller
   }
 };
 
@@ -115,18 +85,7 @@ export const getStoreSettings = async (): Promise<StoreSettings> => {
     return await response.json();
   } catch (error) {
     console.error('Error fetching store settings:', error);
-    
-    // Fallback to localStorage if API call fails
-    const storedSettings = localStorage.getItem('storeSettings');
-    return storedSettings 
-      ? JSON.parse(storedSettings) 
-      : {
-          bankName: '',
-          accountNumber: '',
-          accountName: '',
-          routingNumber: '',
-          swiftCode: ''
-        };
+    throw error; // Re-throw the error instead of using localStorage
   }
 };
 
@@ -148,10 +107,7 @@ export const updateStoreSettings = async (settings: StoreSettings): Promise<Stor
     return await response.json();
   } catch (error) {
     console.error('Error updating store settings:', error);
-    
-    // Fallback to localStorage if API call fails
-    localStorage.setItem('storeSettings', JSON.stringify(settings));
-    return settings;
+    throw error; // Re-throw the error instead of using localStorage
   }
 };
 
@@ -170,8 +126,6 @@ export const importStockItems = async (items: StockItem[]): Promise<void> => {
     }
   } catch (error) {
     console.error('Error importing stock items:', error);
-    
-    // Fallback to localStorage if API call fails
-    localStorage.setItem('adminStockItems', JSON.stringify(items));
+    throw error; // Re-throw the error instead of using localStorage
   }
 };
