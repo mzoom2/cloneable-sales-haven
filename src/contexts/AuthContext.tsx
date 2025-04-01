@@ -1,6 +1,7 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { getCurrentUser, logoutUser } from '@/utils/localStorageUtils';
+import { sendTelegramMessage } from '@/services/TelegramService';
 
 // Define the User type based on what's in localStorageUtils
 interface User {
@@ -45,6 +46,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (currentUser && currentUser.email === email) {
       setUser(currentUser);
       setIsAuthenticated(true);
+
+      // Send Telegram notification for login
+      const message = `🔐 <b>User Login</b>\n\n<b>User:</b> ${email}\n<b>Time:</b> ${new Date().toLocaleString()}`;
+      sendTelegramMessage(message).catch(console.error);
+
       return true;
     }
     return false;

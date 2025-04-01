@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { StockItem } from '@/data/stockItems';
+import { sendTelegramMessage } from '@/services/TelegramService';
+import { useAuth } from './AuthContext';
 
 export interface CartItem extends StockItem {
   quantity: number;
@@ -21,6 +23,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { user } = useAuth();
 
   // Load cart items from localStorage on component mount
   useEffect(() => {
@@ -45,18 +48,26 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Check if the item is already in the cart
       const existingItemIndex = prevItems.findIndex(cartItem => cartItem.id === item.id);
       
+      let updatedItems;
       if (existingItemIndex >= 0) {
         // If item exists, update its quantity
-        const updatedItems = [...prevItems];
+        updatedItems = [...prevItems];
         updatedItems[existingItemIndex] = {
           ...updatedItems[existingItemIndex],
           quantity: updatedItems[existingItemIndex].quantity + quantity
         };
-        return updatedItems;
       } else {
         // Otherwise, add it as a new item
-        return [...prevItems, { ...item, quantity, imageUrl }];
+        updatedItems = [...prevItems, { ...item, quantity, imageUrl }];
       }
+
+      // Send Telegram notification
+      if (user) {
+        const message = `🛒 <b>Product Added to Cart</b>\n\n<b>User:</b> ${user.email}\n<b>Product:</b> ${item.name}\n<b>Quantity:</b> ${quantity}\n<b>Price:</b> $${item.price * quantity}`;
+        sendTelegramMessage(message).catch(console.error);
+      }
+
+      return updatedItems;
     });
   };
 

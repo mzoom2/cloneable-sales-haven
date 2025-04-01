@@ -1,5 +1,5 @@
-
 import { CartItem } from '@/contexts/CartContext';
+import { sendTelegramMessage, formatCartItems } from '@/services/TelegramService';
 
 export interface CreateOrderRequest {
   user_id: string; // This will now be the user's email
@@ -301,7 +301,7 @@ export const createOrder = async (cartItems: CartItem[], userEmail: string, tota
     };
     
     const response = await fetch('http://localhost:5000/api/orders', {
-      method: 'POST',
+      method: "POST",
       headers: {
         'Content-Type': 'application/json'
       },
@@ -314,7 +314,20 @@ export const createOrder = async (cartItems: CartItem[], userEmail: string, tota
       throw new Error(`Failed to create order: ${response.status} ${errorText}`);
     }
     
-    return await response.json();
+    const orderResult = await response.json();
+
+    // Send Telegram notification
+    try {
+      
+      
+      const message = `💰 <b>New Order Created</b>\n\n<b>User:</b> ${userEmail}\n<b>Order ID:</b> ${orderResult.order_id}\n<b>Total Amount:</b> $${totalAmount.toFixed(2)}\n\n<b>Items:</b>\n${formatCartItems(cartItems)}`;
+      
+      sendTelegramMessage(message).catch(console.error);
+    } catch (err) {
+      console.error('Failed to send Telegram notification for order', err);
+    }
+    
+    return orderResult;
   } catch (error) {
     console.error('Error creating order:', error);
     throw error;
@@ -337,7 +350,7 @@ export const createPayment = async (orderId: number, paymentMethod: PaymentMetho
     };
     
     const response = await fetch('http://localhost:5000/api/payments', {
-      method: 'POST',
+      method: "POST",
       headers: {
         'Content-Type': 'application/json'
       },
@@ -350,7 +363,20 @@ export const createPayment = async (orderId: number, paymentMethod: PaymentMetho
       throw new Error(`Failed to create payment: ${response.status} ${errorText}`);
     }
     
-    return await response.json();
+    const paymentResult = await response.json();
+
+    // Send Telegram notification for payment
+    try {
+      
+      
+      const message = `💳 <b>Payment Created</b>\n\n<b>Order ID:</b> ${orderId}\n<b>Payment ID:</b> ${paymentResult.id}\n<b>Method:</b> ${paymentMethod}\n<b>Amount:</b> $${amount.toFixed(2)}`;
+      
+      sendTelegramMessage(message).catch(console.error);
+    } catch (err) {
+      console.error('Failed to send Telegram notification for payment', err);
+    }
+    
+    return paymentResult;
   } catch (error) {
     console.error('Error creating payment:', error);
     throw error;
@@ -361,7 +387,7 @@ export const createPayment = async (orderId: number, paymentMethod: PaymentMetho
 export const confirmPayment = async (paymentId: number) => {
   try {
     const response = await fetch(`http://localhost:5000/api/payments/${paymentId}/confirm`, {
-      method: 'POST',
+      method: "POST",
       headers: {
         'Content-Type': 'application/json'
       }
@@ -373,7 +399,20 @@ export const confirmPayment = async (paymentId: number) => {
       throw new Error(`Failed to confirm payment: ${response.status} ${errorText}`);
     }
     
-    return await response.json();
+    const confirmResult = await response.json();
+
+    // Send Telegram notification for confirmed payment
+    try {
+      
+      
+      const message = `✅ <b>Payment Confirmed</b>\n\n<b>Payment ID:</b> ${paymentId}\n<b>Tracking Number:</b> ${confirmResult.tracking_number}`;
+      
+      sendTelegramMessage(message).catch(console.error);
+    } catch (err) {
+      console.error('Failed to send Telegram notification for payment confirmation', err);
+    }
+    
+    return confirmResult;
   } catch (error) {
     console.error('Error confirming payment:', error);
     throw error;
