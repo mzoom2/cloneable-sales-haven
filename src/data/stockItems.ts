@@ -1,11 +1,10 @@
-
 export interface StockItem {
   id: number;
   name: string;
   quantity: number;
   price: number;
   location: string;
-  grade: 'A+/A' | 'A++' | 'A/A' | 'AB';
+  grade: string; // Changed from union type to any string
 }
 
 export const stockItems: StockItem[] = [

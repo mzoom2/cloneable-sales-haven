@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Table, 
@@ -16,6 +15,7 @@ import { StockItem, stockItems as sampleStockItems } from '@/data/stockItems';
 import { toast } from '@/hooks/use-toast';
 import { Save, X, Upload, RefreshCw, Plus } from 'lucide-react';
 import { getStockItems, updateStockItem, importStockItems, addStockItem } from '@/services/AdminService';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const AdminStockList: React.FC = () => {
   const [items, setItems] = useState<StockItem[]>([]);
@@ -27,12 +27,12 @@ const AdminStockList: React.FC = () => {
   const [importing, setImporting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   
-  // New state for add item dialog
+  // New state for add item dialog with predefined grade options
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newItemName, setNewItemName] = useState("");
   const [newItemPrice, setNewItemPrice] = useState("");
   const [newItemQuantity, setNewItemQuantity] = useState("");
-  const [newItemGrade, setNewItemGrade] = useState("");
+  const [newItemGrade, setNewItemGrade] = useState("A+/A");
   const [newItemLocation, setNewItemLocation] = useState("");
 
   const fetchItems = async () => {
@@ -156,7 +156,7 @@ const AdminStockList: React.FC = () => {
     }
   };
 
-  // New function to handle adding a stock item
+  // Updated handleAddItem function to use the correct grade type
   const handleAddItem = async () => {
     // Validate input
     const price = parseFloat(newItemPrice);
@@ -189,10 +189,10 @@ const AdminStockList: React.FC = () => {
       return;
     }
 
-    if (!newItemGrade.trim()) {
+    if (!newItemGrade) {
       toast({
         title: "Invalid Grade",
-        description: "Please enter a valid grade",
+        description: "Please select a valid grade",
         variant: "destructive"
       });
       return;
@@ -208,7 +208,7 @@ const AdminStockList: React.FC = () => {
     }
 
     try {
-      // Create new item object
+      // Create new item object with the correct grade type
       const newItem = {
         name: newItemName,
         price: price,
@@ -227,7 +227,7 @@ const AdminStockList: React.FC = () => {
       setNewItemName("");
       setNewItemPrice("");
       setNewItemQuantity("");
-      setNewItemGrade("");
+      setNewItemGrade("A+/A");
       setNewItemLocation("");
       
       // Close dialog
@@ -251,6 +251,7 @@ const AdminStockList: React.FC = () => {
     return <div className="flex justify-center py-10">Loading...</div>;
   }
 
+  // Update the Add Item Dialog to use Select for grade
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -445,12 +446,17 @@ const AdminStockList: React.FC = () => {
             
             <div className="space-y-2">
               <Label htmlFor="grade">Grade</Label>
-              <Input
-                id="grade"
-                value={newItemGrade}
-                onChange={(e) => setNewItemGrade(e.target.value)}
-                placeholder="A, B, C, etc."
-              />
+              <Select value={newItemGrade} onValueChange={setNewItemGrade}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select grade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="A+/A">A+/A</SelectItem>
+                  <SelectItem value="A++">A++</SelectItem>
+                  <SelectItem value="A/A">A/A</SelectItem>
+                  <SelectItem value="AB">AB</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="space-y-2">
