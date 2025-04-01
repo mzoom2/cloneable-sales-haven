@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -79,6 +78,29 @@ def get_stock_items():
     except Exception as e:
         logger.error(f"Error fetching stock items: {str(e)}")
         return jsonify({"error": "Failed to fetch stock items"}), 500
+
+# Add a new endpoint to add a stock item
+@app.route('/api/stock', methods=['POST'])
+def add_stock_item():
+    try:
+        data = request.json
+        
+        new_item = StockItem(
+            name=data.get('name'),
+            price=data.get('price'),
+            quantity=data.get('quantity'),
+            grade=data.get('grade'),
+            location=data.get('location')
+        )
+        
+        db.session.add(new_item)
+        db.session.commit()
+        
+        return jsonify(new_item.to_dict()), 201
+    except Exception as e:
+        logger.error(f"Error adding stock item: {str(e)}")
+        db.session.rollback()
+        return jsonify({"error": f"Failed to add stock item: {str(e)}"}), 500
 
 @app.route('/api/stock/<int:item_id>', methods=['GET'])
 def get_stock_item(item_id):

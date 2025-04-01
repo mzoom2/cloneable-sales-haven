@@ -10,11 +10,12 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StockItem, stockItems as sampleStockItems } from '@/data/stockItems';
 import { toast } from '@/hooks/use-toast';
-import { Save, X, Upload, RefreshCw } from 'lucide-react';
-import { getStockItems, updateStockItem, importStockItems } from '@/services/AdminService';
+import { Save, X, Upload, RefreshCw, Plus } from 'lucide-react';
+import { getStockItems, updateStockItem, importStockItems, addStockItem } from '@/services/AdminService';
 
 const AdminStockList: React.FC = () => {
   const [items, setItems] = useState<StockItem[]>([]);
@@ -25,6 +26,14 @@ const AdminStockList: React.FC = () => {
   const [editedQuantity, setEditedQuantity] = useState("");
   const [importing, setImporting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // New state for add item dialog
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newItemName, setNewItemName] = useState("");
+  const [newItemPrice, setNewItemPrice] = useState("");
+  const [newItemQuantity, setNewItemQuantity] = useState("");
+  const [newItemGrade, setNewItemGrade] = useState("");
+  const [newItemLocation, setNewItemLocation] = useState("");
 
   const fetchItems = async () => {
     try {
@@ -147,6 +156,97 @@ const AdminStockList: React.FC = () => {
     }
   };
 
+  // New function to handle adding a stock item
+  const handleAddItem = async () => {
+    // Validate input
+    const price = parseFloat(newItemPrice);
+    const quantity = parseInt(newItemQuantity);
+
+    if (!newItemName.trim()) {
+      toast({
+        title: "Invalid Name",
+        description: "Please enter a valid product name",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (isNaN(price) || price <= 0) {
+      toast({
+        title: "Invalid Price",
+        description: "Please enter a valid price greater than zero",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (isNaN(quantity) || quantity < 0) {
+      toast({
+        title: "Invalid Quantity",
+        description: "Please enter a valid quantity",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!newItemGrade.trim()) {
+      toast({
+        title: "Invalid Grade",
+        description: "Please enter a valid grade",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!newItemLocation.trim()) {
+      toast({
+        title: "Invalid Location",
+        description: "Please enter a valid location",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Create new item object
+      const newItem = {
+        name: newItemName,
+        price: price,
+        quantity: quantity,
+        grade: newItemGrade,
+        location: newItemLocation
+      };
+
+      // Add item via API
+      const addedItem = await addStockItem(newItem);
+      
+      // Update local state
+      setItems(prevItems => [...prevItems, addedItem]);
+      
+      // Reset form
+      setNewItemName("");
+      setNewItemPrice("");
+      setNewItemQuantity("");
+      setNewItemGrade("");
+      setNewItemLocation("");
+      
+      // Close dialog
+      setIsAddDialogOpen(false);
+      
+      toast({
+        title: "Item Added",
+        description: `${newItemName} has been added successfully`,
+      });
+    } catch (error) {
+      console.error('Failed to add item:', error);
+      toast({
+        title: "Add Failed",
+        description: "There was an error adding the item.",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (loading) {
     return <div className="flex justify-center py-10">Loading...</div>;
   }
@@ -159,15 +259,25 @@ const AdminStockList: React.FC = () => {
           <p className="text-gray-500">Update prices and inventory for your products</p>
         </div>
         
-        <Button 
-          onClick={handleRefresh}
-          variant="outline" 
-          disabled={refreshing}
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-          {refreshing ? 'Refreshing...' : 'Refresh'}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleRefresh}
+            variant="outline" 
+            disabled={refreshing}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            {refreshing ? 'Refreshing...' : 'Refresh'}
+          </Button>
+          
+          <Button 
+            onClick={() => setIsAddDialogOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Add Item
+          </Button>
+        </div>
       </div>
       
       {items.length === 0 && (
@@ -287,6 +397,90 @@ const AdminStockList: React.FC = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Item Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-xl mb-4">Add New Product</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Product Name</Label>
+              <Input
+                id="name"
+                value={newItemName}
+                onChange={(e) => setNewItemName(e.target.value)}
+                placeholder="Enter product name"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="price">Price ($)</Label>
+              <Input
+                id="price"
+                type="number"
+                min="0.01"
+                step="0.01"
+                value={newItemPrice}
+                onChange={(e) => setNewItemPrice(e.target.value)}
+                placeholder="0.00"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="quantity">Quantity</Label>
+              <Input
+                id="quantity"
+                type="number"
+                min="0"
+                value={newItemQuantity}
+                onChange={(e) => setNewItemQuantity(e.target.value)}
+                placeholder="0"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="grade">Grade</Label>
+              <Input
+                id="grade"
+                value={newItemGrade}
+                onChange={(e) => setNewItemGrade(e.target.value)}
+                placeholder="A, B, C, etc."
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                value={newItemLocation}
+                onChange={(e) => setNewItemLocation(e.target.value)}
+                placeholder="Warehouse, Store, etc."
+              />
+            </div>
+            
+            <div className="flex space-x-3 pt-4">
+              <Button 
+                className="flex-1" 
+                onClick={handleAddItem}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Product
+              </Button>
+              <Button 
+                className="flex-1" 
+                variant="outline"
+                onClick={() => setIsAddDialogOpen(false)}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Cancel
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

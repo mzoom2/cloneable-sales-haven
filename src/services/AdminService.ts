@@ -55,6 +55,29 @@ export const updateStockItem = async (item: StockItem): Promise<StockItem> => {
   }
 };
 
+// Add a new stock item
+export const addStockItem = async (item: Omit<StockItem, 'id'>): Promise<StockItem> => {
+  try {
+    // Make a real API call to add the item
+    const response = await fetch(`${API_BASE_URL}/stock`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(item)
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to add stock item');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error adding stock item:', error);
+    throw error;
+  }
+};
+
 export interface StoreSettings {
   bankName: string;
   accountNumber: string;
