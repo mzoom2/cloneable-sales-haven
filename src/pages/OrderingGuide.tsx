@@ -33,7 +33,7 @@ const OrderingGuide = () => {
     <div className="flex flex-col min-h-screen bg-[#f5f5f7]">
       <Header />
       
-      <div className="container mx-auto px-4 py-8 md:py-12">
+      <div className="container mx-auto px-1 py-8 md:py-12">
         <h1 className="text-3xl font-bold mb-8 text-center text-[#333]">Order Repair Guide</h1>
         
         {/* Search bar */}
@@ -50,7 +50,7 @@ const OrderingGuide = () => {
         </div>
         
         {/* Main content */}
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex flex-col md:flex-row gap-4">
           {/* Left side - Step navigation */}
           <div className="md:w-1/3">
             <Card className="p-4 bg-white shadow-sm">
