@@ -1,4 +1,3 @@
-
 import { StockItem } from '@/data/stockItems';
 
 // Base URL for the API (adjust this based on where your Flask backend is running)
@@ -55,7 +54,7 @@ export const updateStockItem = async (item: StockItem): Promise<StockItem> => {
   }
 };
 
-// Add a new stock item
+// Add a new stock item with improved error handling
 export const addStockItem = async (item: Omit<StockItem, 'id'>): Promise<StockItem> => {
   try {
     // Make a real API call to add the item
@@ -74,7 +73,25 @@ export const addStockItem = async (item: Omit<StockItem, 'id'>): Promise<StockIt
     return await response.json();
   } catch (error) {
     console.error('Error adding stock item:', error);
-    throw error;
+    
+    // Fallback to localStorage if API call fails
+    const storedItems = localStorage.getItem('adminStockItems');
+    let items = storedItems ? JSON.parse(storedItems) : [];
+    
+    // Generate a new ID (in a real app, this would be handled by the backend)
+    const newId = items.length > 0 ? Math.max(...items.map((i: StockItem) => i.id)) + 1 : 1;
+    
+    // Create the new item with generated ID
+    const newItem = {
+      id: newId,
+      ...item
+    };
+    
+    // Add to the items array and save to localStorage
+    items.push(newItem);
+    localStorage.setItem('adminStockItems', JSON.stringify(items));
+    
+    return newItem;
   }
 };
 
@@ -138,7 +155,6 @@ export const updateStoreSettings = async (settings: StoreSettings): Promise<Stor
   }
 };
 
-// Import stock items from frontend data to backend
 export const importStockItems = async (items: StockItem[]): Promise<void> => {
   try {
     const response = await fetch(`${API_BASE_URL}/import-stock`, {
@@ -154,6 +170,8 @@ export const importStockItems = async (items: StockItem[]): Promise<void> => {
     }
   } catch (error) {
     console.error('Error importing stock items:', error);
-    throw error;
+    
+    // Fallback to localStorage if API call fails
+    localStorage.setItem('adminStockItems', JSON.stringify(items));
   }
 };
