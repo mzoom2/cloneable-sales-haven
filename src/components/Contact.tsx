@@ -65,7 +65,7 @@ const Contact = () => {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Get in Touch</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Have questions about the UEEPhone? Our team is here to help you make the right choice.
+            Have questions about the UEEPhones? Our team is here to help you make the right choice.
           </p>
         </div>
         
@@ -153,7 +153,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium">Phone</h4>
-                    <p className="text-sm text-muted-foreground">+1 (800) UEE-PHONE</p>
+                    <p className="text-sm text-muted-foreground">+85246297806</p>
                     <p className="text-sm text-muted-foreground">Mon-Fri, 9am-6pm EST</p>
                   </div>
                 </div>
@@ -167,8 +167,8 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium">Email</h4>
-                    <p className="text-sm text-muted-foreground">support@ueephone.com</p>
-                    <p className="text-sm text-muted-foreground">sales@ueephone.com</p>
+                    <p className="text-sm text-muted-foreground">support@ueephones.com</p>
+                    <p className="text-sm text-muted-foreground">sales@ueephones.com</p>
                   </div>
                 </div>
                 
@@ -181,7 +181,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-medium">Address</h4>
-                    <p className="text-sm text-muted-foreground">UEE Headquarters</p>
+                    <p className="text-sm text-muted-foreground">UEEPhones Headquarters</p>
                     <p className="text-sm text-muted-foreground">123 Tech Plaza, Suite 400</p>
                     <p className="text-sm text-muted-foreground">San Francisco, CA 94105</p>
                   </div>

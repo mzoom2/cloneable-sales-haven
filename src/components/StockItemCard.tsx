@@ -97,7 +97,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
                 onClick={handleBuyClick}
                 size={isMobile ? "sm" : "default"}
               >
-                Buy
+                Add to Cart
               </Button>
               <Button 
                 variant="outline" 
@@ -118,7 +118,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
       <Dialog open={buyDialogOpen} onOpenChange={setBuyDialogOpen}>
         <DialogContent className="bg-white p-6 max-w-md mx-4">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-[#1a0050] mb-3">Buy</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-[#1a0050] mb-3">Add to Cart</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-6">
@@ -161,7 +161,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
                 onClick={handleBuy}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3"
               >
-                BUY
+                ADD TO CART
               </Button>
               <Button 
                 variant="outline" 

@@ -34,14 +34,14 @@ const ContactPage = () => {
                 <div className="bg-white rounded-full w-14 h-14 flex items-center justify-center mr-6">
                   <Mail className="text-red-600" size={24} />
                 </div>
-                <span className="text-lg">info@ueephone.com</span>
+                <span className="text-lg">info@ueephones.com</span>
               </div>
               
               <div className="flex items-center">
                 <div className="bg-white rounded-full w-14 h-14 flex items-center justify-center mr-6">
                   <Phone className="text-red-600" size={24} />
                 </div>
-                <span className="text-lg">+852 51341845</span>
+                <span className="text-lg">+85246297806</span>
               </div>
               
               <div className="flex items-center">
@@ -149,9 +149,9 @@ const ContactPage = () => {
           {/* Contact Info Columns */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">ABOUT UEPHONE</h3>
+              <h3 className="text-xl font-bold mb-4">ABOUT UEPHONES</h3>
               <p className="text-gray-600">
-                UEPHONE is a professional used mobile phone supplier in Hong Kong. We sell to small retailers, repair shops, wholesalers, refurbishers, and smaller distributors around the globe, and up to a 6-month warranty is provided.
+                UEPHONES is a professional used mobile phone supplier in Hong Kong. We sell to small retailers, repair shops, wholesalers, refurbishers, and smaller distributors around the globe, and up to a 6-month warranty is provided.
               </p>
             </div>
             
@@ -170,7 +170,7 @@ const ContactPage = () => {
             <div>
               <h3 className="text-xl font-bold mb-4">CONTACT INFO</h3>
               <p className="mb-3">
-                <strong>Email:</strong> info@ueephone.com
+                <strong>Email:</strong> info@ueephones.com
               </p>
               <p className="mb-6">
                 <strong>Address:</strong> No. DD98, LOT54, Kwu Tung North Road(Pak Shek Au Tunnel), Sheung Shui, N.T., Hong Kong
