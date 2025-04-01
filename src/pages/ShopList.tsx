@@ -17,12 +17,13 @@ import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/utils/localStorageUtils";
-import { stockItems } from "@/data/stockItems";
+import { StockItem } from "@/data/stockItems";
 import StockItemCard from "@/components/StockItemCard";
 import FilterSidebar from "@/components/FilterSidebar";
 import { MessageCircle, Filter } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getStockItems } from "@/services/StockService";
 import { 
   Pagination, 
   PaginationContent, 
@@ -44,8 +45,32 @@ const ShopList = () => {
   const [chatEmail, setChatEmail] = useState("");
   const [chatQuestion, setChatQuestion] = useState("");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [stockItems, setStockItems] = useState<StockItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  
+  // Fetch stock items
+  useEffect(() => {
+    const fetchStockItems = async () => {
+      try {
+        setLoading(true);
+        const items = await getStockItems();
+        setStockItems(items);
+      } catch (error) {
+        console.error("Error fetching stock items:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load stock items",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchStockItems();
+  }, []);
   
   // Calculate total pages
   const totalPages = Math.ceil(stockItems.length / ITEMS_PER_PAGE);
@@ -289,7 +314,11 @@ const ShopList = () => {
 
       {/* Main content */}
       <div className="flex-grow container mx-auto px-4 py-8">
-        {isLoggedIn ? (
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+          </div>
+        ) : isLoggedIn ? (
           <>
             <div className="flex flex-col md:flex-row gap-8">
               {/* Mobile filter sidebar (shows as a dialog) */}
@@ -342,9 +371,15 @@ const ShopList = () => {
                 
                 {/* Product listings */}
                 <div className="space-y-4">
-                  {currentItems.map(item => (
-                    <StockItemCard key={item.id} item={item} />
-                  ))}
+                  {currentItems.length > 0 ? (
+                    currentItems.map(item => (
+                      <StockItemCard key={item.id} item={item} />
+                    ))
+                  ) : (
+                    <div className="p-8 text-center bg-gray-50 rounded-lg">
+                      <p className="text-gray-500">No items found. Please adjust your search or check back later.</p>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Pagination - simplified on mobile */}

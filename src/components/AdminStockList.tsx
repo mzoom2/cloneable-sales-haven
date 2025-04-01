@@ -11,9 +11,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { StockItem, stockItems } from '@/data/stockItems';
+import { StockItem, stockItems as sampleStockItems } from '@/data/stockItems';
 import { toast } from '@/hooks/use-toast';
-import { Save, X, Upload } from 'lucide-react';
+import { Save, X, Upload, RefreshCw } from 'lucide-react';
 import { getStockItems, updateStockItem, importStockItems } from '@/services/AdminService';
 
 const AdminStockList: React.FC = () => {
@@ -24,25 +24,27 @@ const AdminStockList: React.FC = () => {
   const [editedPrice, setEditedPrice] = useState("");
   const [editedQuantity, setEditedQuantity] = useState("");
   const [importing, setImporting] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchItems = async () => {
+    try {
+      setLoading(true);
+      const data = await getStockItems();
+      setItems(data);
+    } catch (error) {
+      console.error('Failed to fetch stock items:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load stock items. Using cached data if available.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Fetch stock items from the API
-    const fetchItems = async () => {
-      try {
-        const data = await getStockItems();
-        setItems(data);
-      } catch (error) {
-        console.error('Failed to fetch stock items:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load stock items. Using cached data if available.",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     fetchItems();
   }, []);
 
@@ -56,7 +58,7 @@ const AdminStockList: React.FC = () => {
   const handleImportStock = async () => {
     try {
       setImporting(true);
-      await importStockItems(stockItems);
+      await importStockItems(sampleStockItems);
       
       toast({
         title: "Import Successful",
@@ -64,8 +66,7 @@ const AdminStockList: React.FC = () => {
       });
       
       // Refresh the stock items
-      const data = await getStockItems();
-      setItems(data);
+      await fetchItems();
     } catch (error) {
       console.error('Failed to import stock items:', error);
       toast({
@@ -76,6 +77,16 @@ const AdminStockList: React.FC = () => {
     } finally {
       setImporting(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchItems();
+    setRefreshing(false);
+    toast({
+      title: "Refreshed",
+      description: "Stock items have been refreshed from the database.",
+    });
   };
 
   const handleSaveChanges = async () => {
@@ -142,8 +153,22 @@ const AdminStockList: React.FC = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4">Stock Management</h2>
-      <p className="text-gray-500 mb-6">Update prices and inventory for your products</p>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-xl font-semibold">Stock Management</h2>
+          <p className="text-gray-500">Update prices and inventory for your products</p>
+        </div>
+        
+        <Button 
+          onClick={handleRefresh}
+          variant="outline" 
+          disabled={refreshing}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+          {refreshing ? 'Refreshing...' : 'Refresh'}
+        </Button>
+      </div>
       
       {items.length === 0 && (
         <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md mb-6">

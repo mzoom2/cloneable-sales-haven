@@ -1,5 +1,5 @@
 
-import { stockItems as initialStockItems, StockItem } from '@/data/stockItems';
+import { StockItem } from '@/data/stockItems';
 
 // Base URL for the API
 const API_BASE_URL = 'http://localhost:5000/api';
@@ -17,9 +17,8 @@ export const getStockItems = async (): Promise<StockItem[]> => {
   } catch (error) {
     console.error('Error fetching stock items:', error);
     
-    // Fallback to localStorage or initial data if API call fails
-    const storedItems = localStorage.getItem('adminStockItems');
-    return storedItems ? JSON.parse(storedItems) : initialStockItems;
+    // Return empty array if API call fails
+    return [];
   }
 };
 
@@ -34,9 +33,6 @@ export const getStockItemById = async (id: number): Promise<StockItem | undefine
     return await response.json();
   } catch (error) {
     console.error('Error fetching stock item:', error);
-    
-    // Fallback to local method if API call fails
-    const items = await getStockItems();
-    return items.find(item => item.id === id);
+    return undefined;
   }
 };
