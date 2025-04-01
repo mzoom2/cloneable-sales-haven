@@ -2,16 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { 
-  Truck, Package, MapPin, Clock, 
-  CheckCircle2, AlertCircle, ArrowLeft,
+  MapPin, Clock, 
+  AlertCircle, ArrowLeft,
   Calendar, ChevronDown, ChevronUp, Printer
 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { TrackingStatus, TrackingEvent, getTrackingData } from '@/utils/trackingUtils';
+import OrderProgress from '@/components/OrderProgress';
 
 const TrackingDetailsPage = () => {
   const { trackingNumber } = useParams<{ trackingNumber: string }>();
@@ -46,55 +46,23 @@ const TrackingDetailsPage = () => {
     loadTrackingData();
   }, [trackingNumber, toast]);
   
-  // Get status progress percentage
-  const getProgressPercentage = () => {
-    if (!trackingData) return 0;
+  // Map tracking status to OrderStatus type
+  const mapTrackingStatus = (): 'payment' | 'processing' | 'shipped' | 'delivered' => {
+    if (!trackingData) return 'payment';
     
-    const statusMap: Record<string, number> = {
-      'Order Received': 10,
-      'Processing': 25,
-      'Shipped': 40,
-      'In Transit': 60,
-      'Out for Delivery': 80,
-      'Delivered': 100,
-      'Exception': 60, // For exception cases, show partial progress
-    };
-    
-    return statusMap[trackingData.status] || 0;
-  };
-  
-  // Get status icon
-  const getStatusIcon = () => {
-    if (!trackingData) return <Clock />;
-    
-    const iconMap: Record<string, JSX.Element> = {
-      'Order Received': <Package className="h-8 w-8" />,
-      'Processing': <Package className="h-8 w-8" />,
-      'Shipped': <Truck className="h-8 w-8" />,
-      'In Transit': <Truck className="h-8 w-8" />,
-      'Out for Delivery': <Truck className="h-8 w-8" />,
-      'Delivered': <CheckCircle2 className="h-8 w-8" />,
-      'Exception': <AlertCircle className="h-8 w-8" />,
-    };
-    
-    return iconMap[trackingData.status] || <Clock className="h-8 w-8" />;
-  };
-  
-  // Get color based on status
-  const getStatusColor = () => {
-    if (!trackingData) return 'gray';
-    
-    const colorMap: Record<string, string> = {
-      'Order Received': 'text-blue-600',
-      'Processing': 'text-blue-600',
-      'Shipped': 'text-blue-600',
-      'In Transit': 'text-blue-600',
-      'Out for Delivery': 'text-orange-500',
-      'Delivered': 'text-green-500',
-      'Exception': 'text-red-500',
-    };
-    
-    return colorMap[trackingData.status] || 'text-gray-500';
+    switch (trackingData.status) {
+      case 'Order Received':
+      case 'Processing':
+        return 'processing';
+      case 'Shipped':
+      case 'In Transit':
+      case 'Out for Delivery':
+        return 'shipped';
+      case 'Delivered':
+        return 'delivered';
+      default:
+        return 'payment';
+    }
   };
   
   // Events to show (all or limited)
@@ -138,35 +106,13 @@ const TrackingDetailsPage = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center mt-6 mb-2">
-                  <div className={`mr-4 ${getStatusColor()}`}>
-                    {getStatusIcon()}
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Current Status</p>
-                    <h2 className={`text-xl font-semibold ${getStatusColor()}`}>
-                      {trackingData.status}
-                    </h2>
-                    <p className="text-sm mt-1">
-                      <Clock className="inline h-3 w-3 mr-1" />
-                      {trackingData.estimatedDelivery 
-                        ? `Estimated delivery: ${trackingData.estimatedDelivery}` 
-                        : trackingData.status === 'Delivered' 
-                        ? `Delivered on ${trackingData.deliveryDate}`
-                        : 'Delivery date unavailable'}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="mt-6">
-                  <Progress value={getProgressPercentage()} className="h-2 mb-3" />
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>Order Placed</span>
-                    <span>Processing</span>
-                    <span>Shipped</span>
-                    <span>Delivered</span>
-                  </div>
-                </div>
+                {/* Use new OrderProgress component */}
+                <OrderProgress 
+                  initialStatus={mapTrackingStatus()}
+                  animated={mapTrackingStatus() !== 'delivered'}
+                  shipDate={trackingData.deliveryDate || trackingData.shipDate}
+                  estimatedDelivery={trackingData.estimatedDelivery}
+                />
               </div>
               
               {/* Shipping details */}

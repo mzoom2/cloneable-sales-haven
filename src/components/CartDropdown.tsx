@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, X, ShoppingCart } from "lucide-react";
@@ -17,11 +18,11 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
   const [couponCode, setCouponCode] = useState('');
   const [shipping, setShipping] = useState(0);
   const navigate = useNavigate();
-  const { cartItems, removeFromCart, getTotalPrice, getTotalItems } = useCart();
+  const { cartItems, removeFromCart, getTotalPrice, getUniqueItemsCount } = useCart();
   
   const subtotal = getTotalPrice();
   const total = subtotal + shipping;
-  const itemCount = getTotalItems();
+  const itemCount = getUniqueItemsCount();
   
   if (!isOpen) return null;
 
@@ -91,7 +92,11 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
                     <div key={item.id} className="grid grid-cols-6 gap-4 p-4 border-b items-center">
                       <div className="col-span-1">
                         <div className="w-16 h-16 bg-gray-200 flex items-center justify-center">
-                          <img src="/placeholder.svg" alt={item.name} className="max-w-full max-h-full" />
+                          {item.imageUrl ? (
+                            <img src={item.imageUrl} alt={item.name} className="max-w-full max-h-full object-contain" />
+                          ) : (
+                            <img src="/placeholder.svg" alt={item.name} className="max-w-full max-h-full" />
+                          )}
                         </div>
                       </div>
                       <div className="col-span-2 font-medium">{item.name}</div>

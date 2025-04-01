@@ -92,7 +92,10 @@ const Header = () => {
 
   // Force re-render when cart items change
   const cartItemsCount = getTotalItems();
-
+  
+  // Get the number of unique items in cart instead of total quantity
+  const uniqueItemsCount = cartItems.length;
+  
   return (
     <>
       <header 
@@ -326,7 +329,7 @@ const Header = () => {
                 >
                   <ShoppingCart size={20} />
                   <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {cartItemsCount}
+                    {uniqueItemsCount}
                   </span>
                 </Button>
               </PopoverTrigger>
@@ -347,7 +350,7 @@ const Header = () => {
                     </button>
                   </div>
                   <div className="p-4 text-center">
-                    <p className="mb-4">You have {cartItemsCount} item(s) in your cart</p>
+                    <p className="mb-4">You have {uniqueItemsCount} item(s) in your cart</p>
                     <div className="flex justify-between gap-2">
                       <Button variant="outline" className="flex-1" onClick={goToCart}>
                         View Cart

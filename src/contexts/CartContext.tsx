@@ -3,16 +3,18 @@ import { StockItem } from '@/data/stockItems';
 
 export interface CartItem extends StockItem {
   quantity: number;
+  imageUrl?: string; // Add support for product images
 }
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (item: StockItem, quantity: number) => void;
+  addToCart: (item: StockItem, quantity: number, imageUrl?: string) => void;
   removeFromCart: (itemId: number) => void;
   clearCart: () => void;
   updateQuantity: (itemId: number, quantity: number) => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
+  getUniqueItemsCount: () => number; // New method
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -38,7 +40,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (item: StockItem, quantity: number) => {
+  const addToCart = (item: StockItem, quantity: number, imageUrl?: string) => {
     setCartItems(prevItems => {
       // Check if the item is already in the cart
       const existingItemIndex = prevItems.findIndex(cartItem => cartItem.id === item.id);
@@ -53,7 +55,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return updatedItems;
       } else {
         // Otherwise, add it as a new item
-        return [...prevItems, { ...item, quantity }];
+        return [...prevItems, { ...item, quantity, imageUrl }];
       }
     });
   };
@@ -86,6 +88,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const getTotalPrice = () => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
+  
+  // New method to get the count of unique items
+  const getUniqueItemsCount = () => {
+    return cartItems.length;
+  };
 
   return (
     <CartContext.Provider value={{
@@ -95,7 +102,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clearCart,
       updateQuantity,
       getTotalItems,
-      getTotalPrice
+      getTotalPrice,
+      getUniqueItemsCount
     }}>
       {children}
     </CartContext.Provider>
