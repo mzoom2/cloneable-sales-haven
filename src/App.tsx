@@ -23,6 +23,7 @@ import OffersPage from './pages/OffersPage';
 import OfferAcceptedDialog from './components/OfferAcceptedDialog';
 import TrackingPage from './pages/TrackingPage';
 import TrackingDetailsPage from './pages/TrackingDetailsPage';
+import AdminPage from './pages/AdminPage';
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
               <Route path="/offers" element={<OffersPage />} />
               <Route path="/track" element={<TrackingPage />} />
               <Route path="/tracking-details/:trackingNumber" element={<TrackingDetailsPage />} />
+              <Route path="/admin" element={<AdminPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />
