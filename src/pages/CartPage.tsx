@@ -9,14 +9,15 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from '@/hooks/use-toast';
+import ShippingCalculator from '@/components/ShippingCalculator';
 
 const CartPage = () => {
   const navigate = useNavigate();
   const [couponCode, setCouponCode] = useState('');
   const { cartItems, removeFromCart, updateQuantity, getTotalPrice } = useCart();
+  const [shipping, setShipping] = useState(0); // Default shipping cost
   
   const subtotal = getTotalPrice();
-  const shipping = cartItems.length > 0 ? 25 : 0; // Fixed shipping for now
   const total = subtotal + shipping;
   
   const handleRemoveItem = (itemId: number) => {
@@ -45,6 +46,14 @@ const CartPage = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleUpdateShipping = (amount: number) => {
+    setShipping(amount);
+    toast({
+      title: "Shipping updated",
+      description: `Shipping cost has been set to $${amount.toFixed(2)}`
+    });
   };
   
   return (
@@ -173,14 +182,8 @@ const CartPage = () => {
                       <span>{subtotal.toFixed(2)}$</span>
                     </div>
                     
-                    <div className="flex justify-between py-2 border-b">
-                      <span>Shipping</span>
-                      <div className="text-right">
-                        <p className="text-sm">Flat rate: {shipping.toFixed(2)}$</p>
-                        <Button variant="link" className="text-sm p-0 h-auto text-blue-600">
-                          Calculate shipping
-                        </Button>
-                      </div>
+                    <div className="border-b">
+                      <ShippingCalculator onUpdateShipping={handleUpdateShipping} />
                     </div>
                     
                     <div className="flex justify-between py-4 font-bold">

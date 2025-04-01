@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
+import ShippingCalculator from '@/components/ShippingCalculator';
 
 interface CartDropdownProps {
   isOpen: boolean;
@@ -15,10 +16,12 @@ interface CartDropdownProps {
 const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState<'cart' | 'offers'>('cart');
   const [couponCode, setCouponCode] = useState('');
+  const [shipping, setShipping] = useState(0);
   const navigate = useNavigate();
   const { cartItems, removeFromCart, getTotalPrice } = useCart();
   
   const subtotal = getTotalPrice();
+  const total = subtotal + shipping;
   
   if (!isOpen) return null;
 
@@ -30,6 +33,10 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
   const goToOffers = () => {
     onClose();
     navigate('/offers');
+  };
+
+  const handleUpdateShipping = (amount: number) => {
+    setShipping(amount);
   };
   
   return (
@@ -153,19 +160,13 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
                         <span>{subtotal.toFixed(2)}$</span>
                       </div>
                       
-                      <div className="flex justify-between py-2 border-b">
-                        <span>Shipping</span>
-                        <div className="text-right">
-                          <p className="text-sm">Enter your address to view shipping options.</p>
-                          <Button variant="link" className="text-sm p-0 h-auto text-blue-600">
-                            Calculate shipping
-                          </Button>
-                        </div>
+                      <div className="border-b">
+                        <ShippingCalculator onUpdateShipping={handleUpdateShipping} />
                       </div>
                       
                       <div className="flex justify-between py-4 font-bold">
                         <span>Total</span>
-                        <span>{subtotal.toFixed(2)}$</span>
+                        <span>{total.toFixed(2)}$</span>
                       </div>
                       
                       <Button className="w-full" onClick={goToCart}>
