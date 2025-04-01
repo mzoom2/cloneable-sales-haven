@@ -13,30 +13,16 @@ import {
 import { getOfferById } from '@/services/OfferService';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from '@/hooks/use-toast';
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { StockItem } from '@/data/stockItems';
 import { ShoppingCart } from 'lucide-react';
-
-interface ShippingAddress {
-  country: string;
-  region: string;
-  town: string;
-  zipCode: string;
-}
+import { StockItem } from '@/data/stockItems';
+import ShippingAddressForm, { ShippingAddress } from './ShippingAddressForm';
 
 const OfferAcceptedDialog: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [offerId, setOfferId] = useState<string | null>(null);
   const [offer, setOffer] = useState<any>(null);
   const [useStoredAddress, setUseStoredAddress] = useState(true);
-  const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
-    country: '',
-    region: '',
-    town: '',
-    zipCode: ''
-  });
+  const [showAddressForm, setShowAddressForm] = useState(false);
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
@@ -91,35 +77,20 @@ const OfferAcceptedDialog: React.FC = () => {
     };
   }, []);
 
-  // Load previously saved shipping address if available
-  useEffect(() => {
-    const savedAddress = localStorage.getItem('shippingAddress');
-    if (savedAddress) {
-      try {
-        const parsedAddress = JSON.parse(savedAddress);
-        setShippingAddress(parsedAddress);
-      } catch (error) {
-        console.error('Failed to parse saved shipping address', error);
-      }
-    }
-  }, []);
-
   const handleProceed = () => {
     if (!offer) return;
     
-    // If they chose a new address and it's not complete, show error
-    if (!useStoredAddress && (!shippingAddress.country || !shippingAddress.region || !shippingAddress.town)) {
-      toast({
-        title: "Incomplete address",
-        description: "Please fill in all required address fields",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Save shipping address for future use if it's new
-    if (!useStoredAddress) {
-      localStorage.setItem('shippingAddress', JSON.stringify(shippingAddress));
+    // If they chose to enter a new address but didn't complete it, show error
+    if (showAddressForm) {
+      const savedAddress = localStorage.getItem('shippingAddress');
+      if (!savedAddress) {
+        toast({
+          title: "Incomplete address",
+          description: "Please fill in all required address fields",
+          variant: "destructive"
+        });
+        return;
+      }
     }
     
     // Create a mock stock item from the offer to add to cart - fixed to match StockItem interface
@@ -142,6 +113,11 @@ const OfferAcceptedDialog: React.FC = () => {
     
     setOpen(false);
     navigate('/cart');
+  };
+
+  const handleAddressSubmit = (address: ShippingAddress) => {
+    // Address is saved to localStorage in the ShippingAddressForm component
+    setShowAddressForm(false);
   };
 
   if (!offer) return null;
@@ -167,13 +143,16 @@ const OfferAcceptedDialog: React.FC = () => {
               type="radio"
               id="useExisting"
               name="addressOption"
-              checked={useStoredAddress}
-              onChange={() => setUseStoredAddress(true)}
+              checked={useStoredAddress && !showAddressForm}
+              onChange={() => {
+                setUseStoredAddress(true);
+                setShowAddressForm(false);
+              }}
               className="h-4 w-4 text-purple-600"
             />
-            <Label htmlFor="useExisting">
+            <label htmlFor="useExisting">
               Use existing shipping address
-            </Label>
+            </label>
           </div>
 
           <div className="flex items-center space-x-2">
@@ -181,65 +160,20 @@ const OfferAcceptedDialog: React.FC = () => {
               type="radio"
               id="useNew"
               name="addressOption"
-              checked={!useStoredAddress}
-              onChange={() => setUseStoredAddress(false)}
+              checked={showAddressForm}
+              onChange={() => {
+                setUseStoredAddress(false);
+                setShowAddressForm(true);
+              }}
               className="h-4 w-4 text-purple-600"
             />
-            <Label htmlFor="useNew">
+            <label htmlFor="useNew">
               Enter a new shipping address
-            </Label>
+            </label>
           </div>
 
-          {!useStoredAddress && (
-            <div className="space-y-3">
-              <div>
-                <Label htmlFor="country" className="block text-sm mb-1">
-                  Country / region <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="country"
-                  value={shippingAddress.country}
-                  onChange={(e) => setShippingAddress({...shippingAddress, country: e.target.value})}
-                  placeholder="Enter country"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="region" className="block text-sm mb-1">
-                  Region <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="region"
-                  value={shippingAddress.region}
-                  onChange={(e) => setShippingAddress({...shippingAddress, region: e.target.value})}
-                  placeholder="Enter state/province/region"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="town" className="block text-sm mb-1">
-                  Town / District <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="town"
-                  value={shippingAddress.town}
-                  onChange={(e) => setShippingAddress({...shippingAddress, town: e.target.value})}
-                  placeholder="Enter town or district"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="zipCode" className="block text-sm mb-1">
-                  Postcode / ZIP (optional)
-                </Label>
-                <Input
-                  id="zipCode"
-                  value={shippingAddress.zipCode}
-                  onChange={(e) => setShippingAddress({...shippingAddress, zipCode: e.target.value})}
-                  placeholder="Enter postcode or ZIP"
-                />
-              </div>
-            </div>
+          {showAddressForm && (
+            <ShippingAddressForm onAddressSubmit={handleAddressSubmit} />
           )}
         </div>
 

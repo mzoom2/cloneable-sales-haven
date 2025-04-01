@@ -3,19 +3,28 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { AlertCircle, X } from "lucide-react";
+import { AlertCircle, X, MapPin } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from '@/hooks/use-toast';
 import ShippingCalculator from '@/components/ShippingCalculator';
+import ShippingAddressForm, { ShippingAddress } from '@/components/ShippingAddressForm';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger
+} from "@/components/ui/collapsible";
 
 const CartPage = () => {
   const navigate = useNavigate();
   const [couponCode, setCouponCode] = useState('');
   const { cartItems, removeFromCart, updateQuantity, getTotalPrice } = useCart();
   const [shipping, setShipping] = useState(0); // Default shipping cost
+  const [addressExpanded, setAddressExpanded] = useState(false);
+  const { isAuthenticated } = useAuth();
   
   const subtotal = getTotalPrice();
   const total = subtotal + shipping;
@@ -54,6 +63,44 @@ const CartPage = () => {
       title: "Shipping updated",
       description: `Shipping cost has been set to $${amount.toFixed(2)}`
     });
+  };
+
+  const handleAddressSubmit = (address: ShippingAddress) => {
+    setAddressExpanded(false);
+    // The address is already saved to localStorage in the ShippingAddressForm component
+  };
+
+  const handleCheckout = () => {
+    // Check if shipping address exists
+    const savedAddress = localStorage.getItem('shippingAddress');
+    if (!savedAddress) {
+      toast({
+        title: "Shipping address required",
+        description: "Please add a shipping address before checkout",
+        variant: "destructive"
+      });
+      setAddressExpanded(true);
+      return;
+    }
+
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast({
+        title: "Login required",
+        description: "Please login to proceed with checkout",
+        variant: "destructive"
+      });
+      navigate('/login');
+      return;
+    }
+
+    // Proceed with checkout
+    toast({
+      title: "Proceeding to checkout",
+      description: "Redirecting to payment page"
+    });
+    // This would typically navigate to a checkout page
+    // navigate('/checkout');
   };
   
   return (
@@ -186,13 +233,39 @@ const CartPage = () => {
                       <ShippingCalculator onUpdateShipping={handleUpdateShipping} />
                     </div>
                     
+                    {/* Shipping Address Section */}
+                    <Collapsible 
+                      open={addressExpanded}
+                      onOpenChange={setAddressExpanded}
+                      className="w-full border-b pb-4"
+                    >
+                      <div className="flex justify-between py-2">
+                        <span>Shipping Address</span>
+                        <div className="text-right">
+                          <CollapsibleTrigger asChild>
+                            <Button variant="link" className="text-sm p-0 h-auto text-blue-600 flex items-center">
+                              {addressExpanded ? "Hide" : "Add/Edit Address"}
+                              <MapPin size={16} className="ml-1" />
+                            </Button>
+                          </CollapsibleTrigger>
+                        </div>
+                      </div>
+                      
+                      <CollapsibleContent className="space-y-4 pt-2">
+                        <ShippingAddressForm 
+                          onAddressSubmit={handleAddressSubmit}
+                          buttonText="Save Shipping Address"
+                        />
+                      </CollapsibleContent>
+                    </Collapsible>
+                    
                     <div className="flex justify-between py-4 font-bold">
                       <span>Total</span>
                       <span>{total.toFixed(2)}$</span>
                     </div>
                   </div>
                   
-                  <Button className="w-full mt-4">
+                  <Button className="w-full mt-4" onClick={handleCheckout}>
                     Proceed to Checkout
                   </Button>
                 </CardContent>
