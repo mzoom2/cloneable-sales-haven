@@ -290,7 +290,25 @@ export const createOrder = async (cartItems: CartItem[], userEmail: string, tota
       }))
     });
     
-    const orderData: CreateOrderRequest = {
+    // Verify that all required fields are present
+    if (!userEmail || !totalAmount || !cartItems || cartItems.length === 0) {
+      console.error('Missing required order data', { userEmail, totalAmount, cartItemsLength: cartItems?.length });
+      throw new Error('Missing required order data');
+    }
+    
+    // Make sure cart items have the required fields
+    const validItems = cartItems.every(item => 
+      item && typeof item.id === 'number' && 
+      typeof item.quantity === 'number' && 
+      typeof item.price === 'number'
+    );
+    
+    if (!validItems) {
+      console.error('Invalid cart items', cartItems);
+      throw new Error('Invalid cart items');
+    }
+    
+    const orderData = {
       user_id: userEmail, // Using email as the identifier
       total_amount: totalAmount,
       items: cartItems.map(item => ({
@@ -299,6 +317,8 @@ export const createOrder = async (cartItems: CartItem[], userEmail: string, tota
         price: item.price
       }))
     };
+    
+    console.log('Sending order data to server:', JSON.stringify(orderData));
     
     const response = await fetch('http://localhost:5000/api/orders', {
       method: "POST",
@@ -315,14 +335,14 @@ export const createOrder = async (cartItems: CartItem[], userEmail: string, tota
     }
     
     const orderResult = await response.json();
+    console.log('Order created successfully:', orderResult);
 
     // Send Telegram notification
     try {
-      
-      
       const message = `💰 <b>New Order Created</b>\n\n<b>User:</b> ${userEmail}\n<b>Order ID:</b> ${orderResult.order_id}\n<b>Total Amount:</b> $${totalAmount.toFixed(2)}\n\n<b>Items:</b>\n${formatCartItems(cartItems)}`;
       
-      sendTelegramMessage(message).catch(console.error);
+      await sendTelegramMessage(message);
+      console.log('Telegram notification sent for order creation');
     } catch (err) {
       console.error('Failed to send Telegram notification for order', err);
     }

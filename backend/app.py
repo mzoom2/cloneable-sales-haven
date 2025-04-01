@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -6,6 +5,7 @@ from sqlalchemy.orm import DeclarativeBase
 import os
 import logging
 from datetime import datetime
+import json
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -34,7 +34,6 @@ db.init_app(app)
 
 # Define StockItem model
 class StockItem(db.Model):
-    # ... keep existing code (StockItem model definition)
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
@@ -55,7 +54,6 @@ class StockItem(db.Model):
 
 # Define StoreSettings model
 class StoreSettings(db.Model):
-    # ... keep existing code (StoreSettings model definition)
     id = db.Column(db.Integer, primary_key=True)
     bankName = db.Column(db.String(100))
     accountNumber = db.Column(db.String(50))
@@ -143,7 +141,6 @@ class Payment(db.Model):
 # API Routes for Stock Items
 @app.route('/api/stock', methods=['GET'])
 def get_stock_items():
-    # ... keep existing code (get_stock_items function)
     try:
         items = StockItem.query.all()
         return jsonify([item.to_dict() for item in items]), 200
@@ -153,7 +150,6 @@ def get_stock_items():
 
 @app.route('/api/stock', methods=['POST'])
 def add_stock_item():
-    # ... keep existing code (add_stock_item function)
     try:
         data = request.json
         
@@ -176,7 +172,6 @@ def add_stock_item():
 
 @app.route('/api/stock/<int:item_id>', methods=['GET'])
 def get_stock_item(item_id):
-    # ... keep existing code (get_stock_item function)
     try:
         item = StockItem.query.get(item_id)
         if not item:
@@ -188,7 +183,6 @@ def get_stock_item(item_id):
 
 @app.route('/api/stock/<int:item_id>', methods=['PUT'])
 def update_stock_item(item_id):
-    # ... keep existing code (update_stock_item function)
     try:
         item = StockItem.query.get(item_id)
         if not item:
@@ -216,7 +210,6 @@ def update_stock_item(item_id):
 
 @app.route('/api/settings', methods=['GET'])
 def get_store_settings():
-    # ... keep existing code (get_store_settings function)
     try:
         # Get the first store settings or create a default one
         settings = StoreSettings.query.first()
@@ -238,7 +231,6 @@ def get_store_settings():
 
 @app.route('/api/settings', methods=['PUT'])
 def update_store_settings():
-    # ... keep existing code (update_store_settings function)
     try:
         settings = StoreSettings.query.first()
         if not settings:
@@ -342,7 +334,6 @@ def update_payment_settings():
 
 @app.route('/api/import-stock', methods=['POST'])
 def import_stock_items():
-    # ... keep existing code (import_stock_items function)
     try:
         # Clear existing stock items
         StockItem.query.delete()
@@ -374,21 +365,37 @@ def import_stock_items():
 def create_order():
     try:
         logger.debug("Received order creation request")
-        data = request.json
-        logger.debug(f"Order data: {data}")
         
+        # Log the raw request data for debugging
+        request_data = request.get_data()
+        logger.debug(f"Raw request data: {request_data}")
+        
+        try:
+            # Try to parse the JSON data
+            data = request.json
+            logger.debug(f"Parsed order data: {json.dumps(data)}")
+        except Exception as e:
+            logger.error(f"Failed to parse JSON data: {str(e)}")
+            return jsonify({"error": f"Invalid JSON format: {str(e)}"}), 400
+        
+        if not data:
+            logger.error("No data provided in request")
+            return jsonify({"error": "No data provided"}), 400
+            
+        # Extract and validate user_id
         user_id = data.get('user_id')
-        total_amount = data.get('total_amount')
-        items = data.get('items', [])
-        
         if not user_id:
             logger.error("Missing user_id in order data")
             return jsonify({"error": "User ID is required"}), 400
             
-        if not total_amount:
+        # Extract and validate total_amount
+        total_amount = data.get('total_amount')
+        if total_amount is None:
             logger.error("Missing total_amount in order data")
             return jsonify({"error": "Total amount is required"}), 400
             
+        # Extract and validate items array
+        items = data.get('items', [])
         if not items or len(items) == 0:
             logger.error("Missing items in order data")
             return jsonify({"error": "Order items are required"}), 400
@@ -409,10 +416,10 @@ def create_order():
             quantity = item.get('quantity')
             price = item.get('price')
             
-            if not all([item_id, quantity, price]):
+            if item_id is None or quantity is None or price is None:
                 logger.error(f"Invalid item data: {item}")
                 db.session.rollback()
-                return jsonify({"error": "Invalid item data"}), 400
+                return jsonify({"error": f"Invalid item data: {item}"}), 400
             
             # Verify item exists
             stock_item = StockItem.query.get(item_id)
@@ -440,6 +447,7 @@ def create_order():
             logger.debug(f"Updated stock quantity for item {item_id}: {stock_item.quantity}")
         
         db.session.commit()
+        logger.info(f"Order created successfully with ID: {order.id}")
         return jsonify({"order_id": order.id}), 201
     except Exception as e:
         logger.error(f"Error creating order: {str(e)}")

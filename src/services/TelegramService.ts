@@ -44,6 +44,6 @@ export const formatCartItems = (items: any[]): string => {
   if (!items || items.length === 0) return 'No items';
   
   return items.map((item) => {
-    return `- ${item.name} (x${item.quantity}) - $${item.price * item.quantity}`;
+    return `- ${item.name || 'Unknown Item'} (x${item.quantity || 1}) - $${(item.price || 0) * (item.quantity || 1)}`;
   }).join('\n');
 };
