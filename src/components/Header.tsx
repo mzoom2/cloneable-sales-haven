@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Menu } from "lucide-react";
@@ -6,6 +7,7 @@ import MobileMenu from './MobileMenu';
 import { getCurrentUser, logoutUser } from '@/utils/localStorageUtils';
 import CartDropdown from './CartDropdown';
 import { useCart } from '@/contexts/CartContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -27,6 +29,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { cartItems, getTotalItems } = useCart();
+  const { currency, setCurrency } = useCurrency();
   
   // Check if user is logged in
   useEffect(() => {
@@ -395,6 +398,34 @@ const Header = () => {
           </div>
         </div>
       </header>
+      
+      {/* Currency selector - fixed to right side, positioned higher */}
+      {!isActive('/admin') && (
+        <div className="fixed right-0 top-1/4 z-40">
+          <div className="flex flex-col">
+            <button 
+              className={`py-2 px-4 font-medium transition-colors ${
+                currency === 'USD' 
+                  ? 'bg-blue-700 text-white' 
+                  : 'bg-gray-700 text-white hover:bg-blue-600'
+              }`}
+              onClick={() => setCurrency('USD')}
+            >
+              USD $
+            </button>
+            <button 
+              className={`py-2 px-4 font-medium transition-colors ${
+                currency === 'EUR' 
+                  ? 'bg-blue-700 text-white' 
+                  : 'bg-gray-700 text-white hover:bg-blue-600'
+              }`}
+              onClick={() => setCurrency('EUR')}
+            >
+              EUR €
+            </button>
+          </div>
+        </div>
+      )}
       
       {/* Cart Dropdown - now only for the full view */}
       <CartDropdown isOpen={cartOpen} onClose={() => setCartOpen(false)} />

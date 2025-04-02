@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import ShippingCalculator from '@/components/ShippingCalculator';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface CartDropdownProps {
   isOpen: boolean;
@@ -19,9 +20,12 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
   const [shipping, setShipping] = useState(0);
   const navigate = useNavigate();
   const { cartItems, removeFromCart, getTotalPrice, getUniqueItemsCount } = useCart();
+  const { convertPrice, formatPrice } = useCurrency();
   
   const subtotal = getTotalPrice();
-  const total = subtotal + shipping;
+  const convertedSubtotal = convertPrice(subtotal);
+  const convertedShipping = convertPrice(shipping);
+  const total = convertedSubtotal + convertedShipping;
   const itemCount = getUniqueItemsCount();
   
   if (!isOpen) return null;
@@ -88,31 +92,36 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
                 
                 {/* Cart items */}
                 {cartItems.length > 0 ? (
-                  cartItems.map((item) => (
-                    <div key={item.id} className="grid grid-cols-6 gap-4 p-4 border-b items-center">
-                      <div className="col-span-1">
-                        <div className="w-16 h-16 bg-gray-200 flex items-center justify-center">
-                          {item.imageUrl ? (
-                            <img src={item.imageUrl} alt={item.name} className="max-w-full max-h-full object-contain" />
-                          ) : (
-                            <img src="/placeholder.svg" alt={item.name} className="max-w-full max-h-full" />
-                          )}
+                  cartItems.map((item) => {
+                    const itemPrice = convertPrice(item.price);
+                    const itemTotal = itemPrice * item.quantity;
+                    
+                    return (
+                      <div key={item.id} className="grid grid-cols-6 gap-4 p-4 border-b items-center">
+                        <div className="col-span-1">
+                          <div className="w-16 h-16 bg-gray-200 flex items-center justify-center">
+                            {item.imageUrl ? (
+                              <img src={item.imageUrl} alt={item.name} className="max-w-full max-h-full object-contain" />
+                            ) : (
+                              <img src="/placeholder.svg" alt={item.name} className="max-w-full max-h-full" />
+                            )}
+                          </div>
+                        </div>
+                        <div className="col-span-2 font-medium">{item.name}</div>
+                        <div className="col-span-1 text-center">{formatPrice(itemPrice)}</div>
+                        <div className="col-span-1 text-center">{item.quantity}</div>
+                        <div className="col-span-1 text-right flex justify-end items-center">
+                          <span className="mr-2">{formatPrice(itemTotal)}</span>
+                          <button 
+                            className="text-gray-400 hover:text-red-500"
+                            onClick={() => removeFromCart(item.id)}
+                          >
+                            <X size={18} />
+                          </button>
                         </div>
                       </div>
-                      <div className="col-span-2 font-medium">{item.name}</div>
-                      <div className="col-span-1 text-center">{item.price.toFixed(2)}$</div>
-                      <div className="col-span-1 text-center">{item.quantity}</div>
-                      <div className="col-span-1 text-right flex justify-end items-center">
-                        <span className="mr-2">{(item.price * item.quantity).toFixed(2)}$</span>
-                        <button 
-                          className="text-gray-400 hover:text-red-500"
-                          onClick={() => removeFromCart(item.id)}
-                        >
-                          <X size={18} />
-                        </button>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <div className="p-8 text-center">
                     <div className="flex justify-center mb-4">
@@ -162,7 +171,7 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
                       
                       <div className="flex justify-between py-2 border-b">
                         <span>Subtotal</span>
-                        <span>{subtotal.toFixed(2)}$</span>
+                        <span>{formatPrice(convertedSubtotal)}</span>
                       </div>
                       
                       <div className="border-b">
@@ -171,7 +180,7 @@ const CartDropdown: React.FC<CartDropdownProps> = ({ isOpen, onClose }) => {
                       
                       <div className="flex justify-between py-4 font-bold">
                         <span>Total</span>
-                        <span>{total.toFixed(2)}$</span>
+                        <span>{formatPrice(total)}</span>
                       </div>
                       
                       <Button className="w-full" onClick={goToCart}>

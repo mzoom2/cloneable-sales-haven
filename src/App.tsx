@@ -16,6 +16,7 @@ import Account from './pages/Account';
 import Videos from './pages/Videos';
 import { CartProvider } from './contexts/CartContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { CurrencyProvider } from './contexts/CurrencyContext';
 import { Toaster } from "@/components/ui/toaster";
 import CartPage from './pages/CartPage';
 import ShopList from './pages/ShopList';
@@ -30,33 +31,35 @@ function App() {
   return (
     <div className="App">
       <AuthProvider>
-        <CartProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/preregister" element={<PreRegister />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/videos" element={<Videos />} />
-              <Route path="/ordering-guide" element={<OrderingGuide />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/payment" element={<PaymentPage />} />
-              <Route path="/shop-list" element={<ShopList />} />
-              <Route path="/offers" element={<OffersPage />} />
-              <Route path="/track" element={<TrackingPage />} />
-              <Route path="/tracking-details/:trackingNumber" element={<TrackingDetailsPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Toaster />
-            <OfferAcceptedDialog />
-          </BrowserRouter>
-        </CartProvider>
+        <CurrencyProvider>
+          <CartProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/preregister" element={<PreRegister />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/account" element={<Account />} />
+                <Route path="/videos" element={<Videos />} />
+                <Route path="/ordering-guide" element={<OrderingGuide />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/payment" element={<PaymentPage />} />
+                <Route path="/shop-list" element={<ShopList />} />
+                <Route path="/offers" element={<OffersPage />} />
+                <Route path="/track" element={<TrackingPage />} />
+                <Route path="/tracking-details/:trackingNumber" element={<TrackingDetailsPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <Toaster />
+              <OfferAcceptedDialog />
+            </BrowserRouter>
+          </CartProvider>
+        </CurrencyProvider>
       </AuthProvider>
     </div>
   );

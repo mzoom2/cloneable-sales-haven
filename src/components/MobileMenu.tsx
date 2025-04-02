@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ChevronRight, Facebook, Twitter, Linkedin, Instagram, X } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -11,6 +12,8 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
+  const { currency, setCurrency } = useCurrency();
+  
   return (
     <div 
       className={`fixed inset-0 bg-white z-50 transition-transform duration-300 ${
@@ -109,10 +112,24 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         
         {/* Currency Selector */}
         <div className="flex flex-col absolute top-1/3 right-0">
-          <button className="bg-blue-700 text-white py-2 px-4 font-medium">
+          <button 
+            className={`py-2 px-4 font-medium transition-colors ${
+              currency === 'USD' 
+                ? 'bg-blue-700 text-white' 
+                : 'bg-gray-700 text-white hover:bg-blue-600'
+            }`}
+            onClick={() => setCurrency('USD')}
+          >
             USD $
           </button>
-          <button className="bg-gray-800 text-white py-2 px-4 font-medium">
+          <button 
+            className={`py-2 px-4 font-medium transition-colors ${
+              currency === 'EUR' 
+                ? 'bg-blue-700 text-white' 
+                : 'bg-gray-700 text-white hover:bg-blue-600'
+            }`}
+            onClick={() => setCurrency('EUR')}
+          >
             EUR €
           </button>
         </div>
