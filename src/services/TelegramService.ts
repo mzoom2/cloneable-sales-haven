@@ -44,7 +44,9 @@ export const formatCartItems = (items: any[]): string => {
   if (!items || items.length === 0) return 'No items';
   
   return items.map((item) => {
-    const quantityInfo = item.originalQuantity && item.originalQuantity !== item.quantity
+    // Safely check if originalQuantity exists on the item
+    const hasOriginalQuantity = 'originalQuantity' in item && typeof item.originalQuantity === 'number';
+    const quantityInfo = hasOriginalQuantity && item.originalQuantity !== item.quantity
       ? `${item.quantity}/${item.originalQuantity}`
       : item.quantity || 1;
     

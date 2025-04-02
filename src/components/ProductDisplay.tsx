@@ -22,27 +22,27 @@ const ProductCard = ({ title, imageSrc }: { title: string; imageSrc: string }) =
 const ProductDisplay = () => {
   const isMobile = useIsMobile();
   
-  // Updated to use wholesale images
+  // Updated to use real wholesale iPhone images
   const products = [
     {
       title: "Used iPhones, A Grade",
-      imageSrc: "/lovable-uploads/f38cab13-f016-49bf-b6b8-985824c7bf99.png"
+      imageSrc: "https://www.bulkmobiles.com/images/product/large/iphone-xs-max-unlocked-used-wholesale-bulk.jpg"
     },
     {
       title: "Used iPhones, A/A-mix Grade",
-      imageSrc: "/lovable-uploads/2213ba6e-4049-4822-aec3-9945966ee6d5.png"
+      imageSrc: "https://i0.wp.com/www.mytrendyphone.co.uk/images/Original-Used-Apple-iPhone-6S-Plus-16GB-Gold-01042020-01-p.jpg"
     },
     {
       title: "Premium iPhone Collection",
-      imageSrc: "/lovable-uploads/75d557cf-c547-4786-ba5b-3857b2022bcd.png"
+      imageSrc: "https://www.bulkmobiles.com/images/product/large/apple-iphone-7-plus-used-wholesale-bulk.jpg"
     }
   ];
   
-  // Updated to use wholesale images
+  // Updated to use real wholesale accessories images
   const accessories = [
-    "/lovable-uploads/8b0759ae-90d5-4f0a-9807-77c8d6da0e8d.png",
-    "/lovable-uploads/be05eb0d-d6ae-4c82-a3d9-671e71e89016.png",
-    "/lovable-uploads/391c0f05-6d37-4158-9461-c1682ffa41f7.png"
+    "https://www.androidcentral.com/sites/androidcentral.com/files/styles/large/public/article_images/2020/08/best-usb-c-cables-grid.jpg",
+    "https://www.bulkmobiles.com/images/product/large/wholesale-bulk-otter-box-cases.jpg",
+    "https://www.bulkmobiles.com/images/product/large/wholesale-bulk-iphone-lcd-screen-digitizer.jpg"
   ];
   
   return (
@@ -117,7 +117,7 @@ const ProductDisplay = () => {
           <div className="flex flex-col items-center">
             <div className="w-32 h-32 md:w-40 md:h-40 bg-gray-100 rounded-full flex items-center justify-center mb-4 overflow-hidden">
               <img 
-                src="/lovable-uploads/f38cab13-f016-49bf-b6b8-985824c7bf99.png" 
+                src="https://www.bulkmobiles.com/images/product/large/iphone-8-unlocked-used-wholesale-bulk.jpg" 
                 alt="iPhone 12" 
                 className="w-full h-full object-cover"
               />
@@ -128,7 +128,7 @@ const ProductDisplay = () => {
           <div className="flex flex-col items-center">
             <div className="w-32 h-32 md:w-40 md:h-40 bg-gray-100 rounded-full flex items-center justify-center mb-4 overflow-hidden">
               <img 
-                src="/lovable-uploads/2213ba6e-4049-4822-aec3-9945966ee6d5.png" 
+                src="https://www.bulkmobiles.com/images/product/large/iphone-x-unlocked-used-wholesale-bulk.jpg" 
                 alt="iPhone Pro Models" 
                 className="w-full h-full object-cover"
               />
