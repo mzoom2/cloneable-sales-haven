@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -212,9 +213,9 @@ const ShopList = () => {
         </div>
       </div>
       
-      {/* Chat button - fixed to right side */}
+      {/* Chat button - fixed to right side, positioned lower */}
       {!isMobile && (
-        <div className="fixed right-0 top-1/3 z-40">
+        <div className="fixed right-0 top-2/5 z-40">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>

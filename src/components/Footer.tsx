@@ -106,21 +106,6 @@ const Footer = () => {
             alt="We are here" 
             className="w-40 h-auto"
           />
-          
-          {/* Chat button */}
-          <div className="absolute bottom-4 right-4">
-            <Button 
-              size="icon" 
-              className="w-14 h-14 rounded-full bg-red-600 hover:bg-red-700 text-white shadow-lg relative"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-              </svg>
-              <span className="absolute -top-2 -right-2 bg-white text-red-600 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                1
-              </span>
-            </Button>
-          </div>
         </div>
       </div>
     </footer>
