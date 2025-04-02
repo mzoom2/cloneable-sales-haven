@@ -4,8 +4,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "react-router-dom";
 
 const Hero = () => {
-  // Updated to use real wholesale phone image
-  const PHONE_IMAGE_URL = "https://www.bulkmobiles.com/images/product/large/iphone-xs-max-unlocked-used-wholesale-bulk.jpg";
+  // Updated to use the uploaded iPhone image
+  const PHONE_IMAGE_URL = "/lovable-uploads/6b84953c-3f6f-4c0d-9196-0026598d3afe.png";
   const isMobile = useIsMobile();
 
   return (
@@ -92,7 +92,7 @@ const Hero = () => {
           <div className="w-full lg:w-1/2 flex justify-center pt-8 lg:pt-0 z-10">
             <img 
               src={PHONE_IMAGE_URL} 
-              alt="Wholesale iPhone inventory" 
+              alt="iPhone product display" 
               className="w-full max-w-md h-auto object-contain rounded-lg"
             />
           </div>

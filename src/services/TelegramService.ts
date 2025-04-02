@@ -44,13 +44,7 @@ export const formatCartItems = (items: any[]): string => {
   if (!items || items.length === 0) return 'No items';
   
   return items.map((item) => {
-    // Safely check if originalQuantity exists on the item
-    const hasOriginalQuantity = 'originalQuantity' in item && typeof item.originalQuantity === 'number';
-    const quantityInfo = hasOriginalQuantity && item.originalQuantity !== item.quantity
-      ? `${item.quantity}/${item.originalQuantity}`
-      : item.quantity || 1;
-    
-    return `- ${item.name || 'Unknown Item'} (x${quantityInfo}) - $${((item.price || 0) * (item.quantity || 1)).toFixed(2)}`;
+    return `- ${item.name || 'Unknown Item'} (x${item.quantity || 1}) - $${(item.price || 0) * (item.quantity || 1)}`;
   }).join('\n');
 };
 
@@ -64,3 +58,4 @@ export const sendCartItemNotification = (userEmail: string, item: any): void => 
   
   sendTelegramMessage(message).catch(console.error);
 };
+
