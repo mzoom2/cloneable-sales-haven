@@ -65,6 +65,26 @@ export const addStockItem = async (item: Omit<StockItem, 'id'>): Promise<StockIt
   }
 };
 
+// Add new delete function for stock items
+export const deleteStockItem = async (itemId: number): Promise<void> => {
+  try {
+    // Make a real API call to delete the item
+    const response = await fetch(`${API_BASE_URL}/stock/${itemId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to delete stock item');
+    }
+  } catch (error) {
+    console.error('Error deleting stock item:', error);
+    throw error;
+  }
+};
+
 export interface StoreSettings {
   bankName: string;
   accountNumber: string;

@@ -233,6 +233,27 @@ def update_stock_item(item_id):
         db.session.rollback()
         return jsonify({"error": "Failed to update stock item"}), 500
 
+# Add new DELETE endpoint for stock items
+@app.route('/api/stock/<int:item_id>', methods=['DELETE'])
+def delete_stock_item(item_id):
+    try:
+        item = StockItem.query.get(item_id)
+        if not item:
+            return jsonify({"error": "Item not found"}), 404
+        
+        # Check if item is referenced in any orders
+        order_items = OrderItem.query.filter_by(stock_item_id=item_id).first()
+        if order_items:
+            return jsonify({"error": "Cannot delete item that is referenced in orders"}), 400
+            
+        db.session.delete(item)
+        db.session.commit()
+        return jsonify({"message": f"Item {item_id} deleted successfully"}), 200
+    except Exception as e:
+        logger.error(f"Error deleting stock item: {str(e)}")
+        db.session.rollback()
+        return jsonify({"error": f"Failed to delete stock item: {str(e)}"}), 500
+
 @app.route('/api/settings', methods=['GET'])
 def get_store_settings():
     try:
@@ -780,29 +801,4 @@ def mark_messages_as_read():
             # Admin is reading user messages
             unread_messages = ChatMessage.query.filter_by(
                 conversation_id=conversation_id,
-                is_admin_reply=False,
-                is_read=False
-            ).all()
-        else:
-            # User is reading admin messages
-            unread_messages = ChatMessage.query.filter_by(
-                conversation_id=conversation_id,
-                is_admin_reply=True,
-                is_read=False
-            ).all()
-            
-        for message in unread_messages:
-            message.is_read = True
-            
-        db.session.commit()
-        
-        return jsonify({"message": f"Marked {len(unread_messages)} messages as read"}), 200
-    except Exception as e:
-        logger.error(f"Error marking messages as read: {str(e)}")
-        db.session.rollback()
-        return jsonify({"error": f"Failed to mark messages as read: {str(e)}"}), 500
-
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()  # Create tables
-    app.run(debug=True, host='0.0.0.0', port=5
+                is_

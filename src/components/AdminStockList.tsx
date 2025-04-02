@@ -13,9 +13,19 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { StockItem, stockItems as sampleStockItems } from '@/data/stockItems';
 import { toast } from '@/hooks/use-toast';
-import { Save, X, Upload, RefreshCw, Plus } from 'lucide-react';
-import { getStockItems, updateStockItem, importStockItems, addStockItem } from '@/services/AdminService';
+import { Save, X, Upload, RefreshCw, Plus, Trash2 } from 'lucide-react';
+import { getStockItems, updateStockItem, importStockItems, addStockItem, deleteStockItem } from '@/services/AdminService';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog";
 
 const AdminStockList: React.FC = () => {
   const [items, setItems] = useState<StockItem[]>([]);
@@ -34,6 +44,10 @@ const AdminStockList: React.FC = () => {
   const [newItemQuantity, setNewItemQuantity] = useState("");
   const [newItemGrade, setNewItemGrade] = useState("A+/A");
   const [newItemLocation, setNewItemLocation] = useState("");
+
+  // State for delete confirmation dialog
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<StockItem | null>(null);
 
   const fetchItems = async () => {
     try {
@@ -62,6 +76,39 @@ const AdminStockList: React.FC = () => {
     setEditedPrice(item.price.toString());
     setEditedQuantity(item.quantity.toString());
     setIsDialogOpen(true);
+  };
+
+  // New function to handle delete click
+  const handleDeleteClick = (item: StockItem) => {
+    setItemToDelete(item);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // New function to confirm deletion
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+    
+    try {
+      await deleteStockItem(itemToDelete.id);
+      
+      // Update local state
+      setItems(prevItems => prevItems.filter(item => item.id !== itemToDelete.id));
+      
+      toast({
+        title: "Item Deleted",
+        description: `${itemToDelete.name} has been deleted successfully`,
+      });
+    } catch (error) {
+      console.error('Failed to delete item:', error);
+      toast({
+        title: "Delete Failed",
+        description: "There was an error deleting the item.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setItemToDelete(null);
+    }
   };
 
   const handleImportStock = async () => {
@@ -156,7 +203,6 @@ const AdminStockList: React.FC = () => {
     }
   };
 
-  // Updated handleAddItem function to use the correct grade type
   const handleAddItem = async () => {
     // Validate input
     const price = parseFloat(newItemPrice);
@@ -251,7 +297,6 @@ const AdminStockList: React.FC = () => {
     return <div className="flex justify-center py-10">Loading...</div>;
   }
 
-  // Update the Add Item Dialog to use Select for grade
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -309,7 +354,7 @@ const AdminStockList: React.FC = () => {
                 <TableHead className="w-[100px] text-right">Quantity</TableHead>
                 <TableHead className="w-[100px] text-right">Grade</TableHead>
                 <TableHead className="w-[100px] text-right">Location</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
+                <TableHead className="w-[150px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -322,13 +367,22 @@ const AdminStockList: React.FC = () => {
                   <TableCell className="text-right">{item.grade}</TableCell>
                   <TableCell className="text-right">{item.location}</TableCell>
                   <TableCell>
-                    <Button 
-                      onClick={() => handleEditClick(item)}
-                      variant="outline" 
-                      size="sm"
-                    >
-                      Edit
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={() => handleEditClick(item)}
+                        variant="outline" 
+                        size="sm"
+                      >
+                        Edit
+                      </Button>
+                      <Button 
+                        onClick={() => handleDeleteClick(item)}
+                        variant="destructive" 
+                        size="sm"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -489,6 +543,27 @@ const AdminStockList: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {itemToDelete?.name}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
