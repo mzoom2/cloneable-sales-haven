@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -7,12 +6,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +14,7 @@ import { getCurrentUser } from "@/utils/localStorageUtils";
 import { StockItem } from "@/data/stockItems";
 import StockItemCard from "@/components/StockItemCard";
 import FilterSidebar from "@/components/FilterSidebar";
-import { MessageCircle, Filter } from "lucide-react";
+import { Filter } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getStockItems } from "@/services/StockService";
@@ -41,10 +34,6 @@ const ShopList = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [chatOpen, setChatOpen] = useState(false);
-  const [chatName, setChatName] = useState("");
-  const [chatEmail, setChatEmail] = useState("");
-  const [chatQuestion, setChatQuestion] = useState("");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,32 +88,6 @@ const ShopList = () => {
   
   const handleLogin = () => {
     navigate('/login');
-  };
-
-  const handleChatSubmit = () => {
-    if (!chatName || !chatEmail || !chatQuestion) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    toast({
-      title: "Chat initiated",
-      description: "Our team will get back to you shortly",
-    });
-    
-    setChatOpen(false);
-    setChatName("");
-    setChatEmail("");
-    setChatQuestion("");
-  };
-
-  const handleChatButtonClick = () => {
-    console.log("Chat button clicked");
-    setChatOpen(true);
   };
   
   const toggleMobileFilters = () => {
@@ -212,39 +175,10 @@ const ShopList = () => {
           </div>
         </div>
       </div>
-      
-      {/* Chat button - fixed to bottom right */}
-      {!isMobile && (
-        <div className="fixed right-0 bottom-6 z-40">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  className="bg-red-600 text-white p-3 flex items-center justify-center"
-                  onClick={handleChatButtonClick}
-                >
-                  <MessageCircle size={24} />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="left">
-                <p>Start a live chat</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      )}
 
-      {/* Mobile floating buttons */}
+      {/* Mobile floating filter button */}
       {isMobile && (
         <div className="fixed bottom-4 right-4 flex flex-col gap-3 z-40">
-          {/* Chat button */}
-          <button
-            className="bg-red-600 text-white p-3 rounded-full shadow-lg flex items-center justify-center"
-            onClick={handleChatButtonClick}
-          >
-            <MessageCircle size={24} />
-          </button>
-          
           {/* Filter button */}
           <button
             className="bg-blue-600 text-white p-3 rounded-full shadow-lg flex items-center justify-center"
@@ -254,50 +188,6 @@ const ShopList = () => {
           </button>
         </div>
       )}
-
-      {/* Chat Dialog */}
-      <Dialog open={chatOpen} onOpenChange={setChatOpen}>
-        <DialogContent className="bg-white p-0 border-none max-w-md mx-4">
-          <div className="bg-red-600 p-4 text-white">
-            <DialogTitle className="text-xl font-bold text-center">Live Chat</DialogTitle>
-          </div>
-          <div className="p-6 space-y-6">
-            <div className="space-y-4">
-              <div>
-                <Input
-                  placeholder="Name"
-                  value={chatName}
-                  onChange={(e) => setChatName(e.target.value)}
-                  className="border rounded-md p-2 w-full"
-                />
-              </div>
-              <div>
-                <Input
-                  placeholder="Email"
-                  type="email"
-                  value={chatEmail}
-                  onChange={(e) => setChatEmail(e.target.value)}
-                  className="border rounded-md p-2 w-full"
-                />
-              </div>
-              <div>
-                <Input
-                  placeholder="Question"
-                  value={chatQuestion}
-                  onChange={(e) => setChatQuestion(e.target.value)}
-                  className="border rounded-md p-2 w-full"
-                />
-              </div>
-              <Button 
-                onClick={handleChatSubmit}
-                className="w-full bg-red-600 hover:bg-red-700 flex items-center justify-center gap-2"
-              >
-                <span className="text-white">▶</span> Start Chat
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Main content */}
       <div className="flex-grow container mx-auto px-4 py-8">
