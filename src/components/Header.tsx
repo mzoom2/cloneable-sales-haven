@@ -170,7 +170,7 @@ const Header = () => {
                   >
                     Inventory
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className="z-50 left-1/2 transform -translate-x-1/2 shadow-xl rounded-md overflow-hidden">
+                  <NavigationMenuContent className="z-50 shadow-xl rounded-md overflow-hidden">
                     <div className="grid grid-cols-4 gap-0 min-w-[800px]">
                       {/* Used iPhones Column */}
                       <div className="p-4">
