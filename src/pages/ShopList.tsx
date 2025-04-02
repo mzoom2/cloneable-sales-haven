@@ -212,21 +212,7 @@ const ShopList = () => {
         </div>
       </div>
       
-      {/* Currency selector - fixed to right side, positioned higher */}
-      {!isMobile && (
-        <div className="fixed right-0 top-1/4 z-40">
-          <div className="flex flex-col">
-            <button className="bg-blue-700 text-white py-2 px-4 font-medium">
-              USD $
-            </button>
-            <button className="bg-gray-800 text-white py-2 px-4 font-medium">
-              EUR €
-            </button>
-          </div>
-        </div>
-      )}
-      
-      {/* Chat button - fixed to right side, positioned lower */}
+      {/* Chat button - fixed to right side */}
       {!isMobile && (
         <div className="fixed right-0 top-1/3 z-40">
           <TooltipProvider>
