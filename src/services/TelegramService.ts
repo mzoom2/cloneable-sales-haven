@@ -47,3 +47,17 @@ export const formatCartItems = (items: any[]): string => {
     return `- ${item.name || 'Unknown Item'} (x${item.quantity || 1}) - $${(item.price || 0) * (item.quantity || 1)}`;
   }).join('\n');
 };
+
+/**
+ * Send a chat notification to Telegram
+ */
+export const sendChatNotification = async (username: string, email: string, message: string, conversationId: string): Promise<void> => {
+  const notification = `
+<b>New Chat Message</b>
+<b>From:</b> ${username || 'Anonymous'} (${email || 'No email'})
+<b>Message:</b> ${message}
+<b>Conversation ID:</b> ${conversationId}
+  `;
+  
+  await sendTelegramMessage(notification);
+};

@@ -138,6 +138,31 @@ class Payment(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
+# Define ChatMessage model for storing chat messages
+class ChatMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(100), nullable=True)  # Allow anonymous users
+    username = db.Column(db.String(100), nullable=True)
+    email = db.Column(db.String(100), nullable=True)
+    message = db.Column(db.Text, nullable=False)
+    is_admin_reply = db.Column(db.Boolean, default=False)
+    is_read = db.Column(db.Boolean, default=False)
+    conversation_id = db.Column(db.String(100), nullable=False)  # Group messages by conversation
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'username': self.username,
+            'email': self.email,
+            'message': self.message,
+            'is_admin_reply': self.is_admin_reply,
+            'is_read': self.is_read,
+            'conversation_id': self.conversation_id,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
 # API Routes for Stock Items
 @app.route('/api/stock', methods=['GET'])
 def get_stock_items():
@@ -586,7 +611,198 @@ def get_order_by_tracking(tracking_number):
         logger.error(f"Error fetching order: {str(e)}")
         return jsonify({"error": f"Failed to fetch order: {str(e)}"}), 500
 
+# New Chat API endpoints
+@app.route('/api/chat/messages', methods=['POST'])
+def send_chat_message():
+    try:
+        data = request.json
+        user_id = data.get('user_id', 'anonymous')
+        username = data.get('username', 'Guest User')
+        email = data.get('email')
+        message = data.get('message')
+        conversation_id = data.get('conversation_id')
+        
+        if not message:
+            return jsonify({"error": "Message is required"}), 400
+            
+        if not conversation_id:
+            # Generate a unique conversation ID if not provided
+            conversation_id = f"conv_{datetime.utcnow().timestamp()}_{user_id}"
+            
+        # Create a new chat message
+        chat_message = ChatMessage(
+            user_id=user_id,
+            username=username,
+            email=email,
+            message=message,
+            conversation_id=conversation_id,
+            is_admin_reply=False,
+            is_read=False
+        )
+        
+        db.session.add(chat_message)
+        db.session.commit()
+        
+        # Trigger notification to Telegram
+        try:
+            from services.telegram_service import send_telegram_message
+            
+            notification_message = f"""
+<b>New Chat Message</b>
+<b>From:</b> {username} ({email or 'No email'})
+<b>Message:</b> {message}
+<b>Conversation ID:</b> {conversation_id}
+            """
+            
+            send_telegram_message(notification_message)
+        except Exception as e:
+            logger.error(f"Failed to send Telegram notification: {str(e)}")
+        
+        return jsonify(chat_message.to_dict()), 201
+    except Exception as e:
+        logger.error(f"Error sending chat message: {str(e)}")
+        db.session.rollback()
+        return jsonify({"error": f"Failed to send message: {str(e)}"}), 500
+
+@app.route('/api/chat/messages/<conversation_id>', methods=['GET'])
+def get_chat_messages(conversation_id):
+    try:
+        messages = ChatMessage.query.filter_by(conversation_id=conversation_id).order_by(ChatMessage.created_at).all()
+        
+        # Mark all unread admin messages as read
+        for message in messages:
+            if message.is_admin_reply and not message.is_read:
+                message.is_read = True
+        
+        db.session.commit()
+        
+        return jsonify([message.to_dict() for message in messages]), 200
+    except Exception as e:
+        logger.error(f"Error fetching chat messages: {str(e)}")
+        return jsonify({"error": f"Failed to fetch messages: {str(e)}"}), 500
+
+@app.route('/api/chat/admin/messages', methods=['GET'])
+def get_all_chat_conversations():
+    try:
+        # Get unique conversation IDs with the latest message from each
+        conversations = db.session.query(
+            ChatMessage.conversation_id,
+            db.func.max(ChatMessage.created_at).label('latest_message')
+        ).group_by(ChatMessage.conversation_id).all()
+        
+        result = []
+        
+        for conv_id, latest_date in conversations:
+            # Get the latest message in this conversation
+            latest_message = ChatMessage.query.filter_by(
+                conversation_id=conv_id, 
+                created_at=latest_date
+            ).first()
+            
+            # Count unread messages from users
+            unread_count = ChatMessage.query.filter_by(
+                conversation_id=conv_id,
+                is_admin_reply=False,
+                is_read=False
+            ).count()
+            
+            # Get user info from the first user message in the conversation
+            first_user_message = ChatMessage.query.filter_by(
+                conversation_id=conv_id,
+                is_admin_reply=False
+            ).order_by(ChatMessage.created_at).first()
+            
+            if latest_message and first_user_message:
+                result.append({
+                    'conversation_id': conv_id,
+                    'username': first_user_message.username,
+                    'email': first_user_message.email,
+                    'latest_message': latest_message.message,
+                    'latest_message_time': latest_message.created_at.isoformat(),
+                    'unread_count': unread_count,
+                    'is_latest_from_admin': latest_message.is_admin_reply
+                })
+        
+        # Sort by latest message time descending
+        result.sort(key=lambda x: x['latest_message_time'], reverse=True)
+        
+        return jsonify(result), 200
+    except Exception as e:
+        logger.error(f"Error fetching chat conversations: {str(e)}")
+        return jsonify({"error": f"Failed to fetch conversations: {str(e)}"}), 500
+
+@app.route('/api/chat/admin/reply', methods=['POST'])
+def admin_reply_to_chat():
+    try:
+        data = request.json
+        conversation_id = data.get('conversation_id')
+        message = data.get('message')
+        
+        if not conversation_id or not message:
+            return jsonify({"error": "Conversation ID and message are required"}), 400
+            
+        # Find the conversation
+        conversation_exists = ChatMessage.query.filter_by(conversation_id=conversation_id).first()
+        if not conversation_exists:
+            return jsonify({"error": "Conversation not found"}), 404
+            
+        # Create admin reply
+        admin_message = ChatMessage(
+            user_id='admin',
+            username='Admin',
+            message=message,
+            conversation_id=conversation_id,
+            is_admin_reply=True,
+            is_read=False
+        )
+        
+        db.session.add(admin_message)
+        db.session.commit()
+        
+        return jsonify(admin_message.to_dict()), 201
+    except Exception as e:
+        logger.error(f"Error sending admin reply: {str(e)}")
+        db.session.rollback()
+        return jsonify({"error": f"Failed to send reply: {str(e)}"}), 500
+
+@app.route('/api/chat/messages/mark-read', methods=['POST'])
+def mark_messages_as_read():
+    try:
+        data = request.json
+        conversation_id = data.get('conversation_id')
+        is_admin = data.get('is_admin', False)
+        
+        if not conversation_id:
+            return jsonify({"error": "Conversation ID is required"}), 400
+            
+        # Mark messages as read based on who is reading them
+        if is_admin:
+            # Admin is reading user messages
+            unread_messages = ChatMessage.query.filter_by(
+                conversation_id=conversation_id,
+                is_admin_reply=False,
+                is_read=False
+            ).all()
+        else:
+            # User is reading admin messages
+            unread_messages = ChatMessage.query.filter_by(
+                conversation_id=conversation_id,
+                is_admin_reply=True,
+                is_read=False
+            ).all()
+            
+        for message in unread_messages:
+            message.is_read = True
+            
+        db.session.commit()
+        
+        return jsonify({"message": f"Marked {len(unread_messages)} messages as read"}), 200
+    except Exception as e:
+        logger.error(f"Error marking messages as read: {str(e)}")
+        db.session.rollback()
+        return jsonify({"error": f"Failed to mark messages as read: {str(e)}"}), 500
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Create tables
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5
