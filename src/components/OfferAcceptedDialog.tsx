@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -99,9 +98,9 @@ const OfferAcceptedDialog: React.FC = () => {
       id: parseInt(offer.productId),
       name: offer.product,
       price: parseFloat(offer.offeredPrice),
+      quantity: offer.offeredQuantity,
       location: 'HongKong', // Default location since it's required
-      grade: 'A+/A', // Default grade since it's required
-      quantity: offer.offeredQuantity // Now properly included in the interface
+      grade: 'A+/A' // Default grade since it's required
     };
     
     // Add the accepted offer to cart
