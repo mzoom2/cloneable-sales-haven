@@ -36,11 +36,13 @@ const Index = () => {
   }, [isMobile]);
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="min-h-screen w-full overflow-x-hidden">
       <Header />
-      <Hero />
-      <ProductDisplay />
-      <BecomeAgent />
+      <main>
+        <Hero />
+        <ProductDisplay />
+        <BecomeAgent />
+      </main>
       <Footer />
     </div>
   );

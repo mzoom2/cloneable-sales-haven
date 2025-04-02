@@ -9,7 +9,7 @@ const Hero = () => {
   const isMobile = useIsMobile();
 
   return (
-    <section className="relative pt-16 md:pt-24 pb-12 md:pb-16 overflow-hidden bg-[#262084]">
+    <section className="relative pt-16 md:pt-24 pb-12 md:pb-16 overflow-hidden bg-[#262084] w-full">
       <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center">
         {/* Text content */}
         <div className={`w-full lg:w-1/2 pt-6 md:pt-12 lg:pt-16 space-y-4 md:space-y-6 text-white z-10 ${isMobile ? 'text-center' : ''}`}>

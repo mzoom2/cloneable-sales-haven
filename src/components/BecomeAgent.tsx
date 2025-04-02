@@ -1,12 +1,13 @@
 
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Link } from "react-router-dom";
 
 const BecomeAgent = () => {
   const isMobile = useIsMobile();
   
   return (
-    <section className="py-12 md:py-16 bg-gray-50">
+    <section className="py-12 md:py-16 bg-gray-50 w-full">
       <div className="container mx-auto px-4">
         <h2 className="text-xl md:text-2xl font-bold mb-8 md:mb-12 text-center">Become an Agent</h2>
         
@@ -32,7 +33,7 @@ const BecomeAgent = () => {
               
               <div className="flex items-start gap-2">
                 <span className="font-bold text-gray-700">4.</span>
-                <span>...</span>
+                <span>Direct Support from Our Team</span>
               </div>
             </div>
             
@@ -41,8 +42,8 @@ const BecomeAgent = () => {
             </p>
             
             <div className="pt-4">
-              <Button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6">
-                Apply Now
+              <Button className="bg-indigo-600 hover:bg-indigo-700 text-white px-6" asChild>
+                <Link to="/preregister">Apply Now</Link>
               </Button>
             </div>
           </div>
