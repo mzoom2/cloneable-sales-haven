@@ -98,15 +98,6 @@ const Footer = () => {
         <div className="text-center text-xs opacity-70 mb-2">
           <p>© 2012-2025 Uephone. All Right Reserved.</p>
         </div>
-
-        {/* "We are here" image in bottom right */}
-        <div className="fixed bottom-0 right-0 z-40">
-          <img 
-            src="/lovable-uploads/2213ba6e-4049-4822-aec3-9945966ee6d5.png" 
-            alt="We are here" 
-            className="w-40 h-auto"
-          />
-        </div>
       </div>
     </footer>
   );

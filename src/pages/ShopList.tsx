@@ -213,9 +213,9 @@ const ShopList = () => {
         </div>
       </div>
       
-      {/* Chat button - fixed to right side, positioned lower */}
+      {/* Chat button - fixed to bottom right */}
       {!isMobile && (
-        <div className="fixed right-0 top-2/5 z-40">
+        <div className="fixed right-0 bottom-6 z-40">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
