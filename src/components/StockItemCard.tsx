@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { StockItem } from "@/data/stockItems";
 import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
-import { ShoppingCart, Plus, Minus, Check, X, Store } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Check, X, Store, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { useCurrency } from '@/contexts/CurrencyContext';
+import { useNavigate } from "react-router-dom";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 interface StockItemCardProps {
   item: StockItem;
@@ -18,6 +20,7 @@ export default function StockItemCard({ item }: StockItemCardProps) {
   const [isAdded, setIsAdded] = useState(false);
   const { addToCart } = useCart();
   const { formatPrice, convertPrice } = useCurrency();
+  const navigate = useNavigate();
   
   const handleAddToCart = () => {
     if (quantity > 0) {
@@ -35,6 +38,10 @@ export default function StockItemCard({ item }: StockItemCardProps) {
     }
   };
   
+  const handleViewDetails = () => {
+    navigate(`/product/${item.id}`);
+  };
+  
   const handleIncrement = () => {
     setQuantity(prev => prev + 1);
   };
@@ -50,11 +57,11 @@ export default function StockItemCard({ item }: StockItemCardProps) {
     : { text: "Out of Stock", color: "bg-red-500" };
   
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300">
       <CardContent className="p-0">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
           {/* Product Info */}
-          <div className="md:col-span-8 p-4">
+          <div className="md:col-span-8 p-4 cursor-pointer" onClick={handleViewDetails}>
             <h3 className="font-medium text-lg mb-1">{item.name}</h3>
             
             <div className="text-sm text-gray-500 mb-4">
@@ -124,25 +131,35 @@ export default function StockItemCard({ item }: StockItemCardProps) {
               </div>
             </div>
             
-            <Button 
-              className="w-full flex items-center justify-center gap-2"
-              disabled={isAdded || item.quantity === 0}
-              onClick={handleAddToCart}
-            >
-              {isAdded ? (
-                <>
-                  <Check size={16} /> Added
-                </>
-              ) : item.quantity === 0 ? (
-                <>
-                  <X size={16} /> Out of Stock
-                </>
-              ) : (
-                <>
-                  <ShoppingCart size={16} /> Add to Cart
-                </>
-              )}
-            </Button>
+            <div className="space-y-2">
+              <Button 
+                className="w-full flex items-center justify-center gap-2"
+                disabled={isAdded || item.quantity === 0}
+                onClick={handleAddToCart}
+              >
+                {isAdded ? (
+                  <>
+                    <Check size={16} /> Added
+                  </>
+                ) : item.quantity === 0 ? (
+                  <>
+                    <X size={16} /> Out of Stock
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart size={16} /> Add to Cart
+                  </>
+                )}
+              </Button>
+              
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={handleViewDetails}
+              >
+                <Info size={16} /> View Details
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>

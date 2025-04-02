@@ -157,7 +157,7 @@ const Header = () => {
               My Account
             </Link>
             
-            {/* Inventory Navigation Menu with Dropdown - kept for product categories */}
+            {/* Inventory Navigation Menu with Dropdown - improved positioning */}
             <NavigationMenu className="p-0">
               <NavigationMenuList className="space-x-0">
                 <NavigationMenuItem>
@@ -170,8 +170,8 @@ const Header = () => {
                   >
                     Inventory
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid grid-cols-4 gap-0 min-w-[800px] p-4">
+                  <NavigationMenuContent className="z-50 shadow-xl rounded-md overflow-hidden">
+                    <div className="grid grid-cols-4 gap-0 min-w-[800px]">
                       {/* Used iPhones Column */}
                       <div className="p-4">
                         <h3 className="text-lg font-semibold mb-3">Used iPhones</h3>
