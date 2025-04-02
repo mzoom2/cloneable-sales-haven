@@ -38,6 +38,19 @@ export interface ChatConversation {
 const API_URL = 'http://localhost:5000/api';
 
 /**
+ * Check if there are unread messages
+ */
+export const checkUnreadMessages = async (conversationId: string): Promise<boolean> => {
+  try {
+    const messages = await getChatMessages(conversationId);
+    return messages.some(msg => msg.is_admin_reply && !msg.is_read);
+  } catch (error) {
+    console.error('Failed to check for unread messages:', error);
+    return false;
+  }
+};
+
+/**
  * Send a new chat message
  */
 export const sendChatMessage = async (message: Omit<ChatMessage, 'is_admin_reply' | 'is_read' | 'created_at'>): Promise<ChatMessage> => {

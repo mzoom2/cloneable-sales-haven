@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Facebook, Linkedin, Instagram, Twitter, Youtube, Github, MessageCircle, Send, X, Loader2 } from "lucide-react";
+import { Facebook, Linkedin, Instagram, Twitter, Youtube, Github, MessageCircle, Send, X, Loader2, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,7 @@ const Footer = () => {
   const [chatInitialized, setChatInitialized] = useState(false);
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const [pollInterval, setPollInterval] = useState<number | null>(null);
+  const [messageCountBadge, setMessageCountBadge] = useState<number>(0);
   const isMobile = useIsMobile();
   const { user } = useAuth();
 
@@ -69,7 +70,10 @@ const Footer = () => {
       // Mark messages as read when chat is opened
       if (hasUnreadMessages) {
         markMessagesAsRead(conversationId, false)
-          .then(() => setHasUnreadMessages(false))
+          .then(() => {
+            setHasUnreadMessages(false);
+            setMessageCountBadge(0);
+          })
           .catch(console.error);
       }
     } else {
@@ -106,8 +110,9 @@ const Footer = () => {
       setChatMessages(messages);
       
       // Check for unread admin messages
-      const hasUnread = messages.some(msg => msg.is_admin_reply && !msg.is_read);
-      setHasUnreadMessages(hasUnread);
+      const unreadMessages = messages.filter(msg => msg.is_admin_reply && !msg.is_read);
+      setHasUnreadMessages(unreadMessages.length > 0);
+      setMessageCountBadge(unreadMessages.length);
     } catch (error) {
       console.error("Failed to load chat messages", error);
     }
@@ -116,11 +121,12 @@ const Footer = () => {
   const checkForNewMessages = async (convId: string) => {
     try {
       const messages = await getChatMessages(convId);
-      const hasUnread = messages.some(msg => msg.is_admin_reply && !msg.is_read);
-      setHasUnreadMessages(hasUnread);
+      const unreadMessages = messages.filter(msg => msg.is_admin_reply && !msg.is_read);
+      setHasUnreadMessages(unreadMessages.length > 0);
+      setMessageCountBadge(unreadMessages.length);
       
       // If there are unread messages, notify the user
-      if (hasUnread && !chatOpen) {
+      if (unreadMessages.length > 0 && !chatOpen) {
         toast({
           title: "New message",
           description: "You have a new reply in your chat",
@@ -189,7 +195,10 @@ const Footer = () => {
     // Mark messages as read when chat is opened
     if (hasUnreadMessages && conversationId) {
       markMessagesAsRead(conversationId, false)
-        .then(() => setHasUnreadMessages(false))
+        .then(() => {
+          setHasUnreadMessages(false);
+          setMessageCountBadge(0);
+        })
         .catch(console.error);
     }
   };
@@ -289,10 +298,10 @@ const Footer = () => {
                   className={`${hasUnreadMessages ? 'animate-pulse bg-green-600' : 'bg-red-600'} text-white p-3 rounded-full shadow-lg flex items-center justify-center relative`}
                   onClick={handleChatButtonClick}
                 >
-                  <MessageCircle size={24} />
-                  {hasUnreadMessages && (
+                  {hasUnreadMessages ? <Bell size={24} /> : <MessageCircle size={24} />}
+                  {messageCountBadge > 0 && (
                     <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      !
+                      {messageCountBadge}
                     </span>
                   )}
                 </button>
@@ -312,10 +321,10 @@ const Footer = () => {
             className={`${hasUnreadMessages ? 'animate-pulse bg-green-600' : 'bg-red-600'} text-white p-3 rounded-full shadow-lg flex items-center justify-center relative`}
             onClick={handleChatButtonClick}
           >
-            <MessageCircle size={24} />
-            {hasUnreadMessages && (
+            {hasUnreadMessages ? <Bell size={24} /> : <MessageCircle size={24} />}
+            {messageCountBadge > 0 && (
               <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                !
+                {messageCountBadge}
               </span>
             )}
           </button>
