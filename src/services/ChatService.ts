@@ -33,43 +33,62 @@ export interface ChatConversation {
 }
 
 /**
+ * API Base URL - Update according to your environment
+ */
+const API_URL = 'http://localhost:5000/api';
+
+/**
  * Send a new chat message
  */
 export const sendChatMessage = async (message: Omit<ChatMessage, 'is_admin_reply' | 'is_read' | 'created_at'>): Promise<ChatMessage> => {
   try {
-    // Store conversation in local storage for demo purposes
-    // In production, this would be handled by the backend
-    const localMessages = localStorage.getItem('chatMessages') || '[]';
-    const messages = JSON.parse(localMessages) as ChatMessage[];
+    // Send message to backend API
+    const response = await fetch(`${API_URL}/chat/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Chat message error:', errorData);
+      throw new Error('Failed to send chat message');
+    }
+
+    const newMessage = await response.json();
     
-    // Create a new message
-    const newMessage: ChatMessage = {
-      ...message,
-      id: Date.now(),
-      is_admin_reply: false,
-      is_read: true,
-      created_at: new Date().toISOString(),
-      conversation_id: message.conversation_id || `conv_${Date.now()}`
-    };
+    // Also send notification to Telegram (as a backup)
+    try {
+      await sendTelegramNotification(
+        message.username || 'Anonymous',
+        message.email || 'No email',
+        message.message,
+        message.conversation_id
+      );
+    } catch (telegramError) {
+      console.warn('Telegram notification failed, but message was saved:', telegramError);
+    }
     
-    // Add to messages array
-    messages.push(newMessage);
-    
-    // Store back in localStorage
-    localStorage.setItem('chatMessages', JSON.stringify(messages));
-    
-    // Send notification to Telegram
-    await sendTelegramNotification(
-      newMessage.username || 'Anonymous',
-      newMessage.email || 'No email',
-      newMessage.message,
-      newMessage.conversation_id
-    );
-    
-    console.log('Chat message saved and notification sent');
+    console.log('Chat message saved successfully');
     return newMessage;
   } catch (error) {
     console.error('Chat message error:', error);
+    
+    // Fallback to Telegram if API fails
+    try {
+      await sendTelegramNotification(
+        message.username || 'Anonymous',
+        message.email || 'No email',
+        message.message,
+        message.conversation_id
+      );
+      console.log('Chat message failed but Telegram notification sent');
+    } catch (telegramError) {
+      console.error('Both API and Telegram notification failed:', telegramError);
+    }
+    
     throw error;
   }
 };
@@ -79,12 +98,15 @@ export const sendChatMessage = async (message: Omit<ChatMessage, 'is_admin_reply
  */
 export const getChatMessages = async (conversationId: string): Promise<ChatMessage[]> => {
   try {
-    // Get messages from local storage for demo
-    const localMessages = localStorage.getItem('chatMessages') || '[]';
-    const messages = JSON.parse(localMessages) as ChatMessage[];
+    const response = await fetch(`${API_URL}/chat/messages/${conversationId}`);
     
-    // Filter for this conversation
-    return messages.filter(msg => msg.conversation_id === conversationId);
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Get chat messages error:', errorData);
+      throw new Error('Failed to get chat messages');
+    }
+    
+    return await response.json();
   } catch (error) {
     console.error('Get chat messages error:', error);
     throw error;
@@ -96,46 +118,15 @@ export const getChatMessages = async (conversationId: string): Promise<ChatMessa
  */
 export const getAllChatConversations = async (): Promise<ChatConversation[]> => {
   try {
-    // Get messages from local storage
-    const localMessages = localStorage.getItem('chatMessages') || '[]';
-    const messages = JSON.parse(localMessages) as ChatMessage[];
+    const response = await fetch(`${API_URL}/chat/admin/messages`);
     
-    // Group by conversation
-    const conversationsMap = new Map<string, ChatMessage[]>();
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Get chat conversations error:', errorData);
+      throw new Error('Failed to get chat conversations');
+    }
     
-    messages.forEach(msg => {
-      if (!conversationsMap.has(msg.conversation_id)) {
-        conversationsMap.set(msg.conversation_id, []);
-      }
-      conversationsMap.get(msg.conversation_id)?.push(msg);
-    });
-    
-    // Convert to conversation summaries
-    const conversations: ChatConversation[] = [];
-    
-    conversationsMap.forEach((msgs, conversationId) => {
-      // Sort by created_at
-      msgs.sort((a, b) => {
-        return new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime();
-      });
-      
-      const latestMsg = msgs[0];
-      const username = msgs.find(m => m.username)?.username || 'Anonymous';
-      const email = msgs.find(m => m.email)?.email;
-      const unreadCount = msgs.filter(m => !m.is_read).length;
-      
-      conversations.push({
-        conversation_id: conversationId,
-        username,
-        email,
-        latest_message: latestMsg.message,
-        latest_message_time: latestMsg.created_at || new Date().toISOString(),
-        unread_count: unreadCount,
-        is_latest_from_admin: latestMsg.is_admin_reply
-      });
-    });
-    
-    return conversations;
+    return await response.json();
   } catch (error) {
     console.error('Get chat conversations error:', error);
     throw error;
@@ -147,27 +138,24 @@ export const getAllChatConversations = async (): Promise<ChatConversation[]> => 
  */
 export const sendAdminChatReply = async (conversationId: string, message: string): Promise<ChatMessage> => {
   try {
-    // Get messages from local storage
-    const localMessages = localStorage.getItem('chatMessages') || '[]';
-    const messages = JSON.parse(localMessages) as ChatMessage[];
+    const response = await fetch(`${API_URL}/chat/admin/reply`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        conversation_id: conversationId,
+        message
+      }),
+    });
     
-    // Create admin reply
-    const adminReply: ChatMessage = {
-      id: Date.now(),
-      user_id: 'admin',
-      username: 'Admin',
-      message,
-      is_admin_reply: true,
-      is_read: false,
-      conversation_id: conversationId,
-      created_at: new Date().toISOString()
-    };
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Admin reply error:', errorData);
+      throw new Error('Failed to send admin reply');
+    }
     
-    // Add to messages and save
-    messages.push(adminReply);
-    localStorage.setItem('chatMessages', JSON.stringify(messages));
-    
-    return adminReply;
+    return await response.json();
   } catch (error) {
     console.error('Admin reply error:', error);
     throw error;
@@ -179,23 +167,22 @@ export const sendAdminChatReply = async (conversationId: string, message: string
  */
 export const markMessagesAsRead = async (conversationId: string, isAdmin: boolean = false): Promise<void> => {
   try {
-    // Get messages from local storage
-    const localMessages = localStorage.getItem('chatMessages') || '[]';
-    const messages = JSON.parse(localMessages) as ChatMessage[];
-    
-    // Mark appropriate messages as read
-    const updatedMessages = messages.map(msg => {
-      if (msg.conversation_id === conversationId) {
-        // If admin is marking user messages as read, or user is marking admin messages as read
-        if ((isAdmin && !msg.is_admin_reply) || (!isAdmin && msg.is_admin_reply)) {
-          return { ...msg, is_read: true };
-        }
-      }
-      return msg;
+    const response = await fetch(`${API_URL}/chat/messages/mark-read`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        conversation_id: conversationId,
+        is_admin: isAdmin
+      }),
     });
     
-    // Save back to localStorage
-    localStorage.setItem('chatMessages', JSON.stringify(updatedMessages));
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Mark as read error:', errorData);
+      throw new Error('Failed to mark messages as read');
+    }
   } catch (error) {
     console.error('Mark as read error:', error);
     throw error;
