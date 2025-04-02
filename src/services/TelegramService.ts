@@ -61,3 +61,23 @@ export const sendChatNotification = async (username: string, email: string, mess
   
   await sendTelegramMessage(notification);
 };
+
+/**
+ * Send a notification to Telegram for a new chat message
+ */
+export const sendTelegramNotification = async (
+  username: string,
+  email: string,
+  message: string,
+  conversationId: string
+): Promise<void> => {
+  const notification = `
+<b>🔔 New Chat Message</b>
+<b>From:</b> ${username || 'Anonymous'} 
+<b>Email:</b> ${email || 'No email'}
+<b>Message:</b> ${message}
+<b>Conversation ID:</b> ${conversationId}
+  `;
+  
+  await sendTelegramMessage(notification);
+};

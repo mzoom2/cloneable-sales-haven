@@ -3,29 +3,51 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { sendTelegramNotification } from "@/services/TelegramService";
 
 const Contact = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
   const sectionRef = useRef<HTMLDivElement>(null);
   
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Send notification to telegram
+      await sendTelegramNotification(
+        name,
+        email,
+        `${subject}: ${message}`,
+        `contact_${Date.now()}`
+      );
+      
       toast({
         title: "Message sent successfully",
         description: "We'll get back to you as soon as possible.",
       });
       
       // Reset form
-      const form = e.target as HTMLFormElement;
-      form.reset();
-    }, 1500);
+      setName("");
+      setEmail("");
+      setSubject("");
+      setMessage("");
+    } catch (error) {
+      console.error("Error sending contact form:", error);
+      toast({
+        title: "Failed to send message",
+        description: "Please try again later or contact us directly.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   useEffect(() => {
@@ -83,6 +105,8 @@ const Contact = () => {
                     name="name"
                     placeholder="John Doe"
                     required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     className="bg-white/50 dark:bg-black/10 border-gray-200 dark:border-gray-800"
                   />
                 </div>
@@ -97,6 +121,8 @@ const Contact = () => {
                     type="email"
                     placeholder="john@example.com"
                     required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="bg-white/50 dark:bg-black/10 border-gray-200 dark:border-gray-800"
                   />
                 </div>
@@ -111,6 +137,8 @@ const Contact = () => {
                   name="subject"
                   placeholder="How can we help you?"
                   required
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
                   className="bg-white/50 dark:bg-black/10 border-gray-200 dark:border-gray-800"
                 />
               </div>
@@ -125,6 +153,8 @@ const Contact = () => {
                   rows={5}
                   placeholder="Your message here..."
                   required
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                   className="bg-white/50 dark:bg-black/10 border-gray-200 dark:border-gray-800 resize-none"
                 />
               </div>
