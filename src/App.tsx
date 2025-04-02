@@ -23,40 +23,43 @@ import { Toaster } from '@/components/ui/toaster';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CartProvider } from '@/contexts/CartContext';
 import { CurrencyProvider } from '@/contexts/CurrencyContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <CurrencyProvider>
-        <CartProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/shop-list" element={<ShopList />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/offers" element={<OffersPage />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/videos" element={<Videos />} />
-              <Route path="/ordering-guide" element={<OrderingGuide />} />
-              <Route path="/preregister" element={<PreRegister />} />
-              <Route path="/track" element={<TrackingPage />} />
-              <Route path="/track/:id" element={<TrackingDetailsPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/payment" element={<PaymentPage />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Toaster />
-          </Router>
-        </CartProvider>
-      </CurrencyProvider>
+      <AuthProvider>
+        <CurrencyProvider>
+          <CartProvider>
+            <Router>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/shop-list" element={<ShopList />} />
+                <Route path="/account" element={<Account />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/offers" element={<OffersPage />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/videos" element={<Videos />} />
+                <Route path="/ordering-guide" element={<OrderingGuide />} />
+                <Route path="/preregister" element={<PreRegister />} />
+                <Route path="/track" element={<TrackingPage />} />
+                <Route path="/track/:id" element={<TrackingDetailsPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/payment" element={<PaymentPage />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <Toaster />
+            </Router>
+          </CartProvider>
+        </CurrencyProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

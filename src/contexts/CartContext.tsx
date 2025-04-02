@@ -6,6 +6,7 @@ import { useAuth } from './AuthContext';
 export interface CartItem extends StockItem {
   quantity: number;
   imageUrl?: string; // Add support for product images
+  originalQuantity?: number; // Add this optional property
 }
 
 interface CartContextType {
@@ -58,7 +59,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       } else {
         // Otherwise, add it as a new item
-        updatedItems = [...prevItems, { ...item, quantity, imageUrl }];
+        updatedItems = [...prevItems, { ...item, quantity, originalQuantity: quantity, imageUrl }];
       }
 
       // Send Telegram notification
