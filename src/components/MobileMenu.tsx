@@ -1,9 +1,9 @@
-
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { ChevronRight, Facebook, Twitter, Linkedin, Instagram, X } from "lucide-react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useEffect, useState } from 'react';
+import { X, ChevronsRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import { getCurrentUser, logoutUser } from '@/utils/localStorageUtils';
 import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface MobileMenuProps {
@@ -12,129 +12,273 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
+  const [isSubmenuOpen, setIsSubmenuOpen] = useState<Record<string, boolean>>({});
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { currency, setCurrency } = useCurrency();
   
+  // Check if user is logged in
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    setIsLoggedIn(!!currentUser);
+  }, []);
+  
+  // Handle login button click
+  const handleLogin = () => {
+    onClose();
+    navigate('/login');
+  };
+  
+  // Handle logout button click
+  const handleLogout = () => {
+    logoutUser();
+    setIsLoggedIn(false);
+    onClose();
+    navigate('/');
+  };
+  
+  // Toggle submenu
+  const toggleSubmenu = (key: string) => {
+    setIsSubmenuOpen(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+  
+  // Close menu when a link is clicked
+  const handleLinkClick = (path: string) => {
+    onClose();
+    navigate(path);
+  };
+  
+  // Determine if a path is active
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+  
+  // Menu variants for animation
+  const menuVariants = {
+    closed: {
+      x: "-100%",
+      transition: {
+        type: "tween",
+        duration: 0.3,
+        when: "afterChildren",
+        staggerChildren: 0.05,
+        staggerDirection: -1
+      }
+    },
+    open: {
+      x: 0,
+      transition: {
+        type: "tween",
+        duration: 0.3,
+        when: "beforeChildren",
+        staggerChildren: 0.05,
+        staggerDirection: 1
+      }
+    }
+  };
+  
+  // Item variants for animation
+  const itemVariants = {
+    closed: {
+      x: -20,
+      opacity: 0
+    },
+    open: {
+      x: 0,
+      opacity: 1
+    }
+  };
+  
   return (
-    <div 
-      className={`fixed inset-0 bg-white z-50 transition-transform duration-300 ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}
-    >
-      <div className="flex flex-col h-full">
-        {/* Header */}
-        <div className="p-4 border-b flex justify-between items-center">
-          <h2 className="text-lg font-medium">Log in / Sign Up</h2>
-          <Button variant="ghost" size="icon" onClick={onClose} className="text-gray-500 hover:bg-transparent hover:text-gray-700">
-            <X size={24} />
-          </Button>
-        </div>
-        
-        {/* Navigation Links */}
-        <nav className="flex-1 overflow-auto">
-          <ul className="p-4 space-y-4">
-            <li>
-              <Link 
-                to="/" 
-                className="block py-3 px-4 text-[#6c5ce7] bg-[#f3f0ff] rounded-md font-medium"
-                onClick={onClose}
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link 
-                to="/shop-list" 
-                className="block py-3 px-4 text-gray-800 font-medium"
-                onClick={onClose}
-              >
-                Stock List
-              </Link>
-            </li>
-            <li>
-              <Link 
-                to="/videos" 
-                className="block py-3 px-4 text-gray-800 font-medium"
-                onClick={onClose}
-              >
-                <div className="flex items-center justify-between">
-                  <span>Videos</span>
-                  <ChevronRight size={20} />
-                </div>
-              </Link>
-            </li>
-            <li>
-              <Link 
-                to="/ordering-guide" 
-                className="block py-3 px-4 text-gray-800 font-medium"
-                onClick={onClose}
-              >
-                Ordering Guide
-              </Link>
-            </li>
-            <li>
-              <Link 
-                to="/account" 
-                className="block py-3 px-4 text-gray-800 font-medium"
-                onClick={onClose}
-              >
-                My account
-              </Link>
-            </li>
-          </ul>
-        </nav>
-        
-        {/* Contact Information */}
-        <div className="border-t p-4 space-y-4">
-          <div>
-            <h3 className="font-bold text-lg mb-2">Call us</h3>
-            <a href="tel:+1123456789" className="text-[#6c5ce7] font-medium block">+&#40;1&#41; 123 456 789</a>
-            <p className="text-gray-600 my-2">329 Queensberry Street, North Melbourne</p>
-            <p className="text-gray-600">VIC 3051, Australia.</p>
-            <a href="mailto:hi@educrat.com" className="text-gray-600 block mt-2">hi@educrat.com</a>
-          </div>
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop - using dark overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.7 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black z-40"
+            onClick={onClose}
+          />
           
-          {/* Social Media Links */}
-          <div className="flex space-x-6 pt-2">
-            <a href="#" className="text-gray-500 hover:text-gray-700">
-              <Facebook size={20} />
-            </a>
-            <a href="#" className="text-gray-500 hover:text-gray-700">
-              <Twitter size={20} />
-            </a>
-            <a href="#" className="text-gray-500 hover:text-gray-700">
-              <Linkedin size={20} />
-            </a>
-            <a href="#" className="text-gray-500 hover:text-gray-700">
-              <Instagram size={20} />
-            </a>
-          </div>
-        </div>
-        
-        {/* Currency Selector */}
-        <div className="flex flex-col absolute top-1/3 right-0">
-          <button 
-            className={`py-2 px-4 font-medium transition-colors ${
-              currency === 'USD' 
-                ? 'bg-blue-700 text-white' 
-                : 'bg-gray-700 text-white hover:bg-blue-600'
-            }`}
-            onClick={() => setCurrency('USD')}
+          {/* Menu panel */}
+          <motion.div
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={menuVariants}
+            className="fixed top-0 left-0 bottom-0 w-4/5 max-w-sm bg-white z-50 shadow-lg flex flex-col"
           >
-            USD $
-          </button>
-          <button 
-            className={`py-2 px-4 font-medium transition-colors ${
-              currency === 'EUR' 
-                ? 'bg-blue-700 text-white' 
-                : 'bg-gray-700 text-white hover:bg-blue-600'
-            }`}
-            onClick={() => setCurrency('EUR')}
-          >
-            EUR €
-          </button>
-        </div>
-      </div>
-    </div>
+            {/* Header with close button */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <p className="font-semibold text-lg">Menu</p>
+              <Button variant="ghost" size="icon" onClick={onClose}>
+                <X size={24} />
+              </Button>
+            </div>
+            
+            {/* Currency selector */}
+            <div className="px-4 py-3 border-b">
+              <p className="font-medium mb-2">Select Currency</p>
+              <div className="flex space-x-2">
+                <Button 
+                  variant={currency === 'USD' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setCurrency('USD')}
+                  className="flex-1"
+                >
+                  USD ($)
+                </Button>
+                <Button 
+                  variant={currency === 'EUR' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setCurrency('EUR')}
+                  className="flex-1"
+                >
+                  EUR (€)
+                </Button>
+              </div>
+            </div>
+            
+            {/* Menu items */}
+            <div className="flex-1 overflow-y-auto">
+              <motion.nav className="flex flex-col">
+                {/* Main pages */}
+                <motion.div
+                  variants={itemVariants}
+                  className={`p-4 border-b ${isActive('/') && 'bg-gray-100'}`}
+                  onClick={() => handleLinkClick('/')}
+                >
+                  Home
+                </motion.div>
+                
+                <motion.div
+                  variants={itemVariants}
+                  className={`p-4 border-b ${isActive('/shop-list') && 'bg-gray-100'}`}
+                  onClick={() => handleLinkClick('/shop-list')}
+                >
+                  Stock List
+                </motion.div>
+                
+                <motion.div
+                  variants={itemVariants}
+                  className={`p-4 border-b ${isActive('/videos') && 'bg-gray-100'}`}
+                  onClick={() => handleLinkClick('/videos')}
+                >
+                  Videos
+                </motion.div>
+                
+                <motion.div
+                  variants={itemVariants}
+                  className={`p-4 border-b ${isActive('/ordering-guide') && 'bg-gray-100'}`}
+                  onClick={() => handleLinkClick('/ordering-guide')}
+                >
+                  Ordering Guide
+                </motion.div>
+                
+                {/* Account related */}
+                <motion.div
+                  variants={itemVariants}
+                  className={`p-4 border-b ${isActive('/account') && 'bg-gray-100'}`}
+                  onClick={() => handleLinkClick('/account')}
+                >
+                  My Account
+                </motion.div>
+                
+                <motion.div
+                  variants={itemVariants}
+                  className={`p-4 border-b ${isActive('/cart') && 'bg-gray-100'}`}
+                  onClick={() => handleLinkClick('/cart')}
+                >
+                  Cart
+                </motion.div>
+                
+                {/* Inventory with submenu */}
+                <motion.div variants={itemVariants} className="border-b">
+                  <div 
+                    className="p-4 flex justify-between items-center"
+                    onClick={() => toggleSubmenu('inventory')}
+                  >
+                    <span>Inventory</span>
+                    <ChevronsRight 
+                      size={18} 
+                      className={`transition-transform ${isSubmenuOpen.inventory ? 'rotate-90' : ''}`}
+                    />
+                  </div>
+                  
+                  {/* Submenu for inventory */}
+                  {isSubmenuOpen.inventory && (
+                    <div className="bg-gray-50 py-2">
+                      <div 
+                        className="px-6 py-2 hover:bg-gray-100"
+                        onClick={() => handleLinkClick('/shop-list?category=iphone')}
+                      >
+                        iPhones
+                      </div>
+                      <div 
+                        className="px-6 py-2 hover:bg-gray-100"
+                        onClick={() => handleLinkClick('/shop-list?category=samsung')}
+                      >
+                        Samsung
+                      </div>
+                      <div 
+                        className="px-6 py-2 hover:bg-gray-100"
+                        onClick={() => handleLinkClick('/shop-list?category=accessories')}
+                      >
+                        Accessories
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+                
+                {/* Other pages */}
+                <motion.div
+                  variants={itemVariants}
+                  className={`p-4 border-b ${isActive('/about') && 'bg-gray-100'}`}
+                  onClick={() => handleLinkClick('/about')}
+                >
+                  About Us
+                </motion.div>
+                
+                <motion.div
+                  variants={itemVariants}
+                  className={`p-4 border-b ${isActive('/contact') && 'bg-gray-100'}`}
+                  onClick={() => handleLinkClick('/contact')}
+                >
+                  Contact Us
+                </motion.div>
+              </motion.nav>
+            </div>
+            
+            {/* Footer with login/logout */}
+            <div className="p-4 border-t">
+              {isLoggedIn ? (
+                <Button 
+                  variant="destructive"
+                  className="w-full"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              ) : (
+                <Button 
+                  variant="default"
+                  className="w-full"
+                  onClick={handleLogin}
+                >
+                  Login
+                </Button>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 

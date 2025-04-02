@@ -30,8 +30,8 @@ import PaymentPage from './pages/PaymentPage';
 function App() {
   return (
     <div className="App">
-      <AuthProvider>
-        <CurrencyProvider>
+      <CurrencyProvider>
+        <AuthProvider>
           <CartProvider>
             <BrowserRouter>
               <Routes>
@@ -59,8 +59,8 @@ function App() {
               <OfferAcceptedDialog />
             </BrowserRouter>
           </CartProvider>
-        </CurrencyProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </CurrencyProvider>
     </div>
   );
 }
