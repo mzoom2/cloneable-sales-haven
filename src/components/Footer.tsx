@@ -37,7 +37,7 @@ const Footer = () => {
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const [pollInterval, setPollInterval] = useState<number | null>(null);
   const isMobile = useIsMobile();
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
 
   // Check for saved conversation ID in localStorage
   useEffect(() => {
@@ -50,11 +50,11 @@ const Footer = () => {
     }
 
     // Pre-fill user info if logged in
-    if (currentUser) {
-      setChatName(currentUser.displayName || "");
-      setChatEmail(currentUser.email || "");
+    if (user) {
+      setChatName(user.firstName || "");
+      setChatEmail(user.email || "");
     }
-  }, [currentUser]);
+  }, [user]);
 
   // Set up polling for new messages when chat is open
   useEffect(() => {
@@ -146,7 +146,7 @@ const Footer = () => {
     try {
       // If we don't have a conversation ID yet, this will be a new conversation
       const messageData = {
-        user_id: currentUser?.uid || 'anonymous',
+        user_id: user?.email || 'anonymous',
         username: chatName,
         email: chatEmail,
         message: chatQuestion,
