@@ -2,11 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Link } from "react-router-dom";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const Hero = () => {
   // Updated to use the uploaded iPhone image
   const PHONE_IMAGE_URL = "/lovable-uploads/6b84953c-3f6f-4c0d-9196-0026598d3afe.png";
   const isMobile = useIsMobile();
+  const { currency } = useCurrency();
 
   return (
     <section className="relative pt-16 md:pt-24 pb-12 md:pb-16 overflow-hidden bg-[#262084]">
@@ -17,7 +19,7 @@ const Hero = () => {
             Welcome To Our Sales System
           </h1>
           <p className="text-base md:text-lg max-w-md leading-relaxed opacity-90 mx-auto lg:mx-0">
-            The safest marketplace for used devices wholesale. Deepphone has the best deals on used devices.
+            The safest marketplace for used devices wholesale. Deepphone has the best deals on used devices in {currency}.
           </p>
           
           <div className="pt-2 md:pt-4 flex justify-center lg:justify-start">

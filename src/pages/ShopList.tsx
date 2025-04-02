@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -20,10 +21,11 @@ import { getCurrentUser } from "@/utils/localStorageUtils";
 import { StockItem } from "@/data/stockItems";
 import StockItemCard from "@/components/StockItemCard";
 import FilterSidebar from "@/components/FilterSidebar";
-import { MessageCircle, Filter } from "lucide-react";
+import { MessageCircle, Filter, DollarSign, Euro } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getStockItems } from "@/services/StockService";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { 
   Pagination, 
   PaginationContent, 
@@ -47,6 +49,7 @@ const ShopList = () => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const { currency, setCurrency } = useCurrency();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
@@ -128,6 +131,15 @@ const ShopList = () => {
   
   const toggleMobileFilters = () => {
     setShowMobileFilters(!showMobileFilters);
+  };
+  
+  // Function to handle currency change
+  const handleCurrencyChange = (newCurrency: 'USD' | 'EUR') => {
+    setCurrency(newCurrency);
+    toast({
+      title: `Currency changed to ${newCurrency}`,
+      description: `Prices will now display in ${newCurrency === 'USD' ? 'US Dollars' : 'Euros'}`,
+    });
   };
   
   // Generate pagination items
@@ -216,11 +228,23 @@ const ShopList = () => {
       {!isMobile && (
         <div className="fixed right-0 top-1/4 z-40">
           <div className="flex flex-col">
-            <button className="bg-blue-700 text-white py-2 px-4 font-medium">
-              USD $
+            <button 
+              className={`py-2 px-4 font-medium flex items-center justify-center gap-2 ${
+                currency === 'USD' ? 'bg-blue-700 text-white' : 'bg-gray-800 text-white'
+              }`}
+              onClick={() => handleCurrencyChange('USD')}
+            >
+              <DollarSign size={16} />
+              USD
             </button>
-            <button className="bg-gray-800 text-white py-2 px-4 font-medium">
-              EUR €
+            <button 
+              className={`py-2 px-4 font-medium flex items-center justify-center gap-2 ${
+                currency === 'EUR' ? 'bg-blue-700 text-white' : 'bg-gray-800 text-white'
+              }`}
+              onClick={() => handleCurrencyChange('EUR')}
+            >
+              <Euro size={16} />
+              EUR
             </button>
           </div>
         </div>
