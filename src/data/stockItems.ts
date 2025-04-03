@@ -1,4 +1,3 @@
-
 export interface StockItem {
   id: number;
   name: string;
@@ -6,7 +5,12 @@ export interface StockItem {
   price: number;
   location: string;
   grade: string;
-  imageUrl?: string;
+  images: {
+    main: string;
+    front?: string;
+    back?: string;
+    detail?: string;
+  };
 }
 
 export const stockItems: StockItem[] = [
@@ -16,7 +20,10 @@ export const stockItems: StockItem[] = [
     quantity: 351,
     price: 697.00,
     location: 'HongKong',
-    grade: 'A+/A'
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+15+Pro'
+    }
   },
   {
     id: 2,
@@ -24,7 +31,10 @@ export const stockItems: StockItem[] = [
     quantity: 430,
     price: 838.00,
     location: 'HongKong',
-    grade: 'A+/A'
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+15+Pro+Max'
+    }
   },
   {
     id: 3,
@@ -32,7 +42,10 @@ export const stockItems: StockItem[] = [
     quantity: 508,
     price: 591.50,
     location: 'HongKong',
-    grade: 'A+/A'
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14+Pro+Max'
+    }
   },
   {
     id: 4,
@@ -40,7 +53,10 @@ export const stockItems: StockItem[] = [
     quantity: 418,
     price: 633.80,
     location: 'HongKong',
-    grade: 'A+/A'
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14+Pro+Max'
+    }
   },
   {
     id: 5,
@@ -48,7 +64,10 @@ export const stockItems: StockItem[] = [
     quantity: 411,
     price: 605.60,
     location: 'HongKong',
-    grade: 'A+/A'
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14+Pro+Max'
+    }
   },
   {
     id: 6,
@@ -56,7 +75,10 @@ export const stockItems: StockItem[] = [
     quantity: 447,
     price: 647.90,
     location: 'HongKong',
-    grade: 'A+/A'
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14+Pro+Max'
+    }
   },
   {
     id: 7,
@@ -64,7 +86,10 @@ export const stockItems: StockItem[] = [
     quantity: 500,
     price: 662.00,
     location: 'HongKong',
-    grade: 'A++'
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14'
+    }
   },
   {
     id: 8,
@@ -72,7 +97,10 @@ export const stockItems: StockItem[] = [
     quantity: 570,
     price: 718.30,
     location: 'HongKong',
-    grade: 'A++'
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14'
+    }
   },
   {
     id: 9,
@@ -80,7 +108,10 @@ export const stockItems: StockItem[] = [
     quantity: 600,
     price: 704.20,
     location: 'HongKong',
-    grade: 'A++'
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14+Plus'
+    }
   },
   {
     id: 10,
@@ -88,7 +119,10 @@ export const stockItems: StockItem[] = [
     quantity: 460,
     price: 774.60,
     location: 'HongKong',
-    grade: 'A++'
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14+Plus'
+    }
   },
   {
     id: 11,
@@ -96,7 +130,10 @@ export const stockItems: StockItem[] = [
     quantity: 325,
     price: 597.00,
     location: 'HongKong',
-    grade: 'A+/A'
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Pro'
+    }
   },
   {
     id: 12,
@@ -104,7 +141,10 @@ export const stockItems: StockItem[] = [
     quantity: 380,
     price: 738.00,
     location: 'HongKong',
-    grade: 'A+/A'
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Pro+Max'
+    }
   },
   {
     id: 13,
@@ -112,7 +152,10 @@ export const stockItems: StockItem[] = [
     quantity: 408,
     price: 491.50,
     location: 'HongKong',
-    grade: 'A+/A'
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Pro+Max'
+    }
   },
   {
     id: 14,
@@ -120,7 +163,10 @@ export const stockItems: StockItem[] = [
     quantity: 318,
     price: 533.80,
     location: 'HongKong',
-    grade: 'A+/A'
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Pro+Max'
+    }
   },
   {
     id: 15,
@@ -128,7 +174,10 @@ export const stockItems: StockItem[] = [
     quantity: 311,
     price: 505.60,
     location: 'HongKong',
-    grade: 'A+/A'
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Pro+Max'
+    }
   },
   {
     id: 16,
@@ -136,7 +185,10 @@ export const stockItems: StockItem[] = [
     quantity: 347,
     price: 547.90,
     location: 'HongKong',
-    grade: 'A+/A'
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Pro+Max'
+    }
   },
   {
     id: 17,
@@ -144,7 +196,10 @@ export const stockItems: StockItem[] = [
     quantity: 400,
     price: 562.00,
     location: 'HongKong',
-    grade: 'A++'
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13'
+    }
   },
   {
     id: 18,
@@ -152,7 +207,10 @@ export const stockItems: StockItem[] = [
     quantity: 470,
     price: 618.30,
     location: 'HongKong',
-    grade: 'A++'
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13'
+    }
   },
   {
     id: 19,
@@ -160,7 +218,10 @@ export const stockItems: StockItem[] = [
     quantity: 500,
     price: 604.20,
     location: 'HongKong',
-    grade: 'A++'
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Plus'
+    }
   },
   {
     id: 20,
@@ -168,6 +229,9 @@ export const stockItems: StockItem[] = [
     quantity: 360,
     price: 674.60,
     location: 'HongKong',
-    grade: 'A++'
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Plus'
+    }
   },
 ];

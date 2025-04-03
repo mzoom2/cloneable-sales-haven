@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
   Table, 
@@ -10,12 +11,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { StockItem, stockItems as sampleStockItems } from '@/data/stockItems';
 import { toast } from '@/hooks/use-toast';
-import { Save, X, Upload, RefreshCw, Plus, Trash2 } from 'lucide-react';
+import { Save, X, Upload, RefreshCw, Plus, Trash2, Image as ImageIcon } from 'lucide-react';
 import { getStockItems, updateStockItem, importStockItems, addStockItem, deleteStockItem } from '@/services/AdminService';
+import { updateStockItemImages } from '@/services/StockService';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import ImageUploader from '@/components/ImageUploader';
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const AdminStockList: React.FC = () => {
   const [items, setItems] = useState<StockItem[]>([]);
@@ -44,6 +48,14 @@ const AdminStockList: React.FC = () => {
   const [newItemQuantity, setNewItemQuantity] = useState("");
   const [newItemGrade, setNewItemGrade] = useState("A+/A");
   const [newItemLocation, setNewItemLocation] = useState("");
+
+  // Image management state
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
+  const [imageItem, setImageItem] = useState<StockItem | null>(null);
+  const [mainImage, setMainImage] = useState("");
+  const [frontImage, setFrontImage] = useState("");
+  const [backImage, setBackImage] = useState("");
+  const [detailImage, setDetailImage] = useState("");
 
   // State for delete confirmation dialog
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -76,6 +88,16 @@ const AdminStockList: React.FC = () => {
     setEditedPrice(item.price.toString());
     setEditedQuantity(item.quantity.toString());
     setIsDialogOpen(true);
+  };
+
+  // Handle image management click
+  const handleImagesClick = (item: StockItem) => {
+    setImageItem(item);
+    setMainImage(item.images?.main || "");
+    setFrontImage(item.images?.front || "");
+    setBackImage(item.images?.back || "");
+    setDetailImage(item.images?.detail || "");
+    setIsImageDialogOpen(true);
   };
 
   // New function to handle delete click
@@ -203,6 +225,45 @@ const AdminStockList: React.FC = () => {
     }
   };
 
+  const handleSaveImages = async () => {
+    if (!imageItem) return;
+    
+    try {
+      const images = {
+        main: mainImage,
+        front: frontImage || undefined,
+        back: backImage || undefined,
+        detail: detailImage || undefined
+      };
+      
+      // Update the item images via API
+      await updateStockItemImages(imageItem.id, images);
+      
+      // Update local state
+      setItems(prevItems => 
+        prevItems.map(item => 
+          item.id === imageItem.id 
+            ? { ...item, images } 
+            : item
+        )
+      );
+      
+      setIsImageDialogOpen(false);
+      
+      toast({
+        title: "Images Updated",
+        description: `Images for ${imageItem.name} have been updated successfully`,
+      });
+    } catch (error) {
+      console.error('Failed to update item images:', error);
+      toast({
+        title: "Update Failed",
+        description: "There was an error updating the item images.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleAddItem = async () => {
     // Validate input
     const price = parseFloat(newItemPrice);
@@ -260,7 +321,10 @@ const AdminStockList: React.FC = () => {
         price: price,
         quantity: quantity,
         grade: newItemGrade,
-        location: newItemLocation
+        location: newItemLocation,
+        images: {
+          main: ""
+        }
       };
 
       // Add item via API
@@ -302,7 +366,7 @@ const AdminStockList: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-xl font-semibold">Stock Management</h2>
-          <p className="text-gray-500">Update prices and inventory for your products</p>
+          <p className="text-gray-500">Update prices, inventory, and images for your products</p>
         </div>
         
         <div className="flex gap-2">
@@ -354,14 +418,25 @@ const AdminStockList: React.FC = () => {
                 <TableHead className="w-[100px] text-right">Quantity</TableHead>
                 <TableHead className="w-[100px] text-right">Grade</TableHead>
                 <TableHead className="w-[100px] text-right">Location</TableHead>
-                <TableHead className="w-[150px]">Actions</TableHead>
+                <TableHead className="w-[200px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>{item.id}</TableCell>
-                  <TableCell className="font-medium">{item.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-3">
+                      {item.images?.main && (
+                        <img 
+                          src={item.images.main} 
+                          alt={item.name} 
+                          className="h-10 w-10 object-cover rounded-md"
+                        />
+                      )}
+                      {item.name}
+                    </div>
+                  </TableCell>
                   <TableCell className="text-right">${item.price.toFixed(2)}</TableCell>
                   <TableCell className="text-right">{item.quantity}</TableCell>
                   <TableCell className="text-right">{item.grade}</TableCell>
@@ -374,6 +449,13 @@ const AdminStockList: React.FC = () => {
                         size="sm"
                       >
                         Edit
+                      </Button>
+                      <Button
+                        onClick={() => handleImagesClick(item)}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <ImageIcon className="h-4 w-4" />
                       </Button>
                       <Button 
                         onClick={() => handleDeleteClick(item)}
@@ -445,6 +527,138 @@ const AdminStockList: React.FC = () => {
                   className="flex-1" 
                   variant="outline"
                   onClick={() => setIsDialogOpen(false)}
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Management Dialog */}
+      <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl mb-4">Manage Product Images</DialogTitle>
+          </DialogHeader>
+          {imageItem && (
+            <div className="space-y-4">
+              <div>
+                <p className="font-medium text-gray-700 mb-2">{imageItem.name}</p>
+                <p className="text-sm text-gray-500 mb-4">ID: {imageItem.id}</p>
+              </div>
+              
+              <Tabs defaultValue="upload" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="upload">Upload Images</TabsTrigger>
+                  <TabsTrigger value="preview">Image Preview</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="upload" className="space-y-4 pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <ImageUploader 
+                      label="Main Image" 
+                      imageUrl={mainImage} 
+                      onChange={setMainImage}
+                    />
+                    
+                    <ImageUploader 
+                      label="Front View" 
+                      imageUrl={frontImage} 
+                      onChange={setFrontImage}
+                    />
+                    
+                    <ImageUploader 
+                      label="Back View" 
+                      imageUrl={backImage} 
+                      onChange={setBackImage}
+                    />
+                    
+                    <ImageUploader 
+                      label="Detail View" 
+                      imageUrl={detailImage} 
+                      onChange={setDetailImage}
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="preview" className="pt-4">
+                  {(mainImage || frontImage || backImage || detailImage) ? (
+                    <div className="grid grid-cols-2 gap-4">
+                      {mainImage && (
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium">Main Image</p>
+                          <div className="border rounded-md overflow-hidden bg-slate-100">
+                            <img 
+                              src={mainImage} 
+                              alt="Main" 
+                              className="w-full h-40 object-contain"
+                            />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {frontImage && (
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium">Front View</p>
+                          <div className="border rounded-md overflow-hidden bg-slate-100">
+                            <img 
+                              src={frontImage} 
+                              alt="Front" 
+                              className="w-full h-40 object-contain"
+                            />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {backImage && (
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium">Back View</p>
+                          <div className="border rounded-md overflow-hidden bg-slate-100">
+                            <img 
+                              src={backImage} 
+                              alt="Back" 
+                              className="w-full h-40 object-contain"
+                            />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {detailImage && (
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium">Detail View</p>
+                          <div className="border rounded-md overflow-hidden bg-slate-100">
+                            <img 
+                              src={detailImage} 
+                              alt="Detail" 
+                              className="w-full h-40 object-contain"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center py-10 text-gray-500">
+                      No images uploaded yet
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+              
+              <div className="flex space-x-3 pt-4">
+                <Button 
+                  className="flex-1" 
+                  onClick={handleSaveImages}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Images
+                </Button>
+                <Button 
+                  className="flex-1" 
+                  variant="outline"
+                  onClick={() => setIsImageDialogOpen(false)}
                 >
                   <X className="h-4 w-4 mr-2" />
                   Cancel

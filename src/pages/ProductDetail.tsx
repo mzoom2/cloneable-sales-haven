@@ -26,14 +26,6 @@ const ProductDetail = () => {
   const { formatPrice, convertPrice } = useCurrency();
   const navigate = useNavigate();
 
-  // Mock images for demonstration
-  const productImages = [
-    "https://placehold.co/600x400?text=Main+Image",
-    "https://placehold.co/600x400?text=Side+View",
-    "https://placehold.co/600x400?text=Back+View",
-    "https://placehold.co/600x400?text=Detail+View"
-  ];
-
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -88,6 +80,31 @@ const ProductDetail = () => {
     setOfferDialogOpen(true);
   };
 
+  // Build image array from product images
+  const getProductImages = () => {
+    if (!item || !item.images) {
+      return [
+        `https://placehold.co/600x400?text=${encodeURIComponent(item?.name || 'Product')}`
+      ];
+    }
+    
+    const images = [];
+    if (item.images.main) images.push(item.images.main);
+    if (item.images.front) images.push(item.images.front);
+    if (item.images.back) images.push(item.images.back);
+    if (item.images.detail) images.push(item.images.detail);
+    
+    if (images.length === 0) {
+      return [
+        `https://placehold.co/600x400?text=${encodeURIComponent(item?.name || 'Product')}`
+      ];
+    }
+    
+    return images;
+  };
+
+  const productImages = item ? getProductImages() : [];
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -133,21 +150,23 @@ const ProductDetail = () => {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {productImages.map((img, index) => (
-                    <div 
-                      key={index} 
-                      className={`aspect-square bg-gray-100 rounded-md overflow-hidden cursor-pointer ${index === activeImage ? 'ring-2 ring-blue-600' : ''}`}
-                      onClick={() => setActiveImage(index)}
-                    >
-                      <img 
-                        src={img} 
-                        alt={`Thumbnail ${index + 1}`} 
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  ))}
-                </div>
+                {productImages.length > 1 && (
+                  <div className="grid grid-cols-4 gap-2">
+                    {productImages.map((img, index) => (
+                      <div 
+                        key={index} 
+                        className={`aspect-square bg-gray-100 rounded-md overflow-hidden cursor-pointer ${index === activeImage ? 'ring-2 ring-blue-600' : ''}`}
+                        onClick={() => setActiveImage(index)}
+                      >
+                        <img 
+                          src={img} 
+                          alt={`Thumbnail ${index + 1}`} 
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Product Info */}
@@ -247,6 +266,7 @@ const ProductDetail = () => {
               </div>
             </div>
 
+            {/* Product tabs - tech specs, warranty info, etc. */}
             <div className="mt-12">
               <Tabs defaultValue="details">
                 <TabsList className="w-full grid grid-cols-3 mb-8">

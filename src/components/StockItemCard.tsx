@@ -45,6 +45,9 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
     setOfferDialogOpen(true);
   };
 
+  // Get product image
+  const productImage = item.images?.main || `https://placehold.co/400x400?text=${encodeURIComponent(item.name)}`;
+
   return (
     <>
       <Card 
@@ -56,7 +59,7 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
             {/* Product image */}
             <div className="bg-slate-100 flex items-center justify-center w-full sm:w-40 h-40 shrink-0">
               <img 
-                src={`https://placehold.co/400x400?text=${item.name}`} 
+                src={productImage} 
                 alt={item.name} 
                 className="object-contain h-32 w-32"
               />

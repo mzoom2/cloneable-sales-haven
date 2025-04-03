@@ -34,3 +34,20 @@ export const getStockItemById = async (id: number): Promise<StockItem | undefine
     throw error; // Re-throw the error to be handled by the caller
   }
 };
+
+// New function to update a stock item's images
+export const updateStockItemImages = async (
+  itemId: number, 
+  images: { main: string; front?: string; back?: string; detail?: string }
+): Promise<void> => {
+  try {
+    // In a real app, this would be an API call to update the images
+    console.log(`Updating images for item ${itemId}:`, images);
+    // For now, we'll just log the update as if it was successful
+    
+    return Promise.resolve();
+  } catch (error) {
+    console.error('Error updating stock item images:', error);
+    throw error;
+  }
+};
