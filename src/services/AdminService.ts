@@ -1,8 +1,5 @@
-
 import { StockItem } from '@/data/stockItems';
-
-// Base URL for the API (adjust this based on where your Flask backend is running)
-const API_BASE_URL = 'http://localhost:5000/api';
+import { API_BASE_URL } from '@/config/api';
 
 export const getStockItems = async (): Promise<StockItem[]> => {
   try {

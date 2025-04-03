@@ -1,8 +1,8 @@
-
 /**
  * Chat Service for handling communication with the chat API
  */
 import { sendTelegramNotification } from "@/services/TelegramService";
+import { API_BASE_URL } from '@/config/api';
 
 /**
  * Chat message interface
@@ -33,11 +33,6 @@ export interface ChatConversation {
 }
 
 /**
- * API Base URL - Update according to your environment
- */
-const API_URL = 'http://localhost:5000/api';
-
-/**
  * Check if there are unread messages
  */
 export const checkUnreadMessages = async (conversationId: string): Promise<boolean> => {
@@ -56,7 +51,7 @@ export const checkUnreadMessages = async (conversationId: string): Promise<boole
 export const sendChatMessage = async (message: Omit<ChatMessage, 'is_admin_reply' | 'is_read' | 'created_at'>): Promise<ChatMessage> => {
   try {
     // Send message to backend API
-    const response = await fetch(`${API_URL}/chat/messages`, {
+    const response = await fetch(`${API_BASE_URL}/chat/messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -111,7 +106,7 @@ export const sendChatMessage = async (message: Omit<ChatMessage, 'is_admin_reply
  */
 export const getChatMessages = async (conversationId: string): Promise<ChatMessage[]> => {
   try {
-    const response = await fetch(`${API_URL}/chat/messages/${conversationId}`);
+    const response = await fetch(`${API_BASE_URL}/chat/messages/${conversationId}`);
     
     if (!response.ok) {
       const errorData = await response.json();
@@ -131,7 +126,7 @@ export const getChatMessages = async (conversationId: string): Promise<ChatMessa
  */
 export const getAllChatConversations = async (): Promise<ChatConversation[]> => {
   try {
-    const response = await fetch(`${API_URL}/chat/admin/messages`);
+    const response = await fetch(`${API_BASE_URL}/chat/admin/messages`);
     
     if (!response.ok) {
       const errorData = await response.json();
@@ -151,7 +146,7 @@ export const getAllChatConversations = async (): Promise<ChatConversation[]> => 
  */
 export const sendAdminChatReply = async (conversationId: string, message: string): Promise<ChatMessage> => {
   try {
-    const response = await fetch(`${API_URL}/chat/admin/reply`, {
+    const response = await fetch(`${API_BASE_URL}/chat/admin/reply`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -180,7 +175,7 @@ export const sendAdminChatReply = async (conversationId: string, message: string
  */
 export const markMessagesAsRead = async (conversationId: string, isAdmin: boolean = false): Promise<void> => {
   try {
-    const response = await fetch(`${API_URL}/chat/messages/mark-read`, {
+    const response = await fetch(`${API_BASE_URL}/chat/messages/mark-read`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

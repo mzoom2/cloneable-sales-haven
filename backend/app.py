@@ -6,6 +6,7 @@ import os
 import logging
 from datetime import datetime
 import json
+from config import ALLOWED_ORIGINS, DATABASE_URL, SESSION_SECRET
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -17,11 +18,11 @@ class Base(DeclarativeBase):
 
 # Initialize Flask app and database
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app, resources={r"/api/*": {"origins": ALLOWED_ORIGINS}})  # Enable CORS for API routes
 
 # Configure the database
-app.secret_key = os.environ.get("SESSION_SECRET", "dev_secret_key")
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///store_data.db")
+app.secret_key = SESSION_SECRET
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
@@ -801,4 +802,3 @@ def mark_messages_as_read():
             # Admin is reading user messages
             unread_messages = ChatMessage.query.filter_by(
                 conversation_id=conversation_id,
-                is_

@@ -1,5 +1,6 @@
 import { CartItem } from '@/contexts/CartContext';
 import { sendTelegramMessage, formatCartItems } from '@/services/TelegramService';
+import { API_BASE_URL } from '@/config/api';
 
 export interface CreateOrderRequest {
   user_id: string; // This will now be the user's email
@@ -138,7 +139,7 @@ export const paymentOptions: PaymentOption[] = [
 // Get all payment details from the backend
 export const getAllPaymentDetails = async (): Promise<PaymentDetails> => {
   try {
-    const response = await fetch('http://localhost:5000/api/payment-settings');
+    const response = await fetch(`${API_BASE_URL}/payment-settings`);
     
     if (!response.ok) {
       throw new Error(`Failed to fetch payment details: ${response.status}`);
@@ -155,7 +156,7 @@ export const getAllPaymentDetails = async (): Promise<PaymentDetails> => {
 // Update payment details
 export const updatePaymentDetails = async (details: PaymentDetails): Promise<void> => {
   try {
-    const response = await fetch('http://localhost:5000/api/payment-settings', {
+    const response = await fetch(`${API_BASE_URL}/payment-settings`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -320,7 +321,7 @@ export const createOrder = async (cartItems: CartItem[], userEmail: string, tota
     
     console.log('Sending order data to server:', JSON.stringify(orderData));
     
-    const response = await fetch('http://localhost:5000/api/orders', {
+    const response = await fetch(`${API_BASE_URL}/orders`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
@@ -369,7 +370,7 @@ export const createPayment = async (orderId: number, paymentMethod: PaymentMetho
       amount: amount
     };
     
-    const response = await fetch('http://localhost:5000/api/payments', {
+    const response = await fetch(`${API_BASE_URL}/payments`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'

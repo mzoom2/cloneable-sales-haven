@@ -1,8 +1,5 @@
-
 import { StockItem } from '@/data/stockItems';
-
-// Base URL for the API
-const API_BASE_URL = 'http://localhost:5000/api';
+import { API_BASE_URL } from '@/config/api';
 
 // Get stock items from the backend API without localStorage fallback
 export const getStockItems = async (): Promise<StockItem[]> => {
