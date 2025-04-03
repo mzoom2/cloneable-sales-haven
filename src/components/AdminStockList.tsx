@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
   Table, 
@@ -29,7 +30,7 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -1021,3 +1022,33 @@ const AdminStockList: React.FC = () => {
                       />
                     </TabsContent>
                   </Tabs>
+                  
+                  <div className="flex space-x-3 pt-4">
+                    <Button 
+                      type="submit"
+                      className="flex-1"
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Details
+                    </Button>
+                    <Button 
+                      type="button"
+                      className="flex-1" 
+                      variant="outline"
+                      onClick={() => setIsDetailsDialogOpen(false)}
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default AdminStockList;
