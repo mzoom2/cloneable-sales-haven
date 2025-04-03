@@ -32,7 +32,16 @@ import { stockItems } from './data/stockItems';
 function App() {
   // Create a placeholder/default item and state for OfferAcceptedDialog
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(stockItems[0]);
+  // Make sure we have a valid default item
+  const [selectedItem, setSelectedItem] = useState(stockItems.length > 0 ? stockItems[0] : {
+    id: 0,
+    name: "Default Item",
+    price: 0,
+    quantity: 0,
+    grade: "A",
+    location: "Warehouse",
+    images: { main: "" }
+  });
 
   return (
     <div className="App">

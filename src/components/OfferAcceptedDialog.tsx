@@ -23,17 +23,21 @@ interface OfferAcceptedDialogProps {
 }
 
 const OfferAcceptedDialog: React.FC<OfferAcceptedDialogProps> = ({ item, open, setOpen }) => {
-  const [offerAmount, setOfferAmount] = useState<number>(item.price);
+  // Initialize with a default value to prevent errors when item is undefined
+  const [offerAmount, setOfferAmount] = useState<number>(0);
   const { addToCart } = useCart();
   const { toast } = useToast()
 
+  // Update offerAmount when item changes and is defined
   useEffect(() => {
-    if (item) {
+    if (item && item.price !== undefined) {
       setOfferAmount(item.price);
     }
   }, [item]);
 
   const handleAcceptOffer = () => {
+    if (!item) return; // Guard clause for when item is undefined
+    
     if (offerAmount <= 0 || offerAmount > item.price) {
       toast({
         title: "Invalid Offer Amount",
@@ -55,6 +59,9 @@ const OfferAcceptedDialog: React.FC<OfferAcceptedDialogProps> = ({ item, open, s
     })
     setOpen(false);
   };
+
+  // Don't render anything if item is undefined
+  if (!item) return null;
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
