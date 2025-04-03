@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
@@ -27,8 +27,13 @@ import TrackingDetailsPage from './pages/TrackingDetailsPage';
 import AdminPage from './pages/AdminPage';
 import PaymentPage from './pages/PaymentPage';
 import ProductDetail from './pages/ProductDetail';
+import { stockItems } from './data/stockItems';
 
 function App() {
+  // Create a placeholder/default item and state for OfferAcceptedDialog
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(stockItems[0]);
+
   return (
     <div className="App">
       <CurrencyProvider>
@@ -58,7 +63,11 @@ function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <Toaster />
-              <OfferAcceptedDialog />
+              <OfferAcceptedDialog 
+                item={selectedItem} 
+                open={dialogOpen} 
+                setOpen={setDialogOpen} 
+              />
             </BrowserRouter>
           </CartProvider>
         </AuthProvider>

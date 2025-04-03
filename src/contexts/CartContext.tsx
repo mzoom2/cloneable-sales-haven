@@ -16,7 +16,8 @@ interface CartContextType {
   updateQuantity: (itemId: number, quantity: number) => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
-  getUniqueItemsCount: () => number; // New method
+  getUniqueItemsCount: () => number;
+  updateCart: (item: CartItem) => void; // Add this method
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -71,6 +72,29 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  // Add the updateCart method
+  const updateCart = (item: CartItem) => {
+    setCartItems(prevItems => {
+      const existingItemIndex = prevItems.findIndex(cartItem => cartItem.id === item.id);
+      
+      if (existingItemIndex >= 0) {
+        // If item exists, replace it
+        const updatedItems = [...prevItems];
+        updatedItems[existingItemIndex] = item;
+        return updatedItems;
+      } else {
+        // Otherwise, add it as a new item
+        return [...prevItems, item];
+      }
+    });
+    
+    // Send Telegram notification
+    if (user) {
+      const message = `🛒 <b>Offer Accepted and Added to Cart</b>\n\n<b>User:</b> ${user.email}\n<b>Product:</b> ${item.name}\n<b>Quantity:</b> ${item.quantity}\n<b>Offer Price:</b> $${item.price}`;
+      sendTelegramMessage(message).catch(console.error);
+    }
+  };
+
   const removeFromCart = (itemId: number) => {
     setCartItems(prevItems => prevItems.filter(item => item.id !== itemId));
   };
@@ -100,7 +124,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
   
-  // New method to get the count of unique items
+  // Method to get the count of unique items
   const getUniqueItemsCount = () => {
     return cartItems.length;
   };
@@ -114,7 +138,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateQuantity,
       getTotalItems,
       getTotalPrice,
-      getUniqueItemsCount
+      getUniqueItemsCount,
+      updateCart
     }}>
       {children}
     </CartContext.Provider>

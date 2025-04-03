@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   AlertDialog,
@@ -8,7 +9,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -24,7 +24,7 @@ interface OfferAcceptedDialogProps {
 
 const OfferAcceptedDialog: React.FC<OfferAcceptedDialogProps> = ({ item, open, setOpen }) => {
   const [offerAmount, setOfferAmount] = useState<number>(item.price);
-  const { updateCart } = useCart();
+  const { addToCart } = useCart();
   const { toast } = useToast()
 
   useEffect(() => {
@@ -43,19 +43,15 @@ const OfferAcceptedDialog: React.FC<OfferAcceptedDialogProps> = ({ item, open, s
       return;
     }
 
-    updateCart({
-      id: item.id,
-      name: item.title,
+    addToCart({
+      ...item,
       price: offerAmount,
-      quantity: 1,
-      location: item.location || 'Warehouse',
-      grade: item.grade || 'A',
-      images: { main: item.image || '' }
-    });
+      quantity: 1
+    }, 1);
 
     toast({
       title: "Offer Accepted!",
-      description: `Offer of $${offerAmount} accepted for ${item.title}. Item added to cart.`,
+      description: `Offer of $${offerAmount} accepted for ${item.name}. Item added to cart.`,
     })
     setOpen(false);
   };
