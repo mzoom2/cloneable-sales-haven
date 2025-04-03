@@ -35,7 +35,7 @@ export const getStockItemById = async (id: number): Promise<StockItem | undefine
   }
 };
 
-// New function to update a stock item's images
+// Function to update a stock item's images
 export const updateStockItemImages = async (
   itemId: number, 
   images: { main: string; front?: string; back?: string; detail?: string }
@@ -48,6 +48,32 @@ export const updateStockItemImages = async (
     return Promise.resolve();
   } catch (error) {
     console.error('Error updating stock item images:', error);
+    throw error;
+  }
+};
+
+// New function to update product details, specifications, and warranty info
+export const updateStockItemDetails = async (
+  itemId: number,
+  details: {
+    productDetails?: string;
+    specifications?: {
+      display?: string;
+      performance?: string;
+      camera?: string;
+      battery?: string;
+    };
+    warrantyInfo?: string;
+  }
+): Promise<void> => {
+  try {
+    // In a real app, this would be an API call to update the details
+    console.log(`Updating details for item ${itemId}:`, details);
+    // For now, we'll just log the update as if it was successful
+    
+    return Promise.resolve();
+  } catch (error) {
+    console.error('Error updating stock item details:', error);
     throw error;
   }
 };

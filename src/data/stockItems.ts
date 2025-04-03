@@ -1,3 +1,4 @@
+
 export interface StockItem {
   id: number;
   name: string;
@@ -11,6 +12,14 @@ export interface StockItem {
     back?: string;
     detail?: string;
   };
+  productDetails?: string;
+  specifications?: {
+    display?: string;
+    performance?: string;
+    camera?: string;
+    battery?: string;
+  };
+  warrantyInfo?: string;
 }
 
 export const stockItems: StockItem[] = [

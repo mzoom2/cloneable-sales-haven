@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Table, 
@@ -16,7 +15,7 @@ import { StockItem, stockItems as sampleStockItems } from '@/data/stockItems';
 import { toast } from '@/hooks/use-toast';
 import { Save, X, Upload, RefreshCw, Plus, Trash2, Image as ImageIcon } from 'lucide-react';
 import { getStockItems, updateStockItem, importStockItems, addStockItem, deleteStockItem } from '@/services/AdminService';
-import { updateStockItemImages } from '@/services/StockService';
+import { updateStockItemImages, updateStockItemDetails } from '@/services/StockService';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ImageUploader from '@/components/ImageUploader';
 import { 
@@ -30,6 +29,12 @@ import {
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { FileText } from 'lucide-react';
 
 const AdminStockList: React.FC = () => {
   const [items, setItems] = useState<StockItem[]>([]);
@@ -60,6 +65,104 @@ const AdminStockList: React.FC = () => {
   // State for delete confirmation dialog
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<StockItem | null>(null);
+
+  // New state for details dialog
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [detailsItem, setDetailsItem] = useState<StockItem | null>(null);
+  
+  // Form schema for product details
+  const detailsFormSchema = z.object({
+    productDetails: z.string().optional(),
+    displaySpecs: z.string().optional(),
+    performanceSpecs: z.string().optional(),
+    cameraSpecs: z.string().optional(),
+    batterySpecs: z.string().optional(),
+    warrantyInfo: z.string().optional(),
+  });
+
+  // Initialize form
+  const detailsForm = useForm<z.infer<typeof detailsFormSchema>>({
+    resolver: zodResolver(detailsFormSchema),
+    defaultValues: {
+      productDetails: "",
+      displaySpecs: "",
+      performanceSpecs: "",
+      cameraSpecs: "",
+      batterySpecs: "",
+      warrantyInfo: "",
+    },
+  });
+
+  // Handle details management click
+  const handleDetailsClick = (item: StockItem) => {
+    setDetailsItem(item);
+    
+    // Set form values from existing data
+    detailsForm.reset({
+      productDetails: item.productDetails || "",
+      displaySpecs: item.specifications?.display || "",
+      performanceSpecs: item.specifications?.performance || "",
+      cameraSpecs: item.specifications?.camera || "",
+      batterySpecs: item.specifications?.battery || "",
+      warrantyInfo: item.warrantyInfo || "",
+    });
+    
+    setIsDetailsDialogOpen(true);
+  };
+
+  // Handle save details
+  const handleSaveDetails = async (values: z.infer<typeof detailsFormSchema>) => {
+    if (!detailsItem) return;
+    
+    try {
+      const details = {
+        productDetails: values.productDetails,
+        specifications: {
+          display: values.displaySpecs,
+          performance: values.performanceSpecs,
+          camera: values.cameraSpecs,
+          battery: values.batterySpecs,
+        },
+        warrantyInfo: values.warrantyInfo,
+      };
+      
+      // Update the item details via API
+      await updateStockItemDetails(detailsItem.id, details);
+      
+      // Update local state
+      setItems(prevItems => 
+        prevItems.map(item => 
+          item.id === detailsItem.id 
+            ? { 
+                ...item, 
+                productDetails: values.productDetails,
+                specifications: {
+                  display: values.displaySpecs,
+                  performance: values.performanceSpecs,
+                  camera: values.cameraSpecs,
+                  battery: values.batterySpecs,
+                },
+                warrantyInfo: values.warrantyInfo,
+              } 
+            : item
+        )
+      );
+      
+      setIsDetailsDialogOpen(false);
+      
+      toast({
+        title: "Details Updated",
+        description: `Details for ${detailsItem.name} have been updated successfully`,
+      });
+    } catch (error) {
+      console.error('Failed to update item details:', error);
+      toast({
+        title: "Update Failed",
+        description: "There was an error updating the item details.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const fetchItems = async () => {
     try {
@@ -457,6 +560,13 @@ const AdminStockList: React.FC = () => {
                       >
                         <ImageIcon className="h-4 w-4" />
                       </Button>
+                      <Button
+                        onClick={() => handleDetailsClick(item)}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <FileText className="h-4 w-4" />
+                      </Button>
                       <Button 
                         onClick={() => handleDeleteClick(item)}
                         variant="destructive" 
@@ -778,8 +888,136 @@ const AdminStockList: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  );
-};
 
-export default AdminStockList;
+      {/* Product Details Dialog */}
+      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl mb-4">Product Details & Specifications</DialogTitle>
+          </DialogHeader>
+          {detailsItem && (
+            <div className="space-y-4">
+              <div>
+                <p className="font-medium text-gray-700 mb-2">{detailsItem.name}</p>
+                <p className="text-sm text-gray-500 mb-4">ID: {detailsItem.id}</p>
+              </div>
+              
+              <Form {...detailsForm}>
+                <form onSubmit={detailsForm.handleSubmit(handleSaveDetails)} className="space-y-6">
+                  <Tabs defaultValue="details" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="details">Product Details</TabsTrigger>
+                      <TabsTrigger value="specs">Specifications</TabsTrigger>
+                      <TabsTrigger value="warranty">Warranty Info</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="details" className="space-y-4 pt-4">
+                      <FormField
+                        control={detailsForm.control}
+                        name="productDetails"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Product Details</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Enter detailed product description..." 
+                                className="min-h-[200px] p-3" 
+                                {...field}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </TabsContent>
+                    
+                    <TabsContent value="specs" className="space-y-4 pt-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={detailsForm.control}
+                          name="displaySpecs"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Display Specifications</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Screen size, resolution, etc..." 
+                                  className="min-h-[120px] p-3" 
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={detailsForm.control}
+                          name="performanceSpecs"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Performance Specifications</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Processor, RAM, storage, etc..." 
+                                  className="min-h-[120px] p-3" 
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={detailsForm.control}
+                          name="cameraSpecs"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Camera Specifications</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Megapixels, features, etc..." 
+                                  className="min-h-[120px] p-3" 
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={detailsForm.control}
+                          name="batterySpecs"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Battery Specifications</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="Battery capacity, charging features, etc..." 
+                                  className="min-h-[120px] p-3" 
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="warranty" className="space-y-4 pt-4">
+                      <FormField
+                        control={detailsForm.control}
+                        name="warrantyInfo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Warranty Information</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="Warranty details, coverage periods, etc..." 
+                                className="min-h-[200px] p-3" 
+                                {...field}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </TabsContent>
+                  </Tabs>
