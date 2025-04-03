@@ -42,10 +42,12 @@ const OrderProgress: React.FC<OrderProgressProps> = ({
     
     // If animation is enabled, we'll progress through the statuses
     if (animated && initialStatus !== 'delivered') {
+      // Changed timings to hours (in milliseconds)
+      // 6 hours = 6 * 60 * 60 * 1000 = 21,600,000 milliseconds
       const statusTimings = {
-        payment: 10000,      // 10 seconds for demo (would be 1 day in production)
-        processing: 15000,   // 15 seconds for demo (would be 1-2 days in production) 
-        shipped: 20000,      // 20 seconds for demo (would be 2-3 days in production)
+        payment: 6 * 60 * 60 * 1000,      // 6 hours
+        processing: 6 * 60 * 60 * 1000,   // 6 hours  
+        shipped: 6 * 60 * 60 * 1000,      // 6 hours
       };
       
       const progressInterval = setInterval(() => {
@@ -61,7 +63,7 @@ const OrderProgress: React.FC<OrderProgressProps> = ({
               return currentStatus;
           }
         });
-      }, statusTimings[initialStatus] || 15000);
+      }, statusTimings[initialStatus] || 6 * 60 * 60 * 1000);
       
       return () => clearInterval(progressInterval);
     }
@@ -86,17 +88,20 @@ const OrderProgress: React.FC<OrderProgressProps> = ({
         break;
     }
     
-    // Animate progress
+    // Animate progress more gradually for the longer timeline
     if (progress < targetProgress) {
+      const incrementSize = 0.5; // Smaller increment for smoother animation
+      const animationDuration = 100; // Longer interval between increments (milliseconds)
+      
       const animationInterval = setInterval(() => {
         setProgress(currentProgress => {
           if (currentProgress >= targetProgress) {
             clearInterval(animationInterval);
             return targetProgress;
           }
-          return currentProgress + 1;
+          return currentProgress + incrementSize;
         });
-      }, 50);
+      }, animationDuration);
       
       return () => clearInterval(animationInterval);
     }
