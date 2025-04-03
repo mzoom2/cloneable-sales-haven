@@ -1,168 +1,128 @@
 
-import { Card, CardContent } from "@/components/ui/card";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { StockItem } from "@/data/stockItems";
-import { useCart } from "@/contexts/CartContext";
-import { useState } from "react";
-import { ShoppingCart, Plus, Minus, Check, X, Store, Info } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "@/hooks/use-toast";
+import { useCart } from '@/contexts/CartContext';
+import { StockItem } from '@/data/stockItems';
 import { useCurrency } from '@/contexts/CurrencyContext';
-import { useNavigate } from "react-router-dom";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { ShoppingCart, Tag } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import MakeOfferDialog from './MakeOfferDialog';
 
 interface StockItemCardProps {
   item: StockItem;
 }
 
-export default function StockItemCard({ item }: StockItemCardProps) {
-  const [quantity, setQuantity] = useState(1);
-  const [isAdded, setIsAdded] = useState(false);
+const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
+  const [offerDialogOpen, setOfferDialogOpen] = useState(false);
   const { addToCart } = useCart();
-  const { formatPrice, convertPrice } = useCurrency();
   const navigate = useNavigate();
-  
-  const handleAddToCart = () => {
-    if (quantity > 0) {
-      addToCart(item, quantity);
-      setIsAdded(true);
-      toast({
-        title: "Added to cart",
-        description: `${quantity} x ${item.name} added to your cart`,
-      });
-      
-      // Reset the "Added" state after 2 seconds
-      setTimeout(() => {
-        setIsAdded(false);
-      }, 2000);
-    }
+  const { formatPrice, convertPrice } = useCurrency();
+
+  // Format item data
+  const formattedPrice = formatPrice(convertPrice(item.price));
+
+  // Handle add to cart
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    addToCart(item, 1);
+    toast({
+      title: "Added to cart",
+      description: `${item.name} added to your cart`,
+    });
   };
-  
-  const handleViewDetails = () => {
+
+  // Navigate to product detail page
+  const handleCardClick = () => {
     navigate(`/product/${item.id}`);
   };
-  
-  const handleIncrement = () => {
-    setQuantity(prev => prev + 1);
+
+  // Handle make offer click
+  const handleMakeOffer = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    setOfferDialogOpen(true);
   };
-  
-  const handleDecrement = () => {
-    setQuantity(prev => (prev > 1 ? prev - 1 : 1));
-  };
-  
-  const stockStatus = item.quantity > 10 
-    ? { text: "In Stock", color: "bg-green-500" }
-    : item.quantity > 0 
-    ? { text: "Low Stock", color: "bg-yellow-500" }
-    : { text: "Out of Stock", color: "bg-red-500" };
-  
+
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300">
-      <CardContent className="p-0">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
-          {/* Product Info */}
-          <div className="md:col-span-8 p-4 cursor-pointer" onClick={handleViewDetails}>
-            <h3 className="font-medium text-lg mb-1">{item.name}</h3>
-            
-            <div className="text-sm text-gray-500 mb-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Badge variant="outline" className="rounded-sm">
-                  {item.grade}
-                </Badge>
-                <div className="flex items-center">
-                  <Store size={14} className="mr-1" />
-                  {item.location}
-                </div>
-                <div className={`h-2 w-2 rounded-full ${stockStatus.color}`} />
-                <span>
-                  {stockStatus.text}
-                </span>
-              </div>
+    <>
+      <Card 
+        className="overflow-hidden transition-all cursor-pointer hover:shadow-md"
+        onClick={handleCardClick}
+      >
+        <CardContent className="p-0">
+          <div className="flex flex-col sm:flex-row">
+            {/* Product image */}
+            <div className="bg-slate-100 flex items-center justify-center w-full sm:w-40 h-40 shrink-0">
+              <img 
+                src={`https://placehold.co/400x400?text=${item.name}`} 
+                alt={item.name} 
+                className="object-contain h-32 w-32"
+              />
             </div>
             
-            <div className="mt-2 space-y-2">
-              <div className="grid grid-cols-2 text-sm">
-                <div className="text-gray-600">Quantity Available:</div>
-                <div>{item.quantity}</div>
-              </div>
-              <div className="grid grid-cols-2 text-sm">
-                <div className="text-gray-600">Unit Price:</div>
-                <div className="font-semibold">{formatPrice(convertPrice(item.price))}</div>
-              </div>
-              <div className="grid grid-cols-2 text-sm">
-                <div className="text-gray-600">Warranty:</div>
-                <div>12 Months</div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Action Panel */}
-          <div className="md:col-span-4 bg-gray-50 p-4 flex flex-col justify-between">
-            <div>
-              <div className="text-center mb-4">
-                <div className="text-sm text-gray-500">Price</div>
-                <div className="text-2xl font-bold text-primary">
-                  {formatPrice(convertPrice(item.price))}
+            {/* Product details */}
+            <div className="flex-grow flex flex-col p-4">
+              <div className="flex-grow">
+                <div className="flex justify-between">
+                  <h3 className="font-medium text-lg">{item.name}</h3>
+                  <div className="text-lg font-bold">{formattedPrice}</div>
                 </div>
-                <div className="text-xs text-gray-400">Per Unit</div>
+                
+                <div className="mt-1 flex flex-wrap gap-2">
+                  <Badge variant="outline" className="font-normal">
+                    {item.grade}
+                  </Badge>
+                  <Badge variant="outline" className="font-normal">
+                    {item.location}
+                  </Badge>
+                  {item.quantity > 10 ? (
+                    <Badge className="bg-green-600">In Stock</Badge>
+                  ) : item.quantity > 0 ? (
+                    <Badge className="bg-amber-500">Low Stock</Badge>
+                  ) : (
+                    <Badge variant="destructive">Out of Stock</Badge>
+                  )}
+                </div>
+                
+                <div className="mt-3 text-sm text-gray-600">
+                  Quantity available: {item.quantity}
+                </div>
               </div>
               
-              {/* Quantity selector */}
-              <div className="flex items-center justify-center mb-4">
+              <div className="mt-4 flex gap-2">
                 <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="rounded-l-md rounded-r-none h-9 w-9"
-                  onClick={handleDecrement}
+                  className="flex-1"
+                  variant="default" 
+                  size="sm" 
+                  onClick={handleAddToCart}
+                  disabled={item.quantity === 0}
                 >
-                  <Minus size={14} />
+                  <ShoppingCart className="mr-1 h-4 w-4" /> Add to Cart
                 </Button>
-                <div className="h-9 px-3 flex items-center justify-center border-y w-16">
-                  {quantity}
-                </div>
                 <Button 
+                  className="flex-1"
                   variant="outline" 
-                  size="icon" 
-                  className="rounded-r-md rounded-l-none h-9 w-9"
-                  onClick={handleIncrement}
+                  size="sm" 
+                  onClick={handleMakeOffer}
                 >
-                  <Plus size={14} />
+                  <Tag className="mr-1 h-4 w-4" /> Make Offer
                 </Button>
               </div>
             </div>
-            
-            <div className="space-y-2">
-              <Button 
-                className="w-full flex items-center justify-center gap-2"
-                disabled={isAdded || item.quantity === 0}
-                onClick={handleAddToCart}
-              >
-                {isAdded ? (
-                  <>
-                    <Check size={16} /> Added
-                  </>
-                ) : item.quantity === 0 ? (
-                  <>
-                    <X size={16} /> Out of Stock
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart size={16} /> Add to Cart
-                  </>
-                )}
-              </Button>
-              
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-center gap-2"
-                onClick={handleViewDetails}
-              >
-                <Info size={16} /> View Details
-              </Button>
-            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* Offer Dialog */}
+      <MakeOfferDialog 
+        open={offerDialogOpen} 
+        onOpenChange={setOfferDialogOpen} 
+        stockItem={item}
+      />
+    </>
   );
-}
+};
+
+export default StockItemCard;

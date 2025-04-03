@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StockItem } from "@/data/stockItems";
-import { ShoppingCart, ChevronLeft, Box, Check, Info, Shield, Truck } from "lucide-react";
+import { ShoppingCart, ChevronLeft, Box, Check, Info, Shield, Truck, Tag } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { useCurrency } from '@/contexts/CurrencyContext';
@@ -13,6 +13,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getStockItemById } from '@/services/StockService';
 import { Badge } from "@/components/ui/badge";
+import MakeOfferDialog from '@/components/MakeOfferDialog';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +21,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  const [offerDialogOpen, setOfferDialogOpen] = useState(false);
   const { addToCart } = useCart();
   const { formatPrice, convertPrice } = useCurrency();
   const navigate = useNavigate();
@@ -80,6 +82,10 @@ const ProductDetail = () => {
         description: `${quantity} x ${item.name} added to your cart`,
       });
     }
+  };
+
+  const handleOpenOfferDialog = () => {
+    setOfferDialogOpen(true);
   };
 
   return (
@@ -203,13 +209,23 @@ const ProductDetail = () => {
                     </Button>
                   </div>
                   
-                  <Button 
-                    className="w-full h-12 text-lg"
-                    onClick={handleAddToCart}
-                    disabled={item.quantity === 0}
-                  >
-                    <ShoppingCart className="mr-2" /> Add to Cart
-                  </Button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button 
+                      className="w-full h-12 text-lg"
+                      onClick={handleAddToCart}
+                      disabled={item.quantity === 0}
+                    >
+                      <ShoppingCart className="mr-2" /> Add to Cart
+                    </Button>
+                    
+                    <Button 
+                      variant="outline"
+                      className="w-full h-12 text-lg" 
+                      onClick={handleOpenOfferDialog}
+                    >
+                      <Tag className="mr-2" /> Make Offer
+                    </Button>
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3 pt-4">
@@ -400,6 +416,15 @@ const ProductDetail = () => {
           </div>
         )}
       </div>
+
+      {/* Offer Dialog */}
+      {item && (
+        <MakeOfferDialog 
+          open={offerDialogOpen} 
+          onOpenChange={setOfferDialogOpen} 
+          stockItem={item}
+        />
+      )}
 
       <Footer />
     </div>
