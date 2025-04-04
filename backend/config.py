@@ -19,7 +19,8 @@ DEFAULT_ORIGINS = [
     "https://www.ueephones.com",  # Your production frontend
     "http://www.ueephones.com",   # Non-HTTPS version just in case
     "https://ueephones.com",      # Apex domain with HTTPS
-    "http://ueephones.com"        # Apex domain without HTTPS
+    "http://ueephones.com",       # Apex domain without HTTPS
+    "*"                          # Allow all origins for debugging
 ]
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", ",".join(DEFAULT_ORIGINS)).split(",")
 

@@ -18,7 +18,8 @@ class Base(DeclarativeBase):
 
 # Initialize Flask app and database
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": ALLOWED_ORIGINS}})  # Enable CORS for API routes
+# Enable CORS for API routes with more permissive settings for debugging
+CORS(app, resources={r"/api/*": {"origins": "*", "supports_credentials": True}})
 
 # Configure the database
 app.secret_key = SESSION_SECRET
@@ -32,6 +33,12 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # Initialize SQLAlchemy with app
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
+
+# Add a simple ping endpoint for connectivity testing
+@app.route('/api/ping', methods=['GET'])
+def ping():
+    logger.info("Received ping request")
+    return jsonify({"status": "ok", "message": "API server is running"}), 200
 
 # Define StockItem model
 class StockItem(db.Model):
@@ -795,10 +802,3 @@ def mark_messages_as_read():
         is_admin = data.get('is_admin', False)
         
         if not conversation_id:
-            return jsonify({"error": "Conversation ID is required"}), 400
-            
-        # Mark messages as read based on who is reading them
-        if is_admin:
-            # Admin is reading user messages
-            unread_messages = ChatMessage.query.filter_by(
-                conversation_id=conversation_id,
