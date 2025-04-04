@@ -15,4 +15,5 @@ logging.basicConfig(
 if __name__ == "__main__":
     print(f"Starting server on {HOST}:{PORT}")
     print(f"Debug mode: {True}")
-    app.run(host=HOST, port=PORT, debug=True)
+    print(f"CORS: Enabled for all origins (debug mode)")
+    app.run(host=HOST, port=PORT, debug=True, threaded=True)

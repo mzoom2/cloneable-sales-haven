@@ -18,8 +18,8 @@ class Base(DeclarativeBase):
 
 # Initialize Flask app and database
 app = Flask(__name__)
-# Enable CORS for API routes with more permissive settings for debugging
-CORS(app, resources={r"/api/*": {"origins": "*", "supports_credentials": True}})
+# Enable CORS for all routes with more permissive settings for debugging
+CORS(app, resources={r"/*": {"origins": "*", "supports_credentials": True}})
 
 # Configure the database
 app.secret_key = SESSION_SECRET
@@ -35,10 +35,26 @@ db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
 # Add a simple ping endpoint for connectivity testing
-@app.route('/api/ping', methods=['GET'])
+@app.route('/api/ping', methods=['GET', 'OPTIONS'])
 def ping():
+    # Log request details for debugging
     logger.info("Received ping request")
-    return jsonify({"status": "ok", "message": "API server is running"}), 200
+    logger.info(f"Request Headers: {dict(request.headers)}")
+    logger.info(f"Request Origin: {request.headers.get('Origin', 'No Origin')}")
+    
+    # Handle preflight OPTIONS request
+    if request.method == 'OPTIONS':
+        response = jsonify({"status": "ok"})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', '*')
+        response.headers.add('Access-Control-Allow-Methods', '*')
+        return response
+        
+    return jsonify({
+        "status": "ok", 
+        "message": "API server is running",
+        "timestamp": datetime.utcnow().isoformat()
+    }), 200
 
 # Define StockItem model
 class StockItem(db.Model):
@@ -786,19 +802,4 @@ def admin_reply_to_chat():
         )
         
         db.session.add(admin_message)
-        db.session.commit()
-        
-        return jsonify(admin_message.to_dict()), 201
-    except Exception as e:
-        logger.error(f"Error sending admin reply: {str(e)}")
-        db.session.rollback()
-        return jsonify({"error": f"Failed to send reply: {str(e)}"}), 500
-
-@app.route('/api/chat/messages/mark-read', methods=['POST'])
-def mark_messages_as_read():
-    try:
-        data = request.json
-        conversation_id = data.get('conversation_id')
-        is_admin = data.get('is_admin', False)
-        
-        if not conversation_id:
+        db.

@@ -17,19 +17,25 @@ export const getApiUrl = (endpoint: string): string => {
 // Export a debug function to help troubleshoot API issues
 export const debugApiConnection = async (): Promise<boolean> => {
   try {
+    console.log(`Attempting to connect to API at: ${API_BASE_URL}/ping`);
+    
     const response = await fetch(`${API_BASE_URL}/ping`, { 
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
-      mode: 'cors'
+      mode: 'cors',
+      credentials: 'omit' // Don't send cookies to avoid CORS preflight issues
     });
     
     if (response.ok) {
-      console.log('API connection successful!');
+      const data = await response.json();
+      console.log('API connection successful!', data);
       return true;
     } else {
       console.error(`API connection failed with status: ${response.status}`);
+      console.error(`Response text: ${await response.text()}`);
       return false;
     }
   } catch (error) {

@@ -9,21 +9,27 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { API_BASE_URL, debugApiConnection } from '@/config/api';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("stock");
   const [apiStatus, setApiStatus] = useState<'loading' | 'connected' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [connectionAttempts, setConnectionAttempts] = useState(0);
 
-  // Check API connection on page load
+  // Check API connection on page load and when retrying
   useEffect(() => {
     const checkApiConnection = async () => {
       try {
+        console.log(`Connection attempt #${connectionAttempts + 1} to ${API_BASE_URL}`);
         setApiStatus('loading');
+        setErrorMessage('');
+        
         const isConnected = await debugApiConnection();
+        
         setApiStatus(isConnected ? 'connected' : 'error');
         if (!isConnected) {
-          setErrorMessage('Could not connect to the API server. Please check your backend configuration.');
+          setErrorMessage('Could not connect to the API server. Please check your backend configuration and ensure CORS is properly configured.');
         }
       } catch (error) {
         console.error('Error checking API connection:', error);
@@ -33,7 +39,11 @@ const AdminPage: React.FC = () => {
     };
 
     checkApiConnection();
-  }, []);
+  }, [connectionAttempts]);
+
+  const handleRetryConnection = () => {
+    setConnectionAttempts(prev => prev + 1);
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -48,7 +58,13 @@ const AdminPage: React.FC = () => {
           <Alert className="mb-4 bg-yellow-50 border-yellow-200">
             <AlertTitle>Connecting to backend...</AlertTitle>
             <AlertDescription>
-              Attempting to connect to API server at {API_BASE_URL}
+              <div className="space-y-2">
+                <p>Attempting to connect to API server at {API_BASE_URL}</p>
+                <div className="flex items-center space-x-4">
+                  <Skeleton className="h-4 w-4 rounded-full bg-yellow-200" />
+                  <span>Testing connection...</span>
+                </div>
+              </div>
             </AlertDescription>
           </Alert>
         )}
@@ -57,14 +73,25 @@ const AdminPage: React.FC = () => {
           <Alert className="mb-4 bg-red-50 border-red-200">
             <AlertTitle>API Connection Error</AlertTitle>
             <AlertDescription>
-              <p>{errorMessage}</p>
-              <p className="mt-2">Current API URL: {API_BASE_URL}</p>
-              <Button 
-                onClick={() => window.location.reload()} 
-                className="mt-2 bg-red-500 hover:bg-red-600"
-              >
-                Retry Connection
-              </Button>
+              <div className="space-y-4">
+                <p>{errorMessage}</p>
+                <p>Current API URL: {API_BASE_URL}</p>
+                <div className="space-y-2 text-sm text-gray-500">
+                  <p>Troubleshooting steps:</p>
+                  <ol className="list-decimal pl-5">
+                    <li>Ensure your backend server is running at the URL above</li>
+                    <li>Check CORS settings on your backend to allow requests from {window.location.origin}</li>
+                    <li>Verify your network connectivity</li>
+                    <li>If using HTTPS frontend, ensure your backend also uses HTTPS</li>
+                  </ol>
+                </div>
+                <Button 
+                  onClick={handleRetryConnection} 
+                  className="mt-2 bg-red-500 hover:bg-red-600"
+                >
+                  Retry Connection
+                </Button>
+              </div>
             </AlertDescription>
           </Alert>
         )}
