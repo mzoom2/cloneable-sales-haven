@@ -15,7 +15,11 @@ PORT = int(os.environ.get("BACKEND_PORT", 5000))
 DEFAULT_ORIGINS = [
     "http://localhost:3000",  # Default frontend dev server
     "http://localhost:5173",  # Vite default
-    "https://yourdomain.com"  # Replace with your production domain
+    "https://yourdomain.com", # Replace with your production domain
+    "https://www.ueephones.com",  # Your production frontend
+    "http://www.ueephones.com",   # Non-HTTPS version just in case
+    "https://ueephones.com",      # Apex domain with HTTPS
+    "http://ueephones.com"        # Apex domain without HTTPS
 ]
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", ",".join(DEFAULT_ORIGINS)).split(",")
 

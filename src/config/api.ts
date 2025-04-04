@@ -7,7 +7,7 @@
  */
 
 // The base URL for all API requests
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://elaborate-bruised-embeds-mzoomolabewa.replit.app/api';
 
 // Helper function to build full API URLs
 export const getApiUrl = (endpoint: string): string => {
