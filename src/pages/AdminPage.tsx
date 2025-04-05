@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -10,6 +9,7 @@ import { API_BASE_URL, debugApiConnection } from '@/config/api';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import Title from '@/components/Title';
 
 const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("stock");
@@ -47,6 +47,7 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <Title title="Admin Panel" />
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-6">
