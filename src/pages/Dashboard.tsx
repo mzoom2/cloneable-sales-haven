@@ -1,185 +1,168 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getCurrentUser } from '@/utils/localStorageUtils';
-import { getOffers } from '@/services/OfferService';
-import { Offer } from '@/services/OfferService';
-import Title from '@/components/Title';
+
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  BookOpen,
+  UserCircle,
+  GraduationCap,
+  Bookmark,
+  Star,
+  ShoppingBag,
+  HelpCircle,
+  Settings,
+  LogOut,
+  Trophy
+} from "lucide-react";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      navigate('/login');
-    } else {
-      setIsLoggedIn(true);
-      // Load offers
-      const userOffers = getOffers();
-      setOffers(userOffers);
-    }
-  }, [navigate]);
-
-  if (!isLoggedIn) {
-    return <div>Redirecting to login...</div>;
-  }
-
+  // Mock user data - in a real app this would come from authentication state
+  const user = {
+    firstName: "Adebayooo",
+    lastName: "Musturphaaa",
+    initials: "AM",
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
-      <Title title="Dashboard" />
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8 mt-16">
-        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+      
+      {/* Main content - starts after header height */}
+      <div className="flex-grow pt-16">
+        {/* Currency selector - fixed to right side, positioned higher */}
+        <div className="fixed right-0 top-1/4 z-40">
+          <div className="flex flex-col">
+            <button className="bg-blue-700 text-white py-2 px-4 font-medium">
+              USD $
+            </button>
+            <button className="bg-gray-800 text-white py-2 px-4 font-medium">
+              EUR €
+            </button>
+          </div>
+        </div>
         
-        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="offers">Offers</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Orders</CardTitle>
-                  <CardDescription>Your recent purchase history</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>You have no recent orders.</p>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" onClick={() => setActiveTab('orders')}>View All Orders</Button>
-                </CardFooter>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Pending Offers</CardTitle>
-                  <CardDescription>Offers awaiting response</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>You have {offers.filter(o => o.status === 'pending').length} pending offers.</p>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" onClick={() => setActiveTab('offers')}>View All Offers</Button>
-                </CardFooter>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Account Status</CardTitle>
-                  <CardDescription>Your current account information</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Your account is active.</p>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="outline" onClick={() => navigate('/profile')}>View Profile</Button>
-                </CardFooter>
-              </Card>
+        {/* User info section */}
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center gap-6 border-b pb-6">
+            <Avatar className="h-24 w-24 bg-blue-500">
+              <AvatarFallback className="text-3xl text-white">{user.initials}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-gray-600 text-lg">Hello,</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-[#1a0050]">
+                {user.firstName} {user.lastName}
+              </h1>
             </div>
-          </TabsContent>
+          </div>
           
-          <TabsContent value="orders">
-            <Card>
-              <CardHeader>
-                <CardTitle>Order History</CardTitle>
-                <CardDescription>View and track your orders</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <p className="text-gray-500 mb-4">You haven't placed any orders yet.</p>
-                  <Button onClick={() => navigate('/shop-list')}>Browse Products</Button>
+          {/* Dashboard content */}
+          <div className="flex flex-col md:flex-row gap-8 mt-6">
+            {/* Left sidebar navigation */}
+            <div className="md:w-1/4">
+              <nav className="space-y-1">
+                <Link to="/dashboard" className="flex items-center gap-3 text-white bg-blue-600 rounded-md px-4 py-3 font-medium">
+                  <BookOpen size={20} />
+                  <span>Dashboard</span>
+                </Link>
+                <Link to="/profile" className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 rounded-md px-4 py-3 font-medium">
+                  <UserCircle size={20} />
+                  <span>My Profile</span>
+                </Link>
+                <Link to="/enrolled-courses" className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 rounded-md px-4 py-3 font-medium">
+                  <GraduationCap size={20} />
+                  <span>Enrolled Courses</span>
+                </Link>
+                <Link to="/wishlist" className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 rounded-md px-4 py-3 font-medium">
+                  <Bookmark size={20} />
+                  <span>Wishlist</span>
+                </Link>
+                <Link to="/reviews" className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 rounded-md px-4 py-3 font-medium">
+                  <Star size={20} />
+                  <span>Reviews</span>
+                </Link>
+                <Link to="/quiz-attempts" className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 rounded-md px-4 py-3 font-medium">
+                  <div className="w-5 h-5 flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none">
+                      <rect x="3" y="3" width="7" height="7" rx="1" />
+                      <rect x="14" y="3" width="7" height="7" rx="1" />
+                      <rect x="3" y="14" width="7" height="7" rx="1" />
+                      <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                  </div>
+                  <span>My Quiz Attempts</span>
+                </Link>
+                <Link to="/order-history" className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 rounded-md px-4 py-3 font-medium">
+                  <ShoppingBag size={20} />
+                  <span>Order History</span>
+                </Link>
+                <Link to="/questions" className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 rounded-md px-4 py-3 font-medium">
+                  <HelpCircle size={20} />
+                  <span>Question & Answer</span>
+                </Link>
+                <Link to="/settings" className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 rounded-md px-4 py-3 font-medium">
+                  <Settings size={20} />
+                  <span>Settings</span>
+                </Link>
+                <Link to="/logout" className="flex items-center gap-3 text-gray-700 hover:bg-gray-100 rounded-md px-4 py-3 font-medium">
+                  <LogOut size={20} />
+                  <span>Logout</span>
+                </Link>
+              </nav>
+            </div>
+            
+            {/* Main dashboard content */}
+            <div className="md:w-3/4">
+              {/* Profile photo reminder */}
+              <div className="bg-white border rounded-lg p-4 mb-6 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="16" />
+                      <line x1="12" y1="16" x2="12" y2="16" />
+                    </svg>
+                  </div>
+                  <span>Set Your Profile Photo</span>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="offers">
-            <Card>
-              <CardHeader>
-                <CardTitle>Your Offers</CardTitle>
-                <CardDescription>Manage your product offers</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {offers.length > 0 ? (
-                  <div className="space-y-4">
-                    {offers.map((offer) => (
-                      <div key={offer.id} className="border rounded-lg p-4">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-medium">{offer.product}</h3>
-                            <p className="text-sm text-gray-500">
-                              Offered: {offer.offeredPrice} for {offer.offeredQuantity} units
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              Date: {offer.createdAt.toLocaleDateString()}
-                            </p>
-                          </div>
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            offer.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                            offer.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                            'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {offer.status.charAt(0).toUpperCase() + offer.status.slice(1)}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                <Button variant="outline" className="bg-blue-50 hover:bg-blue-100">Click Here</Button>
+              </div>
+              
+              <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
+              
+              {/* Courses statistics */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="border rounded-lg p-6 text-center">
+                  <div className="w-20 h-20 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <BookOpen size={32} className="text-blue-600" />
                   </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500 mb-4">You haven't made any offers yet.</p>
-                    <Button onClick={() => navigate('/shop-list')}>Browse Products</Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="settings">
-            <Card>
-              <CardHeader>
-                <CardTitle>Account Settings</CardTitle>
-                <CardDescription>Manage your account preferences</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-medium mb-2">Email Notifications</h3>
-                    <div className="flex items-center space-x-2">
-                      <input type="checkbox" id="email-offers" className="rounded" />
-                      <label htmlFor="email-offers">Receive offer updates via email</label>
-                    </div>
-                    <div className="flex items-center space-x-2 mt-2">
-                      <input type="checkbox" id="email-orders" className="rounded" />
-                      <label htmlFor="email-orders">Receive order status updates via email</label>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-medium mb-2">Account Security</h3>
-                    <Button variant="outline" size="sm">Change Password</Button>
-                  </div>
+                  <h3 className="text-4xl font-bold text-gray-800 mb-2">0</h3>
+                  <p className="text-gray-600">Enrolled Courses</p>
                 </div>
-              </CardContent>
-              <CardFooter>
-                <Button>Save Changes</Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </main>
+                
+                <div className="border rounded-lg p-6 text-center">
+                  <div className="w-20 h-20 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <GraduationCap size={32} className="text-blue-600" />
+                  </div>
+                  <h3 className="text-4xl font-bold text-gray-800 mb-2">0</h3>
+                  <p className="text-gray-600">Active Courses</p>
+                </div>
+                
+                <div className="border rounded-lg p-6 text-center">
+                  <div className="w-20 h-20 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <Trophy size={32} className="text-blue-600" />
+                  </div>
+                  <h3 className="text-4xl font-bold text-gray-800 mb-2">0</h3>
+                  <p className="text-gray-600">Completed Courses</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <Footer />
     </div>
   );

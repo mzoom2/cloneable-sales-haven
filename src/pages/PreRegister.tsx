@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import Title from '@/components/Title';
 
 const PreRegister = () => {
   const [userType, setUserType] = useState<string | undefined>(undefined);
@@ -26,7 +25,6 @@ const PreRegister = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
-      <Title title="Pre-Registration" />
       <Header />
       
       {/* Breadcrumb navigation */}

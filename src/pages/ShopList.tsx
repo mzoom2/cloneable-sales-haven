@@ -18,7 +18,6 @@ import { Filter } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getStockItems } from "@/services/StockService";
-import Title from '@/components/Title';
 import { 
   Pagination, 
   PaginationContent, 
@@ -164,7 +163,6 @@ const ShopList = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
-      <Title title="Stock List" />
       <Header />
       
       {/* Breadcrumb navigation */}

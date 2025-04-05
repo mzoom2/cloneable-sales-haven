@@ -6,7 +6,6 @@ import ProductDisplay from '@/components/ProductDisplay';
 import BecomeAgent from '@/components/BecomeAgent';
 import Footer from '@/components/Footer';
 import { useIsMobile } from '@/hooks/use-mobile';
-import Title from '@/components/Title';
 
 const Index = () => {
   const isMobile = useIsMobile();
@@ -38,7 +37,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden">
-      <Title title="Home" />
       <Header />
       <main>
         <Hero />
