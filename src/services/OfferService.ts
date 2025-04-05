@@ -1,88 +1,118 @@
 
-import { StockItem } from "@/data/stockItems";
+import { StockItem } from '@/data/stockItems';
 
 export interface Offer {
-  id: number;
-  productId: number;
-  userId: string;
-  price: number;
-  quantity: number;
-  status: 'pending' | 'accepted' | 'rejected';
-  createdAt: string;
-  product: StockItem;
+  id: string;
+  product: string;
+  offeredPrice: string;
+  offeredQuantity: number;
+  productId: string; // This is defined as string in the interface
+  status: "pending" | "accepted" | "rejected";
+  createdAt: Date;
 }
 
-export type UserOffer = Offer;
+// Get offers from localStorage
+export const getOffers = (): Offer[] => {
+  const offersData = localStorage.getItem('offers');
+  if (!offersData) return [];
+  
+  const parsedOffers = JSON.parse(offersData);
+  return parsedOffers.map((offer: Offer) => ({
+    ...offer,
+    createdAt: new Date(offer.createdAt)
+  }));
+};
 
-// Mock function to get offers
-export const getOffers = async (): Promise<Offer[]> => {
-  // This would typically be an API call
-  return [
-    {
-      id: 1,
-      productId: 1,
-      userId: 'user123',
-      price: 900,
-      quantity: 2,
-      status: 'pending',
-      createdAt: '2023-04-01T10:00:00Z',
-      product: {
-        id: 1,
-        name: "iPhone 13 Pro",
-        price: 999,
-        quantity: 15,
-        images: {
-          main: "/placeholder.svg"
-        },
-        description: "Slightly used iPhone 13 Pro in excellent condition"
-      }
-    },
-    {
-      id: 2,
-      productId: 2,
-      userId: 'user123',
-      price: 750,
-      quantity: 1,
-      status: 'accepted',
-      createdAt: '2023-03-29T14:30:00Z',
-      product: {
-        id: 2,
-        name: "Samsung Galaxy S21",
-        price: 799,
-        quantity: 10,
-        images: {
-          main: "/placeholder.svg"
-        },
-        description: "Refurbished Galaxy S21 with minor cosmetic wear"
-      }
+// Add a new offer
+export const addOffer = (stockItem: StockItem, quantity: number, price: string): Offer => {
+  const offers = getOffers();
+  
+  const newOffer: Offer = {
+    id: generateId(),
+    product: stockItem.name,
+    productId: stockItem.id.toString(), // Convert number to string to match the interface
+    offeredPrice: price,
+    offeredQuantity: quantity,
+    status: "pending",
+    createdAt: new Date()
+  };
+  
+  const updatedOffers = [...offers, newOffer];
+  localStorage.setItem('offers', JSON.stringify(updatedOffers));
+  
+  // Set a timer to auto-accept this offer after 3 minutes (demo purpose)
+  setOfferAcceptanceTimer(newOffer.id);
+  
+  return newOffer;
+};
+
+// Remove an offer
+export const removeOffer = (offerId: string): void => {
+  let offers = getOffers();
+  offers = offers.filter(offer => offer.id !== offerId);
+  localStorage.setItem('offers', JSON.stringify(offers));
+};
+
+// Update an offer's status
+export const updateOfferStatus = (offerId: string, status: "pending" | "accepted" | "rejected"): Offer | null => {
+  let offers = getOffers();
+  const offerIndex = offers.findIndex(offer => offer.id === offerId);
+  
+  if (offerIndex >= 0) {
+    offers[offerIndex] = {
+      ...offers[offerIndex],
+      status
+    };
+    
+    localStorage.setItem('offers', JSON.stringify(offers));
+    return offers[offerIndex];
+  }
+  
+  return null;
+};
+
+// Get a specific offer by ID
+export const getOfferById = (offerId: string): Offer | null => {
+  const offers = getOffers();
+  return offers.find(offer => offer.id === offerId) || null;
+};
+
+// Set a timer to automatically accept an offer after 3 minutes
+const setOfferAcceptanceTimer = (offerId: string): void => {
+  // Store the timer ID in localStorage so it persists across page refreshes
+  const timers = JSON.parse(localStorage.getItem('offerTimers') || '{}');
+  
+  // Set timer to 3 minutes (180000 ms)
+  const timeoutId = setTimeout(() => {
+    const updatedOffer = updateOfferStatus(offerId, "accepted");
+    if (updatedOffer) {
+      // Set a flag in localStorage that indicates an offer was accepted
+      localStorage.setItem('lastAcceptedOffer', offerId);
+      localStorage.setItem('offerAcceptedAt', new Date().toISOString());
+      
+      // Dispatch a custom event that can be listened to in any component
+      window.dispatchEvent(new CustomEvent('offerAccepted', { detail: { offerId } }));
     }
-  ];
+    
+    // Clean up timer reference
+    const currentTimers = JSON.parse(localStorage.getItem('offerTimers') || '{}');
+    delete currentTimers[offerId];
+    localStorage.setItem('offerTimers', JSON.stringify(currentTimers));
+  }, 180000); // 3 minutes
+  
+  // Store timestamp when this offer should be accepted
+  const acceptanceTime = new Date();
+  acceptanceTime.setMinutes(acceptanceTime.getMinutes() + 3);
+  
+  timers[offerId] = {
+    acceptanceTime: acceptanceTime.toISOString()
+  };
+  
+  localStorage.setItem('offerTimers', JSON.stringify(timers));
 };
 
-export const getUserOffers = async (userId: string): Promise<UserOffer[]> => {
-  const offers = await getOffers();
-  return offers.filter(offer => offer.userId === userId);
-};
-
-export const acceptOffer = async (offerId: number): Promise<boolean> => {
-  console.log(`Accepting offer with ID: ${offerId}`);
-  // In a real app, this would make an API call
-  return true;
-};
-
-export const rejectOffer = async (offerId: number): Promise<boolean> => {
-  console.log(`Rejecting offer with ID: ${offerId}`);
-  // In a real app, this would make an API call
-  return true;
-};
-
-export const makeOffer = async (productId: number, price: number, quantity: number): Promise<boolean> => {
-  console.log(`Making offer for product ${productId} at price ${price} for quantity ${quantity}`);
-  // In a real app, this would make an API call
-  return true;
-};
-
-// Adding this function to fix the missing addOffer export
-export const addOffer = async (productId: number, price: number, quantity: number): Promise<boolean> => {
-  return makeOffer(productId, price, quantity);
+// Generate a unique ID
+const generateId = (): string => {
+  return Math.random().toString(36).substring(2, 15) + 
+         Math.random().toString(36).substring(2, 15);
 };

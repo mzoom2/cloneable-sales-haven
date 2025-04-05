@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Facebook, Linkedin, Instagram, Twitter, Youtube, Github, MessageCircle, Send, Loader2, Bell } from "lucide-react";
+import { Facebook, Linkedin, Instagram, Twitter, Youtube, Github, MessageCircle, Send, X, Loader2, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -336,6 +336,14 @@ const Footer = () => {
         <DialogContent className="bg-white p-0 border-none max-w-md mx-4">
           <div className="bg-red-600 p-4 text-white flex justify-between items-center">
             <DialogTitle className="text-xl font-bold">Live Chat</DialogTitle>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-white hover:bg-red-700"
+              onClick={() => setChatOpen(false)}
+            >
+              <X size={18} />
+            </Button>
           </div>
 
           {/* Chat messages area */}

@@ -1,96 +1,316 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/utils/localStorageUtils";
+import { StockItem } from "@/data/stockItems";
+import StockItemCard from "@/components/StockItemCard";
+import FilterSidebar from "@/components/FilterSidebar";
+import { Filter } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { getStockItems } from "@/services/StockService";
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious, 
+  PaginationEllipsis 
+} from "@/components/ui/pagination";
 
-import React, { useState, useEffect } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import StockItemCard from '@/components/StockItemCard';
-import FilterSidebar from '@/components/FilterSidebar';
-import { stockItems, StockItem } from '@/data/stockItems';
-import { useSearchParams } from 'react-router-dom';
-import Title from '@/components/Title';
+const ITEMS_PER_PAGE = 10;
 
-type FilterOptions = {
-  category?: string;
-  grade?: string;
-  location?: string;
-  model?: string;
-};
-
-interface FilterSidebarProps {
-  updateFilters: (newFilters: FilterOptions) => void;
-}
-
-const ShopList: React.FC = () => {
-  const [filteredItems, setFilteredItems] = useState<StockItem[]>(stockItems);
-  const [searchParams, setSearchParams] = useSearchParams();
-
+const ShopList = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [stockItems, setStockItems] = useState<StockItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  
+  // Fetch stock items
   useEffect(() => {
-    const filters: FilterOptions = {};
-    const category = searchParams.get('category');
-    const grade = searchParams.get('grade');
-    const location = searchParams.get('location');
-    const model = searchParams.get('model');
-
-    if (category) filters.category = category;
-    if (grade) filters.grade = grade;
-    if (location) filters.location = location;
-    if (model) filters.model = model;
-
-    applyFilters(filters);
-  }, [searchParams]);
-
-  const applyFilters = (filters: FilterOptions) => {
-    let newFilteredItems = stockItems;
-
-    if (filters.category) {
-      newFilteredItems = newFilteredItems.filter(item => 
-        item.category && item.category.toLowerCase().includes(filters.category!.toLowerCase())
-      );
-    }
-
-    if (filters.grade) {
-      newFilteredItems = newFilteredItems.filter(item => 
-        item.grade && item.grade.toLowerCase().includes(filters.grade!.toLowerCase())
-      );
-    }
-
-    if (filters.location) {
-      newFilteredItems = newFilteredItems.filter(item => 
-        item.location && item.location.toLowerCase().includes(filters.location!.toLowerCase())
+    const fetchStockItems = async () => {
+      try {
+        setLoading(true);
+        const items = await getStockItems();
+        setStockItems(items);
+      } catch (error) {
+        console.error("Error fetching stock items:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load stock items",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchStockItems();
+  }, []);
+  
+  // Calculate total pages
+  const totalPages = Math.ceil(stockItems.length / ITEMS_PER_PAGE);
+  
+  // Filter items based on search query
+  const filteredItems = stockItems.filter(item => 
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  // Get current items for pagination
+  const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+  
+  // Check if user is logged in
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    setIsLoggedIn(!!currentUser);
+  }, []);
+  
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
+  };
+  
+  const handleLogin = () => {
+    navigate('/login');
+  };
+  
+  const toggleMobileFilters = () => {
+    setShowMobileFilters(!showMobileFilters);
+  };
+  
+  // Generate pagination items
+  const renderPaginationItems = () => {
+    const items = [];
+    
+    // Always show first page
+    items.push(
+      <PaginationItem key="page-1">
+        <PaginationLink 
+          onClick={() => handlePageChange(1)} 
+          isActive={currentPage === 1}
+        >
+          1
+        </PaginationLink>
+      </PaginationItem>
+    );
+    
+    // Add ellipsis if needed
+    if (currentPage > 3) {
+      items.push(
+        <PaginationItem key="ellipsis-1">
+          <PaginationEllipsis />
+        </PaginationItem>
       );
     }
     
-    if (filters.model) {
-      newFilteredItems = newFilteredItems.filter(item => 
-        item.model && item.model.toLowerCase().includes(filters.model!.toLowerCase())
+    // Add pages around current page
+    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+      if (i === 1 || i === totalPages) continue; // Skip first and last page as they're always shown
+      
+      items.push(
+        <PaginationItem key={`page-${i}`}>
+          <PaginationLink 
+            onClick={() => handlePageChange(i)} 
+            isActive={currentPage === i}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
       );
     }
-
-    setFilteredItems(newFilteredItems);
+    
+    // Add ellipsis if needed
+    if (currentPage < totalPages - 2) {
+      items.push(
+        <PaginationItem key="ellipsis-2">
+          <PaginationEllipsis />
+        </PaginationItem>
+      );
+    }
+    
+    // Always show last page if there is more than one page
+    if (totalPages > 1) {
+      items.push(
+        <PaginationItem key={`page-${totalPages}`}>
+          <PaginationLink 
+            onClick={() => handlePageChange(totalPages)} 
+            isActive={currentPage === totalPages}
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    return items;
   };
-
-  const updateFilters = (newFilters: FilterOptions) => {
-    // Convert the FilterOptions object to a Record<string, string> for URLSearchParams
-    const params: Record<string, string> = {};
-    Object.entries(newFilters).forEach(([key, value]) => {
-      if (value) params[key] = value;
-    });
-    setSearchParams(params);
-  };
-
+  
   return (
     <div className="min-h-screen flex flex-col">
-      <Title title="Stock List" />
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="flex">
-          <FilterSidebar updateFilters={updateFilters} />
-          <div className="w-3/4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredItems.map(item => (
-              <StockItemCard key={item.id} item={item} />
-            ))}
+      
+      {/* Breadcrumb navigation */}
+      <div className="bg-slate-50 py-3 border-b mt-16">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <a href="/" className="hover:text-primary">Home</a>
+            <span>•</span>
+            <span className="font-medium text-gray-800">Stock List</span>
           </div>
         </div>
-      </main>
+      </div>
+
+      {/* Mobile floating filter button */}
+      {isMobile && (
+        <div className="fixed bottom-4 right-4 flex flex-col gap-3 z-40">
+          {/* Filter button */}
+          <button
+            className="bg-blue-600 text-white p-3 rounded-full shadow-lg flex items-center justify-center"
+            onClick={toggleMobileFilters}
+          >
+            <Filter size={24} />
+          </button>
+        </div>
+      )}
+
+      {/* Main content */}
+      <div className="flex-grow container mx-auto px-4 py-8">
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+          </div>
+        ) : isLoggedIn ? (
+          <>
+            <div className="flex flex-col md:flex-row gap-8">
+              {/* Mobile filter sidebar (shows as a dialog) */}
+              {isMobile && (
+                <Dialog open={showMobileFilters} onOpenChange={setShowMobileFilters}>
+                  <DialogContent className="bg-white p-0 border-none max-w-md mx-4 h-[80vh] overflow-auto">
+                    <div className="bg-blue-600 p-4 text-white">
+                      <DialogTitle className="text-xl font-bold">Filters</DialogTitle>
+                    </div>
+                    <div className="p-4">
+                      <FilterSidebar />
+                      <div className="mt-6">
+                        <Button 
+                          onClick={() => setShowMobileFilters(false)}
+                          className="w-full bg-blue-600"
+                        >
+                          Apply Filters
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
+              
+              {/* Left sidebar with filters - desktop only */}
+              {!isMobile && (
+                <div className="md:w-64 shrink-0">
+                  <FilterSidebar />
+                </div>
+              )}
+              
+              {/* Main product listings */}
+              <div className="flex-1">
+                {/* Search and export header */}
+                <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+                  <div className="mb-4 md:mb-0 flex-1 max-w-md w-full">
+                    <Input 
+                      placeholder="Search model, name..." 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full"
+                    />
+                    <p className="text-sm text-gray-500 mt-2">Items: {filteredItems.length}</p>
+                  </div>
+                  
+                  <Button variant="outline" className="whitespace-nowrap">
+                    Export
+                  </Button>
+                </div>
+                
+                {/* Product listings */}
+                <div className="space-y-4">
+                  {currentItems.length > 0 ? (
+                    currentItems.map(item => (
+                      <StockItemCard key={item.id} item={item} />
+                    ))
+                  ) : (
+                    <div className="p-8 text-center bg-gray-50 rounded-lg">
+                      <p className="text-gray-500">No items found. Please adjust your search or check back later.</p>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Pagination - simplified on mobile */}
+                <div className="mt-8 overflow-x-auto">
+                  <Pagination>
+                    <PaginationContent className={isMobile ? "justify-center gap-1" : ""}>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                          className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                        />
+                      </PaginationItem>
+                      
+                      {isMobile ? (
+                        <PaginationItem>
+                          <PaginationLink isActive={true}>
+                            {currentPage} / {totalPages}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ) : (
+                        renderPaginationItems()
+                      )}
+                      
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="max-w-xl mx-auto bg-white rounded-lg shadow-md p-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-center text-[#1a0050] mb-8">
+              Please login to view stock list.
+            </h1>
+            
+            <div className="flex justify-center">
+              <Button 
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                size="lg"
+                onClick={handleLogin}
+              >
+                Login
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+      
       <Footer />
     </div>
   );

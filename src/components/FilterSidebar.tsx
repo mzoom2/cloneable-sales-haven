@@ -1,50 +1,14 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 
-interface FilterOptions {
-  category?: string;
-  grade?: string;
-  location?: string;
-  model?: string;
-}
-
-interface FilterSidebarProps {
-  updateFilters: (filters: FilterOptions) => void;
-}
-
-const FilterSidebar: React.FC<FilterSidebarProps> = ({ updateFilters }) => {
-  const [filters, setFilters] = useState<FilterOptions>({});
-
-  const handleCategoryChange = (category: string) => {
-    const newFilters = { ...filters, category };
-    setFilters(newFilters);
-    updateFilters(newFilters);
-  };
-
-  const handleGradeChange = (grade: string) => {
-    const newFilters = { ...filters, grade };
-    setFilters(newFilters);
-    updateFilters(newFilters);
-  };
-
-  const handleLocationChange = (location: string) => {
-    const newFilters = { ...filters, location };
-    setFilters(newFilters);
-    updateFilters(newFilters);
-  };
-
+const FilterSidebar = () => {
   return (
     <div className="pr-6">
       <div className="mb-8">
         <h3 className="text-lg font-medium mb-4">Warehouse</h3>
         <div className="space-y-2">
           <label className="flex items-center space-x-2">
-            <input 
-              type="checkbox" 
-              className="rounded border-gray-300"
-              onChange={() => handleLocationChange('USA')}
-              checked={filters.location === 'USA'} 
-            />
+            <input type="checkbox" className="rounded border-gray-300" />
             <span>HongKong (90)</span>
           </label>
         </div>
@@ -54,30 +18,15 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ updateFilters }) => {
         <h3 className="text-lg font-medium mb-4">Categories</h3>
         <div className="space-y-2">
           <label className="flex items-center space-x-2">
-            <input 
-              type="checkbox" 
-              className="rounded border-gray-300" 
-              onChange={() => handleCategoryChange('iphone')}
-              checked={filters.category === 'iphone'}
-            />
+            <input type="checkbox" className="rounded border-gray-300" />
             <span>Cell Phone (67)</span>
           </label>
           <label className="flex items-center space-x-2">
-            <input 
-              type="checkbox" 
-              className="rounded border-gray-300"
-              onChange={() => handleCategoryChange('ipad')} 
-              checked={filters.category === 'ipad'}
-            />
+            <input type="checkbox" className="rounded border-gray-300" />
             <span>Tablets (8)</span>
           </label>
           <label className="flex items-center space-x-2">
-            <input 
-              type="checkbox" 
-              className="rounded border-gray-300"
-              onChange={() => handleCategoryChange('watch')}
-              checked={filters.category === 'watch'} 
-            />
+            <input type="checkbox" className="rounded border-gray-300" />
             <span>Watches (15)</span>
           </label>
         </div>
@@ -97,39 +46,19 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ updateFilters }) => {
         <h3 className="text-lg font-medium mb-4">Grade</h3>
         <div className="space-y-2">
           <label className="flex items-center space-x-2">
-            <input 
-              type="checkbox" 
-              className="rounded border-gray-300"
-              onChange={() => handleGradeChange('A')}
-              checked={filters.grade === 'A'} 
-            />
+            <input type="checkbox" className="rounded border-gray-300" />
             <span>A/A- (94)</span>
           </label>
           <label className="flex items-center space-x-2">
-            <input 
-              type="checkbox" 
-              className="rounded border-gray-300"
-              onChange={() => handleGradeChange('A+')}
-              checked={filters.grade === 'A+'} 
-            />
+            <input type="checkbox" className="rounded border-gray-300" />
             <span>A+/A (27)</span>
           </label>
           <label className="flex items-center space-x-2">
-            <input 
-              type="checkbox" 
-              className="rounded border-gray-300"
-              onChange={() => handleGradeChange('A++')}
-              checked={filters.grade === 'A++'} 
-            />
+            <input type="checkbox" className="rounded border-gray-300" />
             <span>A++ (31)</span>
           </label>
           <label className="flex items-center space-x-2">
-            <input 
-              type="checkbox" 
-              className="rounded border-gray-300"
-              onChange={() => handleGradeChange('AB')}
-              checked={filters.grade === 'AB'} 
-            />
+            <input type="checkbox" className="rounded border-gray-300" />
             <span>AB (8)</span>
           </label>
         </div>
@@ -140,12 +69,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ updateFilters }) => {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="flex items-center space-x-2">
-              <input 
-                type="checkbox" 
-                className="rounded border-gray-300"
-                onChange={() => handleCategoryChange('iphone')}
-                checked={filters.category === 'iphone'} 
-              />
+              <input type="checkbox" className="rounded border-gray-300" />
               <span>Apple (145)</span>
             </label>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
@@ -155,12 +79,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({ updateFilters }) => {
           
           <div className="flex items-center justify-between">
             <label className="flex items-center space-x-2">
-              <input 
-                type="checkbox" 
-                className="rounded border-gray-300"
-                onChange={() => handleCategoryChange('samsung')}
-                checked={filters.category === 'samsung'} 
-              />
+              <input type="checkbox" className="rounded border-gray-300" />
               <span>Samsung (22)</span>
             </label>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">

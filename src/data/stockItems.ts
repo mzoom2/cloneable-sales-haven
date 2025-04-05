@@ -2,93 +2,245 @@
 export interface StockItem {
   id: number;
   name: string;
-  price: number;
   quantity: number;
+  price: number;
+  location: string;
+  grade: string;
   images: {
     main: string;
-    additional?: string[];
+    front?: string;
+    back?: string;
+    detail?: string;
   };
-  description?: string;
-  specs?: Record<string, string>;
-  grade?: string;
-  location?: string;
-  category?: string;
-  model?: string;
   productDetails?: string;
-  specifications?: Record<string, string>;
+  specifications?: {
+    display?: string;
+    performance?: string;
+    camera?: string;
+    battery?: string;
+  };
   warrantyInfo?: string;
 }
 
-// Sample stock items data for testing and development
 export const stockItems: StockItem[] = [
   {
     id: 1,
-    name: "iPhone 13 Pro",
-    price: 999,
-    quantity: 15,
-    grade: "A+",
-    location: "USA",
-    category: "iphone",
-    model: "13",
+    name: 'Unlocked iPhone 15 Pro 256GB Mix Color (e-sim) (A+/A Grade)',
+    quantity: 351,
+    price: 697.00,
+    location: 'HongKong',
+    grade: 'A+/A',
     images: {
-      main: "/placeholder.svg"
-    },
-    description: "Slightly used iPhone 13 Pro in excellent condition"
+      main: 'https://placehold.co/400x400?text=iPhone+15+Pro'
+    }
   },
   {
     id: 2,
-    name: "Samsung Galaxy S21",
-    price: 799,
-    quantity: 10,
-    grade: "A",
-    location: "Germany",
-    category: "samsung",
-    model: "s21",
+    name: 'Unlocked iPhone 15 Pro Max 256GB Mix Color (e-sim) (A+/A Grade)',
+    quantity: 430,
+    price: 838.00,
+    location: 'HongKong',
+    grade: 'A+/A',
     images: {
-      main: "/placeholder.svg"
-    },
-    description: "Refurbished Galaxy S21 with minor cosmetic wear"
+      main: 'https://placehold.co/400x400?text=iPhone+15+Pro+Max'
+    }
   },
   {
     id: 3,
-    name: "iPhone 12",
-    price: 699,
-    quantity: 20,
-    grade: "B+",
-    location: "UK",
-    category: "iphone",
-    model: "12",
+    name: 'Unlocked iPhone 14 Pro Max 128GB Mix Color (Dual Physical SIM) (A+/A Grade)',
+    quantity: 508,
+    price: 591.50,
+    location: 'HongKong',
+    grade: 'A+/A',
     images: {
-      main: "/placeholder.svg"
-    },
-    description: "Used iPhone 12 in good working condition"
+      main: 'https://placehold.co/400x400?text=iPhone+14+Pro+Max'
+    }
   },
   {
     id: 4,
-    name: "iPhone 11 Pro Max",
-    price: 599,
-    quantity: 8,
-    grade: "A",
-    location: "France",
-    category: "iphone",
-    model: "11",
+    name: 'Unlocked iPhone 14 Pro Max 256GB Mix Color (Dual Physical SIM) (A+/A Grade)',
+    quantity: 418,
+    price: 633.80,
+    location: 'HongKong',
+    grade: 'A+/A',
     images: {
-      main: "/placeholder.svg"
-    },
-    description: "Barely used iPhone 11 Pro Max with all accessories"
+      main: 'https://placehold.co/400x400?text=iPhone+14+Pro+Max'
+    }
   },
   {
     id: 5,
-    name: "Samsung Galaxy S20",
-    price: 599,
-    quantity: 12,
-    grade: "A-",
-    location: "USA",
-    category: "samsung",
-    model: "s20",
+    name: 'Unlocked iPhone 14 Pro Max 128GB Mix Color (EU) (A+/A Grade)',
+    quantity: 411,
+    price: 605.60,
+    location: 'HongKong',
+    grade: 'A+/A',
     images: {
-      main: "/placeholder.svg"
-    },
-    description: "Refurbished S20 with slight screen wear"
-  }
+      main: 'https://placehold.co/400x400?text=iPhone+14+Pro+Max'
+    }
+  },
+  {
+    id: 6,
+    name: 'Unlocked iPhone 14 Pro Max 256GB Mix Color (EU) (A+/A Grade)',
+    quantity: 447,
+    price: 647.90,
+    location: 'HongKong',
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14+Pro+Max'
+    }
+  },
+  {
+    id: 7,
+    name: 'Unlocked iPhone 14 128GB Mix Color (Physical SIM + eSIM) (A++ Grade)',
+    quantity: 500,
+    price: 662.00,
+    location: 'HongKong',
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14'
+    }
+  },
+  {
+    id: 8,
+    name: 'Unlocked iPhone 14 256GB Mix Color (Physical SIM + eSIM) (A++ Grade)',
+    quantity: 570,
+    price: 718.30,
+    location: 'HongKong',
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14'
+    }
+  },
+  {
+    id: 9,
+    name: 'Unlocked iPhone 14 Plus 128GB Mix Color (physical sim) (A++ Grade)',
+    quantity: 600,
+    price: 704.20,
+    location: 'HongKong',
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14+Plus'
+    }
+  },
+  {
+    id: 10,
+    name: 'Unlocked iPhone 14 Plus 256GB Mix Color (physical sim) (A++ Grade)',
+    quantity: 460,
+    price: 774.60,
+    location: 'HongKong',
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+14+Plus'
+    }
+  },
+  {
+    id: 11,
+    name: 'Unlocked iPhone 13 Pro 256GB Mix Color (e-sim) (A+/A Grade)',
+    quantity: 325,
+    price: 597.00,
+    location: 'HongKong',
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Pro'
+    }
+  },
+  {
+    id: 12,
+    name: 'Unlocked iPhone 13 Pro Max 256GB Mix Color (e-sim) (A+/A Grade)',
+    quantity: 380,
+    price: 738.00,
+    location: 'HongKong',
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Pro+Max'
+    }
+  },
+  {
+    id: 13,
+    name: 'Unlocked iPhone 13 Pro Max 128GB Mix Color (Dual Physical SIM) (A+/A Grade)',
+    quantity: 408,
+    price: 491.50,
+    location: 'HongKong',
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Pro+Max'
+    }
+  },
+  {
+    id: 14,
+    name: 'Unlocked iPhone 13 Pro Max 256GB Mix Color (Dual Physical SIM) (A+/A Grade)',
+    quantity: 318,
+    price: 533.80,
+    location: 'HongKong',
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Pro+Max'
+    }
+  },
+  {
+    id: 15,
+    name: 'Unlocked iPhone 13 Pro Max 128GB Mix Color (EU) (A+/A Grade)',
+    quantity: 311,
+    price: 505.60,
+    location: 'HongKong',
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Pro+Max'
+    }
+  },
+  {
+    id: 16,
+    name: 'Unlocked iPhone 13 Pro Max 256GB Mix Color (EU) (A+/A Grade)',
+    quantity: 347,
+    price: 547.90,
+    location: 'HongKong',
+    grade: 'A+/A',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Pro+Max'
+    }
+  },
+  {
+    id: 17,
+    name: 'Unlocked iPhone 13 128GB Mix Color (Physical SIM + eSIM) (A++ Grade)',
+    quantity: 400,
+    price: 562.00,
+    location: 'HongKong',
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13'
+    }
+  },
+  {
+    id: 18,
+    name: 'Unlocked iPhone 13 256GB Mix Color (Physical SIM + eSIM) (A++ Grade)',
+    quantity: 470,
+    price: 618.30,
+    location: 'HongKong',
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13'
+    }
+  },
+  {
+    id: 19,
+    name: 'Unlocked iPhone 13 Plus 128GB Mix Color (physical sim) (A++ Grade)',
+    quantity: 500,
+    price: 604.20,
+    location: 'HongKong',
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Plus'
+    }
+  },
+  {
+    id: 20,
+    name: 'Unlocked iPhone 13 Plus 256GB Mix Color (physical sim) (A++ Grade)',
+    quantity: 360,
+    price: 674.60,
+    location: 'HongKong',
+    grade: 'A++',
+    images: {
+      main: 'https://placehold.co/400x400?text=iPhone+13+Plus'
+    }
+  },
 ];
