@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -9,12 +10,12 @@ import { Button } from "@/components/ui/button";
 import { useCart } from '@/contexts/CartContext';
 import Title from '@/components/Title';
 
-interface Params {
+interface ProductParams {
   id: string;
 }
 
 const ProductDetail = () => {
-  const { id } = useParams<Params>();
+  const { id } = useParams<keyof ProductParams>() as ProductParams;
   const [product, setProduct] = useState<StockItem | null>(null);
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -33,7 +34,7 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (product) {
-      addToCart(product);
+      addToCart(product, 1);
     }
   };
   
@@ -45,9 +46,9 @@ const ProductDetail = () => {
         <div className="container mx-auto px-4">
           {product ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <ProductDisplay product={product} />
+              {product && <ProductDisplay product={product} />}
               <div>
-                <ProductSpecs product={product} />
+                {product && <ProductSpecs product={product} />}
                 <div className="mt-6">
                   <Button onClick={handleAddToCart}>Add to Cart</Button>
                 </div>

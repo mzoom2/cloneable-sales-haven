@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -7,12 +8,12 @@ import { stockItems, StockItem } from '@/data/stockItems';
 import { useSearchParams } from 'react-router-dom';
 import Title from '@/components/Title';
 
-interface FilterOptions {
+type FilterOptions = {
   category?: string;
   grade?: string;
   location?: string;
   model?: string;
-}
+};
 
 const ShopList: React.FC = () => {
   const [filteredItems, setFilteredItems] = useState<StockItem[]>(stockItems);
@@ -64,7 +65,12 @@ const ShopList: React.FC = () => {
   };
 
   const updateFilters = (newFilters: FilterOptions) => {
-    setSearchParams(newFilters);
+    // Convert the FilterOptions object to a Record<string, string> for URLSearchParams
+    const params: Record<string, string> = {};
+    Object.entries(newFilters).forEach(([key, value]) => {
+      if (value) params[key] = value;
+    });
+    setSearchParams(params);
   };
 
   return (
