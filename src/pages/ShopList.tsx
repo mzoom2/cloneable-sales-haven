@@ -15,6 +15,10 @@ type FilterOptions = {
   model?: string;
 };
 
+interface FilterSidebarProps {
+  updateFilters: (newFilters: FilterOptions) => void;
+}
+
 const ShopList: React.FC = () => {
   const [filteredItems, setFilteredItems] = useState<StockItem[]>(stockItems);
   const [searchParams, setSearchParams] = useSearchParams();

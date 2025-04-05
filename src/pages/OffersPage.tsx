@@ -1,270 +1,300 @@
-import React, { useEffect, useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getUserOffers, acceptOffer, rejectOffer, UserOffer } from '@/services/OfferService';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { toast } from '@/hooks/use-toast';
-import { useCurrency } from '@/contexts/CurrencyContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Check, X, AlertTriangle, Clock, Loader2 } from 'lucide-react';
 import Title from '@/components/Title';
+import { useCart } from '@/contexts/CartContext';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { formatCurrency } from '@/utils/currencyUtils';
+import { useCurrency } from '@/contexts/CurrencyContext';
+import OfferAcceptedDialog from '@/components/OfferAcceptedDialog';
 
-interface OfferItemProps {
-  offer: UserOffer;
-  onAccept: (offerId: string) => void;
-  onReject: (offerId: string) => void;
-  isAccepting: string | null;
-  isRejecting: string | null;
-}
+type OfferStatus = 'pending' | 'accepted' | 'rejected';
 
-const OfferItem: React.FC<OfferItemProps> = ({ offer, onAccept, onReject, isAccepting, isRejecting }) => {
-  const { currency } = useCurrency();
-
-  const getCurrencySymbol = (currencyCode: string) => {
-    return currencyCode === 'EUR' ? '€' : '$';
-  };
-
-  return (
-    <Card className="bg-white shadow-md">
-      <CardHeader>
-        <CardTitle>Offer for {offer.item_name}</CardTitle>
-        <CardDescription>
-          <div className="flex items-center space-x-2">
-            {offer.status === 'pending' && <Clock className="h-4 w-4 text-gray-500" />}
-            {offer.status === 'accepted' && <Check className="h-4 w-4 text-green-500" />}
-            {offer.status === 'rejected' && <X className="h-4 w-4 text-red-500" />}
-            {offer.status === 'expired' && <AlertTriangle className="h-4 w-4 text-yellow-500" />}
-            <span>Status: {offer.status}</span>
-          </div>
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p>Item ID: {offer.item_id}</p>
-        <p>Your Offer: {getCurrencySymbol(currency)}{offer.offer_price}</p>
-        <p>Item Grade: {offer.item_grade}</p>
-        <p>Quantity: {offer.item_quantity}</p>
-        <p>Offer Date: {new Date(offer.offer_date).toLocaleDateString()}</p>
-        {offer.status === 'rejected' && offer.rejection_reason && (
-          <div className="mt-2">
-            <Badge variant="destructive">Rejection Reason</Badge>
-            <p className="text-sm text-gray-500">{offer.rejection_reason}</p>
-          </div>
-        )}
-      </CardContent>
-      <CardFooter className="flex justify-end gap-2">
-        {offer.status === 'pending' && (
-          <>
-            <Button
-              variant="ghost"
-              onClick={() => onReject(offer.offer_id)}
-              disabled={isRejecting === offer.offer_id}
-            >
-              {isRejecting === offer.offer_id ? (
-                <>
-                  Rejecting <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                </>
-              ) : (
-                <>
-                  <X className="mr-2 h-4 w-4" /> Reject
-                </>
-              )}
-            </Button>
-            <Button
-              onClick={() => onAccept(offer.offer_id)}
-              disabled={isAccepting === offer.offer_id}
-            >
-              {isAccepting === offer.offer_id ? (
-                <>
-                  Accepting <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                </>
-              ) : (
-                <>
-                  <Check className="mr-2 h-4 w-4" /> Accept
-                </>
-              )}
-            </Button>
-          </>
-        )}
-      </CardFooter>
-    </Card>
-  );
-};
-
-const OffersPage = () => {
+const OffersPage: React.FC = () => {
   const [offers, setOffers] = useState<UserOffer[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"pending" | "accepted" | "rejected">("pending");
-  const [isAccepting, setIsAccepting] = useState<string | null>(null);
-  const [isRejecting, setIsRejecting] = useState<string | null>(null);
-  const { currency } = useCurrency();
+  const [filteredOffers, setFilteredOffers] = useState<UserOffer[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<OfferStatus>('pending');
+  const [activeOffer, setActiveOffer] = useState<UserOffer | null>(null);
+  const [isAcceptedDialogOpen, setIsAcceptedDialogOpen] = useState(false);
   const { user } = useAuth();
+  const { updateCart } = useCart();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { currency, formatPrice } = useCurrency();
 
   useEffect(() => {
-    if (user) {
-      loadOffers();
-    }
-  }, [activeTab, user, currency]);
-
-  const loadOffers = async () => {
-    setLoading(true);
-    try {
-      if (!user) {
-        console.error("User not logged in");
-        toast({
-          title: "Error",
-          description: "User not logged in",
-          variant: "destructive",
-        });
-        return;
+    const fetchOffers = async () => {
+      if (user) {
+        try {
+          const userOffers = await getUserOffers(user.id);
+          setOffers(userOffers);
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Failed to fetch offers:', error);
+          setIsLoading(false);
+        }
+      } else {
+        // Redirect to login if no user
+        navigate('/login');
       }
-      const data = await getUserOffers(user.email, currency);
-      setOffers(data);
-    } catch (error) {
-      console.error("Failed to load offers:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load offers",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  const handleAcceptOffer = async (offerId: string) => {
-    setIsAccepting(offerId);
+    fetchOffers();
+  }, [user, navigate]);
+
+  useEffect(() => {
+    if (offers.length > 0) {
+      setFilteredOffers(offers.filter(offer => offer.status === statusFilter));
+    }
+  }, [offers, statusFilter]);
+
+  const handleAcceptOffer = async (offer: UserOffer) => {
     try {
-      await acceptOffer(offerId);
-      setOffers(prevOffers =>
-        prevOffers.map(offer =>
-          offer.offer_id === offerId ? { ...offer, status: 'accepted' } : offer
-        )
-      );
-      toast({
-        title: "Offer Accepted",
-        description: "You have accepted the offer.",
-      });
+      const success = await acceptOffer(offer.id);
+      if (success) {
+        // Update local state
+        const updatedOffers = offers.map(o => 
+          o.id === offer.id ? { ...o, status: 'accepted' as const } : o
+        );
+        setOffers(updatedOffers);
+        
+        setActiveOffer(offer);
+        setIsAcceptedDialogOpen(true);
+        
+        // Add to cart
+        updateCart({
+          ...offer.product,
+          quantity: offer.quantity,
+          price: offer.price / offer.quantity, // Per unit price
+          imageUrl: offer.product.images.main
+        });
+        
+        toast({
+          title: "Offer accepted",
+          description: `You've accepted the offer for ${offer.product.name}.`,
+        });
+      }
     } catch (error) {
-      console.error("Failed to accept offer:", error);
       toast({
-        title: "Error",
-        description: "Failed to accept offer",
         variant: "destructive",
+        title: "Failed to accept offer",
+        description: "There was an error accepting the offer. Please try again.",
       });
-    } finally {
-      setIsAccepting(null);
     }
   };
 
-  const handleRejectOffer = async (offerId: string) => {
-    setIsRejecting(offerId);
+  const handleRejectOffer = async (offerId: number) => {
     try {
-      await rejectOffer(offerId);
-      setOffers(prevOffers =>
-        prevOffers.map(offer =>
-          offer.offer_id === offerId ? { ...offer, status: 'rejected' } : offer
-        )
-      );
-      toast({
-        title: "Offer Rejected",
-        description: "You have rejected the offer.",
-      });
+      const success = await rejectOffer(offerId);
+      if (success) {
+        // Update local state
+        const updatedOffers = offers.map(o => 
+          o.id === offerId ? { ...o, status: 'rejected' as const } : o
+        );
+        setOffers(updatedOffers);
+        
+        toast({
+          title: "Offer rejected",
+          description: "The offer has been rejected.",
+        });
+      }
     } catch (error) {
-      console.error("Failed to reject offer:", error);
       toast({
-        title: "Error",
-        description: "Failed to reject offer",
         variant: "destructive",
+        title: "Failed to reject offer",
+        description: "There was an error rejecting the offer. Please try again.",
       });
-    } finally {
-      setIsRejecting(null);
     }
   };
 
-  const filteredOffers = offers.filter(offer => offer.status === activeTab);
+  const handleFilterChange = (newStatus: OfferStatus) => {
+    setStatusFilter(newStatus);
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Title title="Your Offers" />
+      <Title title="My Offers" />
       <Header />
-      <main className="container mx-auto px-4 py-8 flex-grow">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-indigo-800">Your Offers</h1>
-          <p className="text-gray-600">Manage your offers and track their status</p>
+      <main className="flex-grow py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h1 className="text-3xl font-bold text-gray-800 mb-8">My Offers</h1>
+          
+          {/* Status filter tabs */}
+          <div className="flex border-b mb-8">
+            <button
+              className={`px-6 py-3 font-medium ${
+                statusFilter === 'pending' 
+                  ? 'border-b-2 border-blue-600 text-blue-600' 
+                  : 'text-gray-500'
+              }`}
+              onClick={() => handleFilterChange('pending')}
+            >
+              Pending
+            </button>
+            <button
+              className={`px-6 py-3 font-medium ${
+                statusFilter === 'accepted' 
+                  ? 'border-b-2 border-blue-600 text-blue-600' 
+                  : 'text-gray-500'
+              }`}
+              onClick={() => handleFilterChange('accepted')}
+            >
+              Accepted
+            </button>
+            <button
+              className={`px-6 py-3 font-medium ${
+                statusFilter === 'rejected' 
+                  ? 'border-b-2 border-blue-600 text-blue-600' 
+                  : 'text-gray-500'
+              }`}
+              onClick={() => handleFilterChange('rejected')}
+            >
+              Rejected
+            </button>
+          </div>
+          
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading your offers...</p>
+            </div>
+          ) : filteredOffers.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-16 w-16 mx-auto text-gray-400" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+              <h2 className="mt-4 text-xl font-semibold text-gray-700">No {statusFilter} offers</h2>
+              <p className="mt-2 text-gray-500">
+                {statusFilter === 'pending' ? "You don't have any pending offers at the moment." :
+                 statusFilter === 'accepted' ? "You haven't accepted any offers yet." :
+                 "You haven't rejected any offers yet."}
+              </p>
+              {statusFilter !== 'pending' && (
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => handleFilterChange('pending')}
+                >
+                  View Pending Offers
+                </Button>
+              )}
+              <Button
+                variant="default"
+                className="mt-4 ml-2"
+                onClick={() => navigate('/shop-list')}
+              >
+                Browse Products
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredOffers.map((offer) => (
+                <div key={offer.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+                  <div className="p-4 flex items-center">
+                    <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center mr-4">
+                      {offer.product.images?.main ? (
+                        <img 
+                          src={offer.product.images.main} 
+                          alt={offer.product.name} 
+                          className="max-w-full max-h-full object-cover"
+                        />
+                      ) : (
+                        <div className="text-gray-400">No Image</div>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-800">{offer.product.name}</h3>
+                      <p className="text-sm text-gray-500">
+                        Quantity: {offer.quantity}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 px-4 py-3 border-t">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-gray-600">Original Price:</span>
+                      <span className="font-medium">
+                        {formatCurrency(offer.product.price * offer.quantity, currency)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-gray-600">Your Offer:</span>
+                      <span className="font-semibold text-green-600">
+                        {formatCurrency(offer.price, currency)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                      <span>Savings:</span>
+                      <span>
+                        {formatCurrency((offer.product.price * offer.quantity) - offer.price, currency)}
+                        {' '}
+                        ({Math.round(((offer.product.price * offer.quantity) - offer.price) / (offer.product.price * offer.quantity) * 100)}%)
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span>Date:</span>
+                      <span>{new Date(offer.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  
+                  {statusFilter === 'pending' && (
+                    <div className="p-4 bg-white border-t flex justify-between">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="w-[48%]"
+                        onClick={() => handleRejectOffer(offer.id)}
+                      >
+                        Reject
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        size="sm"
+                        className="w-[48%]"
+                        onClick={() => handleAcceptOffer(offer)}
+                      >
+                        Accept
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {statusFilter === 'accepted' && (
+                    <div className="p-4 bg-green-50 border-t text-center text-green-700 font-medium">
+                      Offer Accepted
+                    </div>
+                  )}
+                  
+                  {statusFilter === 'rejected' && (
+                    <div className="p-4 bg-gray-50 border-t text-center text-gray-500 font-medium">
+                      Offer Rejected
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-
-        <Tabs defaultValue="pending" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="accepted">Accepted</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected</TabsTrigger>
-          </TabsList>
-          <TabsContent value="pending" className="p-4 bg-white rounded-lg shadow">
-            {loading ? (
-              <div className="text-center text-gray-500">Loading offers...</div>
-            ) : filteredOffers.length === 0 ? (
-              <div className="text-center text-gray-500">No pending offers.</div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredOffers.map(offer => (
-                  <OfferItem
-                    key={offer.offer_id}
-                    offer={offer}
-                    onAccept={handleAcceptOffer}
-                    onReject={handleRejectOffer}
-                    isAccepting={isAccepting}
-                    isRejecting={isRejecting}
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-          <TabsContent value="accepted" className="p-4 bg-white rounded-lg shadow">
-            {loading ? (
-              <div className="text-center text-gray-500">Loading offers...</div>
-            ) : filteredOffers.length === 0 ? (
-              <div className="text-center text-gray-500">No accepted offers.</div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredOffers.map(offer => (
-                  <OfferItem
-                    key={offer.offer_id}
-                    offer={offer}
-                    onAccept={handleAcceptOffer}
-                    onReject={handleRejectOffer}
-                    isAccepting={isAccepting}
-                    isRejecting={isRejecting}
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-          <TabsContent value="rejected" className="p-4 bg-white rounded-lg shadow">
-            {loading ? (
-              <div className="text-center text-gray-500">Loading offers...</div>
-            ) : filteredOffers.length === 0 ? (
-              <div className="text-center text-gray-500">No rejected offers.</div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredOffers.map(offer => (
-                  <OfferItem
-                    key={offer.offer_id}
-                    offer={offer}
-                    onAccept={handleAcceptOffer}
-                    onReject={handleRejectOffer}
-                    isAccepting={isAccepting}
-                    isRejecting={isRejecting}
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
       </main>
       <Footer />
+      
+      {activeOffer && (
+        <OfferAcceptedDialog 
+          open={isAcceptedDialogOpen} 
+          offer={activeOffer}
+          onClose={() => setIsAcceptedDialogOpen(false)}
+        />
+      )}
     </div>
   );
 };

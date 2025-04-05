@@ -14,6 +14,14 @@ interface ProductParams {
   id: string;
 }
 
+interface ProductDisplayProps {
+  product: StockItem;
+}
+
+interface ProductSpecsProps {
+  product: StockItem;
+}
+
 const ProductDetail = () => {
   const { id } = useParams<keyof ProductParams>() as ProductParams;
   const [product, setProduct] = useState<StockItem | null>(null);
