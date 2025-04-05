@@ -1,17 +1,29 @@
 
-/**
- * Formats a currency value based on the provided currency code
- * @param amount The amount to format
- * @param currency The currency code (USD or EUR)
- * @returns Formatted currency string
- */
-export const formatCurrency = (amount: number, currency: 'USD' | 'EUR'): string => {
-  const formatter = new Intl.NumberFormat(currency === 'USD' ? 'en-US' : 'de-DE', {
+type Currency = 'USD' | 'EUR';
+
+export const formatCurrency = (amount: number, currency: Currency = 'USD'): string => {
+  const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
   });
   
   return formatter.format(amount);
+};
+
+export const convertCurrency = (amount: number, fromCurrency: Currency, toCurrency: Currency): number => {
+  // Example conversion rates (in reality, you'd fetch these from an API)
+  const conversionRates = {
+    'USD_EUR': 0.85,
+    'EUR_USD': 1.18
+  };
+  
+  if (fromCurrency === toCurrency) {
+    return amount;
+  }
+  
+  const conversionKey = `${fromCurrency}_${toCurrency}` as keyof typeof conversionRates;
+  const rate = conversionRates[conversionKey];
+  
+  return amount * rate;
 };

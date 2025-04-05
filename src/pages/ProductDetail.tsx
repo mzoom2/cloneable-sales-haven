@@ -22,7 +22,7 @@ interface ProductSpecsProps {
   product: StockItem;
 }
 
-const ProductDetail = () => {
+const ProductDetail: React.FC = () => {
   const { id } = useParams<keyof ProductParams>() as ProductParams;
   const [product, setProduct] = useState<StockItem | null>(null);
   const navigate = useNavigate();

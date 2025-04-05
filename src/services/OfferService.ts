@@ -81,3 +81,8 @@ export const makeOffer = async (productId: number, price: number, quantity: numb
   // In a real app, this would make an API call
   return true;
 };
+
+// Adding this function to fix the missing addOffer export
+export const addOffer = async (productId: number, price: number, quantity: number): Promise<boolean> => {
+  return makeOffer(productId, price, quantity);
+};
