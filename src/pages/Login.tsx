@@ -1,79 +1,76 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye } from 'lucide-react';
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form, FormField, FormItem, FormControl } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { validateLogin, setCurrentUser } from "@/utils/localStorageUtils";
-import { useToast } from "@/components/ui/use-toast";
-
-// Define form schema
-const formSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
-  rememberMe: z.boolean().optional()
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { authenticateUser } from '@/utils/localStorageUtils';
+import Title from '@/components/Title';
 
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [loginError, setLoginError] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
-  
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      rememberMe: false
-    },
-  });
-  
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
-    
-    // Validate login against local storage
-    const isValid = validateLogin(data.email, data.password);
-    
-    if (isValid) {
-      // Set current logged in user
-      setCurrentUser(data.email);
-      
-      // Display success message
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Basic email validation
+    if (!email || !email.includes('@')) {
       toast({
-        title: "Login successful!",
-        description: "Welcome back!",
-        duration: 3000,
-      });
-      
-      // Navigate to dashboard
-      navigate("/dashboard");
-    } else {
-      // Show error
-      setLoginError(true);
-      
-      toast({
-        title: "Login failed",
-        description: "Invalid email or password. Please try again.",
+        title: "Invalid email format.",
+        description: "Please enter a valid email address.",
         variant: "destructive",
-        duration: 3000,
+      });
+      return;
+    }
+
+    // Password validation
+    if (!password || password.length < 6) {
+      toast({
+        title: "Invalid password.",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Simulate authentication (replace with actual authentication logic)
+      const isAuthenticated = await authenticateUser(email, password);
+
+      if (isAuthenticated) {
+        toast({
+          title: "Login successful!",
+          description: "You are now logged in.",
+        });
+        navigate('/dashboard');
+      } else {
+        toast({
+          title: "Login failed.",
+          description: "Invalid credentials. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Login error.",
+        description: "An error occurred during login. Please try again later.",
+        variant: "destructive",
       });
     }
   };
-  
+
   return (
     <div className="min-h-screen flex flex-col">
+      <Title title="Login" />
       <Header />
-      
+
       {/* Breadcrumb navigation */}
       <div className="bg-slate-50 py-3 border-b mt-16">
         <div className="container mx-auto px-4">
@@ -84,119 +81,52 @@ const Login = () => {
           </div>
         </div>
       </div>
-      
-      {/* Currency selector - fixed to right side, positioned higher */}
-      <div className="fixed right-0 top-1/4 z-40">
-        <div className="flex flex-col">
-          <button className="bg-blue-700 text-white py-2 px-4 font-medium">
-            USD $
-          </button>
-          <button className="bg-gray-800 text-white py-2 px-4 font-medium">
-            EUR €
-          </button>
-        </div>
-      </div>
-      
+
       {/* Main content */}
-      <div className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
-        <div className="w-full max-w-md bg-white rounded-lg shadow-sm p-8 border border-gray-100 relative">
-          <h1 className="text-2xl md:text-3xl font-bold text-center text-[#1a0050] mb-8">
-            Hi, Welcome back!
-          </h1>
-          
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input 
-                        placeholder="Email" 
-                        className="bg-blue-50 border-0 py-6 text-base" 
-                        {...field} 
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="relative">
-                      <FormControl>
-                        <Input 
-                          type={showPassword ? "text" : "password"} 
-                          placeholder="Password" 
-                          className="bg-blue-50 border-0 py-6 text-base pr-10" 
-                          {...field} 
-                        />
-                      </FormControl>
-                      <button 
-                        type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        <Eye size={18} />
-                      </button>
-                    </div>
-                  </FormItem>
-                )}
-              />
-              
-              {loginError && (
-                <div className="text-red-600 text-sm">
-                  Invalid email or password. Please try again.
+      <div className="flex-grow container mx-auto px-4 py-8">
+        <div className="max-w-md mx-auto">
+          <Card>
+            <CardContent className="p-8">
+              <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                    className="w-full"
+                  />
                 </div>
-              )}
-              
-              <div className="flex items-center justify-between">
-                <FormField
-                  control={form.control}
-                  name="rememberMe"
-                  render={({ field }) => (
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="remember" 
-                        checked={field.value} 
-                        onCheckedChange={field.onChange}
-                      />
-                      <label
-                        htmlFor="remember"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Keep me signed in
-                      </label>
-                    </div>
-                  )}
-                />
-                
-                <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
-                  Forgot Password?
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    type="password"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    required
+                    className="w-full"
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-indigo-600 text-white">
+                  Login
+                </Button>
+              </form>
+              <div className="mt-4 text-center">
+                <Link to="/register" className="text-sm text-gray-600 hover:text-gray-800">
+                  Don't have an account? Register
                 </Link>
               </div>
-              
-              <Button 
-                type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700 py-6 text-base"
-              >
-                Sign In
-              </Button>
-              
-              <div className="text-center mt-4">
-                <p className="text-gray-600">
-                  Don't have an account? <Link to="/register" className="text-blue-600 hover:underline">Register Now</Link>
-                </p>
-              </div>
-            </form>
-          </Form>
+            </CardContent>
+          </Card>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );

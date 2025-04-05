@@ -1,311 +1,128 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { AlertCircle, X, MapPin } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import { useCart } from '@/contexts/CartContext';
-import { toast } from '@/hooks/use-toast';
-import ShippingCalculator from '@/components/ShippingCalculator';
-import ShippingAddressForm, { ShippingAddress } from '@/components/ShippingAddressForm';
-import { useAuth } from '@/contexts/AuthContext';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger
-} from "@/components/ui/collapsible";
+import { useNavigate } from 'react-router-dom';
+import { useCurrency } from '@/contexts/CurrencyContext';
+import { formatCurrency } from '@/utils/currencyUtils';
+import Title from '@/components/Title';
 
 const CartPage = () => {
+  const { cartItems, removeFromCart, clearCart } = useCart();
   const navigate = useNavigate();
-  const [couponCode, setCouponCode] = useState('');
-  const { cartItems, removeFromCart, updateQuantity, getTotalPrice, getTotalItems } = useCart();
-  const [shipping, setShipping] = useState(0); // Default shipping cost
-  const [addressExpanded, setAddressExpanded] = useState(false);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const { isAuthenticated } = useAuth();
-  
-  const subtotal = getTotalPrice();
-  const total = subtotal + shipping;
-  
-  const handleRemoveItem = (itemId: number) => {
+  const { currency } = useCurrency();
+
+  const calculateSubtotal = () => {
+    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  };
+
+  const subtotal = calculateSubtotal();
+  const taxRate = 0.10; // 10% tax rate
+  const tax = subtotal * taxRate;
+  const shippingCost = subtotal > 0 ? 25 : 0;
+  const total = subtotal + tax + shippingCost;
+
+  const handleRemoveFromCart = (itemId: number) => {
     removeFromCart(itemId);
-    toast({
-      title: "Item removed",
-      description: "The item has been removed from your cart"
-    });
   };
 
-  const handleDecreaseQuantity = (itemId: number, currentQuantity: number) => {
-    if (currentQuantity > 1) {
-      updateQuantity(itemId, currentQuantity - 1);
-    } else {
-      handleRemoveItem(itemId);
-    }
-  };
-
-  const handleIncreaseQuantity = (itemId: number, currentQuantity: number, maxQuantity: number) => {
-    if (currentQuantity < maxQuantity) {
-      updateQuantity(itemId, currentQuantity + 1);
-    } else {
-      toast({
-        title: "Maximum quantity reached",
-        description: "You cannot add more of this item",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleUpdateShipping = (amount: number) => {
-    setShipping(amount);
-    toast({
-      title: "Shipping updated",
-      description: `Shipping cost has been set to $${amount.toFixed(2)}`
-    });
-  };
-
-  const handleAddressSubmit = (address: ShippingAddress) => {
-    setAddressExpanded(false);
-    // The address is already saved to localStorage in the ShippingAddressForm component
+  const handleClearCart = () => {
+    clearCart();
   };
 
   const handleCheckout = () => {
-    // Check if cart is empty
-    if (cartItems.length === 0) {
-      toast({
-        title: "Empty cart",
-        description: "Your cart is empty. Add items before checkout.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Check minimum order quantity
-    if (getTotalItems() < 5) {
-      toast({
-        title: "Minimum order quantity not met",
-        description: "Please add at least 5 items to proceed with checkout.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Check if shipping address exists
-    const savedAddress = localStorage.getItem('shippingAddress');
-    if (!savedAddress) {
-      toast({
-        title: "Shipping address required",
-        description: "Please add a shipping address before checkout",
-        variant: "destructive"
-      });
-      setAddressExpanded(true);
-      return;
-    }
-
-    // Check if user is authenticated
-    if (!isAuthenticated) {
-      toast({
-        title: "Login required",
-        description: "Please login to proceed with checkout",
-        variant: "destructive"
-      });
-      navigate('/login');
-      return;
-    }
-
-    // Set loading state
-    setIsCheckingOut(true);
-
-    // Proceed with checkout - navigate to payment page
-    toast({
-      title: "Redirecting to payment",
-      description: "Please wait while we prepare your checkout"
-    });
-    
-    setTimeout(() => {
-      setIsCheckingOut(false);
-      navigate('/payment');
-    }, 1000);
+    navigate('/payment');
   };
-  
+
+  const isCartEmpty = cartItems.length === 0;
+
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
+      <Title title="Shopping Cart" />
       <Header />
-      <div className="container mx-auto px-4 py-20">
-        <h1 className="text-3xl font-bold mb-10 mt-10">Shopping Cart</h1>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader className="border-b p-4">
-                <CardTitle className="text-xl">Cart Items</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                {/* Minimum order notice */}
-                <div className="p-4 flex items-center gap-2 text-red-600 border-b">
-                  <AlertCircle size={20} />
-                  <span>Minimum order quantity should be at least 5.</span>
-                </div>
-                
-                {/* Cart table header */}
-                <div className="grid grid-cols-6 gap-4 p-4 bg-slate-100 text-sm font-medium">
-                  <div className="col-span-1">Image</div>
-                  <div className="col-span-2">Product Name</div>
-                  <div className="col-span-1 text-center">Price</div>
-                  <div className="col-span-1 text-center">Quantity</div>
-                  <div className="col-span-1 text-right">Total</div>
-                </div>
-                
-                {/* Cart items */}
-                {cartItems.length > 0 ? (
-                  cartItems.map((item) => (
-                    <div key={item.id} className="grid grid-cols-6 gap-4 p-4 border-b items-center">
-                      <div className="col-span-1">
-                        <div className="w-16 h-16 bg-gray-200 flex items-center justify-center">
-                          <img src="/placeholder.svg" alt={item.name} className="max-w-full max-h-full" />
-                        </div>
-                      </div>
-                      <div className="col-span-2 font-medium">{item.name}</div>
-                      <div className="col-span-1 text-center">{item.price.toFixed(2)}$</div>
-                      <div className="col-span-1 text-center">
-                        <div className="flex items-center justify-center">
-                          <Button 
-                            variant="outline" 
-                            size="icon" 
-                            className="h-8 w-8 rounded-r-none"
-                            onClick={() => handleDecreaseQuantity(item.id, item.quantity)}
-                          >
-                            -
-                          </Button>
-                          <Input 
-                            type="number" 
-                            className="h-8 w-12 rounded-none text-center" 
-                            value={item.quantity}
-                            readOnly
-                          />
-                          <Button 
-                            variant="outline" 
-                            size="icon" 
-                            className="h-8 w-8 rounded-l-none"
-                            onClick={() => handleIncreaseQuantity(item.id, item.quantity, item.quantity + 10)}
-                          >
-                            +
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="col-span-1 text-right flex justify-end items-center">
-                        <span className="mr-2">{(item.price * item.quantity).toFixed(2)}$</span>
-                        <button 
-                          className="text-gray-400 hover:text-red-500"
-                          onClick={() => handleRemoveItem(item.id)}
-                        >
-                          <X size={18} />
-                        </button>
-                      </div>
+
+      {/* Breadcrumb navigation */}
+      <div className="bg-slate-50 py-3 border-b mt-16">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <a href="/" className="hover:text-primary">Home</a>
+            <span>•</span>
+            <span className="font-medium text-gray-800">Shopping Cart</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="flex-grow container mx-auto px-4 py-8">
+        {isCartEmpty ? (
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-semibold mb-4">Your cart is empty</h2>
+            <p className="text-gray-600">Add items to your cart to proceed to checkout.</p>
+            <Button onClick={() => navigate('/shop-list')} className="mt-4">
+              Continue Shopping
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Cart Items */}
+            <div className="lg:w-3/4">
+              <h2 className="text-2xl font-semibold mb-4">Cart Items</h2>
+              <div className="space-y-4">
+                {cartItems.map((item) => (
+                  <div key={item.id} className="flex items-center border rounded-md p-4">
+                    <img src={item.images.main} alt={item.name} className="w-20 h-20 object-cover rounded-md mr-4" />
+                    <div>
+                      <h3 className="font-semibold">{item.name}</h3>
+                      <p className="text-gray-600">Quantity: {item.quantity}</p>
+                      <p className="text-gray-600">
+                        Price: {formatCurrency(item.price, currency)}
+                      </p>
                     </div>
-                  ))
-                ) : (
-                  <div className="p-8 text-center">
-                    <p className="text-gray-500 mb-4">Your cart is empty</p>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => navigate('/shop-list')}
-                    >
-                      Continue Shopping
-                    </Button>
-                  </div>
-                )}
-                
-                {/* Coupon section */}
-                {cartItems.length > 0 && (
-                  <div className="p-4 border-b flex items-center gap-4 flex-wrap">
-                    <div className="font-medium">Coupon:</div>
-                    <div className="flex-1 max-w-xs">
-                      <Input 
-                        placeholder="Coupon code" 
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                      />
-                    </div>
-                    <Button variant="outline" className="text-purple-600">
-                      Apply coupon
-                    </Button>
                     <div className="ml-auto">
-                      <Button>
-                        Update cart
+                      <Button variant="outline" size="sm" onClick={() => handleRemoveFromCart(item.id)}>
+                        Remove
                       </Button>
                     </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-          
-          {cartItems.length > 0 && (
-            <div className="lg:col-span-1">
-              <Card>
-                <CardHeader className="border-b p-4">
-                  <CardTitle className="text-xl">Cart Totals</CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex justify-between py-2 border-b">
-                      <span>Subtotal</span>
-                      <span>{subtotal.toFixed(2)}$</span>
-                    </div>
-                    
-                    <div className="border-b">
-                      <ShippingCalculator onUpdateShipping={handleUpdateShipping} />
-                    </div>
-                    
-                    {/* Shipping Address Section */}
-                    <Collapsible 
-                      open={addressExpanded}
-                      onOpenChange={setAddressExpanded}
-                      className="w-full border-b pb-4"
-                    >
-                      <div className="flex justify-between py-2">
-                        <span>Shipping Address</span>
-                        <div className="text-right">
-                          <CollapsibleTrigger asChild>
-                            <Button variant="link" className="text-sm p-0 h-auto text-blue-600 flex items-center">
-                              {addressExpanded ? "Hide" : "Add/Edit Address"}
-                              <MapPin size={16} className="ml-1" />
-                            </Button>
-                          </CollapsibleTrigger>
-                        </div>
-                      </div>
-                      
-                      <CollapsibleContent className="space-y-4 pt-2">
-                        <ShippingAddressForm 
-                          onAddressSubmit={handleAddressSubmit}
-                          buttonText="Save Shipping Address"
-                        />
-                      </CollapsibleContent>
-                    </Collapsible>
-                    
-                    <div className="flex justify-between py-4 font-bold">
-                      <span>Total</span>
-                      <span>{total.toFixed(2)}$</span>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    className="w-full mt-4" 
-                    onClick={handleCheckout}
-                    disabled={isCheckingOut}
-                  >
-                    {isCheckingOut ? 'Processing...' : 'Proceed to Checkout'}
-                  </Button>
-                </CardContent>
-              </Card>
+                ))}
+              </div>
+              <Button onClick={handleClearCart} className="mt-4">
+                Clear Cart
+              </Button>
             </div>
-          )}
-        </div>
+
+            {/* Order Summary */}
+            <div className="lg:w-1/4">
+              <div className="border rounded-md p-4">
+                <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+                <div className="flex justify-between mb-2">
+                  <span>Subtotal:</span>
+                  <span>{formatCurrency(subtotal, currency)}</span>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span>Tax ({(taxRate * 100).toFixed(0)}%):</span>
+                  <span>{formatCurrency(tax, currency)}</span>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span>Shipping:</span>
+                  <span>{formatCurrency(shippingCost, currency)}</span>
+                </div>
+                <div className="flex justify-between font-semibold mb-4">
+                  <span>Total:</span>
+                  <span>{formatCurrency(total, currency)}</span>
+                </div>
+                <Button onClick={handleCheckout} disabled={isCartEmpty} className="w-full">
+                  Proceed to Checkout
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
       <Footer />
-    </>
+    </div>
   );
 };
 

@@ -1,89 +1,241 @@
-
-import React, { useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { getCurrentUser } from "@/utils/localStorageUtils";
+import { getCurrentUser, updateUserDetails } from '@/utils/localStorageUtils';
+import { toast } from "@/hooks/use-toast";
+import Title from '@/components/Title';
 
 const Account = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [country, setCountry] = useState('');
+  const [zipCode, setZipCode] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
-  
-  // Check if user is logged in
+
   useEffect(() => {
-    const currentUser = getCurrentUser();
-    if (currentUser) {
-      navigate('/dashboard');
+    const user = getCurrentUser();
+    if (user) {
+      setFirstName(user.firstName || '');
+      setLastName(user.lastName || '');
+      setEmail(user.email || '');
+      setPhone(user.phone || '');
+      setAddress(user.address || '');
+      setCity(user.city || '');
+      setCountry(user.country || '');
+      setZipCode(user.zipCode || '');
+    } else {
+      navigate('/login');
     }
   }, [navigate]);
-  
-  const handleLogin = () => {
-    navigate('/login');
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    switch (name) {
+      case 'firstName':
+        setFirstName(value);
+        break;
+      case 'lastName':
+        setLastName(value);
+        break;
+      case 'email':
+        setEmail(value);
+        break;
+      case 'phone':
+        setPhone(value);
+        break;
+      case 'address':
+        setAddress(value);
+        break;
+      case 'city':
+        setCity(value);
+        break;
+      case 'country':
+        setCountry(value);
+        break;
+      case 'zipCode':
+        setZipCode(value);
+        break;
+      default:
+        break;
+    }
   };
-  
-  const handleRegister = () => {
-    navigate('/pre-register');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedUser = {
+      firstName,
+      lastName,
+      email,
+      phone,
+      address,
+      city,
+      country,
+      zipCode,
+    };
+    updateUserDetails(updatedUser);
+    setIsEditing(false);
+    toast({
+      title: "Success",
+      description: "User details updated successfully.",
+    })
   };
-  
+
   return (
     <div className="min-h-screen flex flex-col">
+      <Title title="My Account" />
       <Header />
-      
+
       {/* Breadcrumb navigation */}
       <div className="bg-slate-50 py-3 border-b mt-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link to="/" className="hover:text-primary">Home</Link>
+            <a href="/" className="hover:text-primary">Home</a>
             <span>•</span>
             <span className="font-medium text-gray-800">My Account</span>
           </div>
         </div>
       </div>
-      
-      {/* Currency selector - fixed to right side, positioned higher */}
-      <div className="fixed right-0 top-1/4 z-40">
-        <div className="flex flex-col">
-          <button className="bg-blue-700 text-white py-2 px-4 font-medium">
-            USD $
-          </button>
-          <button className="bg-gray-800 text-white py-2 px-4 font-medium">
-            EUR €
-          </button>
-        </div>
-      </div>
-      
+
       {/* Main content */}
-      <div className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
-        <div className="w-full max-w-md bg-white rounded-lg shadow-sm p-8 border border-gray-100">
-          <h1 className="text-2xl md:text-3xl font-bold text-center text-[#1a0050] mb-8">
-            My Account
-          </h1>
-          
-          <div className="space-y-6">
-            <p className="text-center text-gray-600 mb-6">
-              Please sign in to access your account dashboard or create a new account.
-            </p>
-            
-            <div className="grid gap-4">
-              <Button 
-                onClick={handleLogin}
-                className="w-full bg-blue-600 hover:bg-blue-700 py-6 text-base"
-              >
-                Sign In
-              </Button>
-              
-              <Button 
-                onClick={handleRegister}
-                variant="outline"
-                className="w-full py-6 text-base"
-              >
-                Create Account
-              </Button>
+      <div className="flex-grow container mx-auto px-4 py-8">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-2xl font-bold mb-6">My Account</h1>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                type="text"
+                id="firstName"
+                name="firstName"
+                value={firstName}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="w-full"
+              />
             </div>
-          </div>
+            <div>
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={lastName}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                type="email"
+                id="email"
+                name="email"
+                value={email}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                type="text"
+                id="phone"
+                name="phone"
+                value={phone}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label htmlFor="address">Address</Label>
+              <Input
+                type="text"
+                id="address"
+                name="address"
+                value={address}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label htmlFor="city">City</Label>
+              <Input
+                type="text"
+                id="city"
+                name="city"
+                value={city}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label htmlFor="country">Country</Label>
+              <Input
+                type="text"
+                id="country"
+                name="country"
+                value={country}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label htmlFor="zipCode">Zip Code</Label>
+              <Input
+                type="text"
+                id="zipCode"
+                name="zipCode"
+                value={zipCode}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="w-full"
+              />
+            </div>
+
+            <div className="flex justify-between">
+              {isEditing ? (
+                <div className="flex space-x-2">
+                  <Button type="submit" className="bg-blue-500 text-white">
+                    Save
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setIsEditing(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={() => setIsEditing(true)}
+                  className="bg-blue-500 text-white"
+                >
+                  Edit Details
+                </Button>
+              )}
+            </div>
+          </form>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );
