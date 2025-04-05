@@ -21,6 +21,7 @@ DEFAULT_ORIGINS = [
     "https://ueephones.com",      # Apex domain with HTTPS
     "http://ueephones.com",       # Apex domain without HTTPS
     "https://d4d88793-2e65-4aee-b492-fc93a5f01757.lovableproject.com", # Lovable preview URL
+    "https://sore-cluttered-audacity-mzoomolabewa.replit.app",  # New backend URL
     "*"                          # Allow all origins for debugging
 ]
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", ",".join(DEFAULT_ORIGINS)).split(",")
