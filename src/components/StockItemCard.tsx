@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCart } from '@/contexts/CartContext';
 import { StockItem } from '@/data/stockItems';
 import { useCurrency } from '@/contexts/CurrencyContext';
-import { ShoppingCart, Tag } from 'lucide-react';
+import { ShoppingCart, Tag, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import MakeOfferDialog from './MakeOfferDialog';
 
@@ -45,8 +45,17 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
     setOfferDialogOpen(true);
   };
 
-  // Get product image
-  const productImage = item.images?.main || `https://placehold.co/400x400?text=${encodeURIComponent(item.name)}`;
+  // Get product image - use main image if available, otherwise use placeholder
+  // Make sure to include the product name in the placeholder for better SEO
+  const getProductImage = () => {
+    if (item.images && item.images.main) {
+      return item.images.main;
+    } else {
+      // Create a formatted name for the placeholder
+      const formattedName = encodeURIComponent(item.name.slice(0, 30));
+      return `https://placehold.co/400x400?text=${formattedName}`;
+    }
+  };
 
   return (
     <>
@@ -57,12 +66,21 @@ const StockItemCard: React.FC<StockItemCardProps> = ({ item }) => {
         <CardContent className="p-0">
           <div className="flex flex-col sm:flex-row">
             {/* Product image */}
-            <div className="bg-slate-100 flex items-center justify-center w-full sm:w-40 h-40 shrink-0">
+            <div className="bg-slate-100 flex items-center justify-center w-full sm:w-40 h-40 shrink-0 relative">
               <img 
-                src={productImage} 
+                src={getProductImage()} 
                 alt={item.name} 
                 className="object-contain h-32 w-32"
+                onError={(e) => {
+                  // If image fails to load, replace with a fallback
+                  (e.target as HTMLImageElement).src = `https://placehold.co/400x400?text=No+Image`;
+                }}
               />
+              {!item.images?.main && (
+                <div className="absolute bottom-2 right-2 bg-gray-200 p-1 rounded-full">
+                  <ImageIcon className="h-4 w-4 text-gray-500" />
+                </div>
+              )}
             </div>
             
             {/* Product details */}
