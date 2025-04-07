@@ -47,19 +47,19 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 
     setIsLoading(true);
 
-    // For now, we'll use a placeholder URL since we don't have a real file upload endpoint
-    // In a real app, you would upload the file to a server or cloud storage
+    // Create a local URL for the image
+    const objectUrl = URL.createObjectURL(file);
+    
+    // For a real app, you would upload the file to a server here
+    // For now, we'll just use the local object URL
     setTimeout(() => {
-      // For demo purposes we're just using placeholders
-      // Here you'd handle the actual file upload
-      const placeholderUrl = `https://placehold.co/400x400?text=${encodeURIComponent(file.name)}`;
-      onChange(placeholderUrl);
+      onChange(objectUrl);
       setIsLoading(false);
       toast({
         title: "Image uploaded",
         description: "The image has been uploaded successfully",
       });
-    }, 1000);
+    }, 500);
   };
 
   const handleRemoveImage = () => {

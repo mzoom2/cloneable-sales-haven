@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Table, 
@@ -1022,33 +1021,3 @@ const AdminStockList: React.FC = () => {
                       />
                     </TabsContent>
                   </Tabs>
-                  
-                  <div className="flex space-x-3 pt-4">
-                    <Button 
-                      type="submit"
-                      className="flex-1"
-                    >
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Details
-                    </Button>
-                    <Button 
-                      type="button"
-                      className="flex-1" 
-                      variant="outline"
-                      onClick={() => setIsDetailsDialogOpen(false)}
-                    >
-                      <X className="h-4 w-4 mr-2" />
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
-
-export default AdminStockList;

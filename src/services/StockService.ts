@@ -1,3 +1,4 @@
+
 import { StockItem } from '@/data/stockItems';
 import { API_BASE_URL } from '@/config/api';
 
@@ -38,9 +39,19 @@ export const updateStockItemImages = async (
   images: { main: string; front?: string; back?: string; detail?: string }
 ): Promise<void> => {
   try {
-    // In a real app, this would be an API call to update the images
+    // Log the images being updated
     console.log(`Updating images for item ${itemId}:`, images);
-    // For now, we'll just log the update as if it was successful
+    
+    // In a real API implementation, you would have an endpoint to upload images
+    // For now, we'll simulate successful update
+    
+    // Make sure the client-side image URLs are preserved
+    const processedImages = {
+      main: images.main,
+      front: images.front || undefined,
+      back: images.back || undefined,
+      detail: images.detail || undefined
+    };
     
     return Promise.resolve();
   } catch (error) {
