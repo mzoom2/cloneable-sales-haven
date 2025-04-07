@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Package } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import Title from '@/components/Title';
 
 const TrackingPage = () => {
   const [trackingNumber, setTrackingNumber] = useState('');
@@ -40,6 +41,7 @@ const TrackingPage = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
+      <Title title="Track Your Order" />
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-12">

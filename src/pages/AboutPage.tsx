@@ -4,10 +4,12 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Phone, Shield, Clock, Truck, Award, Star } from 'lucide-react';
+import Title from '@/components/Title';
 
 const AboutPage = () => {
   return (
     <>
+      <Title title="About Us" />
       <Header />
       
       {/* Hero Section with Background */}

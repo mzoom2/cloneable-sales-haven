@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye } from 'lucide-react';
@@ -13,6 +12,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { validateLogin, setCurrentUser } from "@/utils/localStorageUtils";
 import { useToast } from "@/components/ui/use-toast";
+import Title from '@/components/Title';
 
 // Define form schema
 const formSchema = z.object({
@@ -72,6 +72,7 @@ const Login = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
+      <Title title="Login" />
       <Header />
       
       {/* Breadcrumb navigation */}

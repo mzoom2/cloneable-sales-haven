@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { getOffers, removeOffer, Offer } from '@/services/OfferService';
 import { toast } from '@/hooks/use-toast';
+import Title from '@/components/Title';
 
 const OffersPage = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -28,6 +29,7 @@ const OffersPage = () => {
 
   return (
     <>
+      <Title title="Your Offers" />
       <Header />
       <div className="container mx-auto px-4 py-8">
         {/* Tab navigation */}

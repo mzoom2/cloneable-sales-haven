@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +17,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger
 } from "@/components/ui/collapsible";
+import Title from '@/components/Title';
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -131,6 +133,7 @@ const CartPage = () => {
   
   return (
     <>
+      <Title title="Shopping Cart" />
       <Header />
       <div className="container mx-auto px-4 py-20">
         <h1 className="text-3xl font-bold mb-10 mt-10">Shopping Cart</h1>

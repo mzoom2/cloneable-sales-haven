@@ -27,6 +27,7 @@ import {
   PaginationPrevious, 
   PaginationEllipsis 
 } from "@/components/ui/pagination";
+import Title from '@/components/Title';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -163,6 +164,7 @@ const ShopList = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
+      <Title title="Stock List" />
       <Header />
       
       {/* Breadcrumb navigation */}

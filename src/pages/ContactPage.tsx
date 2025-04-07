@@ -3,10 +3,12 @@ import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
+import Title from '@/components/Title';
 
 const ContactPage = () => {
   return (
     <>
+      <Title title="Contact Us" />
       <Header />
       
       {/* Hero Section with Background */}

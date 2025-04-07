@@ -16,6 +16,7 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
+import Title from '@/components/Title';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -66,6 +67,7 @@ const Profile = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
+      <Title title="My Profile" />
       <Header />
       
       {/* Main content - starts after header height */}

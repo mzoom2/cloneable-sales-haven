@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import Title from '@/components/Title';
 
 const Dashboard = () => {
   // Mock user data - in a real app this would come from authentication state
@@ -28,6 +29,7 @@ const Dashboard = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
+      <Title title="Dashboard" />
       <Header />
       
       {/* Main content - starts after header height */}

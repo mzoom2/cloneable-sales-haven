@@ -12,6 +12,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { TrackingStatus, TrackingEvent, getTrackingData } from '@/utils/trackingUtils';
 import OrderProgress from '@/components/OrderProgress';
+import Title from '@/components/Title';
 
 const TrackingDetailsPage = () => {
   const { trackingNumber } = useParams<{ trackingNumber: string }>();
@@ -72,6 +73,7 @@ const TrackingDetailsPage = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
+      <Title title="Tracking Details" />
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-8">

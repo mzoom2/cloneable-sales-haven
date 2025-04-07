@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getCurrentUser } from "@/utils/localStorageUtils";
+import Title from '@/components/Title';
 
 const Account = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const Account = () => {
   
   return (
     <div className="min-h-screen flex flex-col">
+      <Title title="My Account" />
       <Header />
       
       {/* Breadcrumb navigation */}
