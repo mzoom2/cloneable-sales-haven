@@ -33,25 +33,27 @@ export const getStockItemById = async (id: number): Promise<StockItem | undefine
   }
 };
 
-// Function to update a stock item's images
+// Function to update a stock item's images by sending them to the backend
 export const updateStockItemImages = async (
   itemId: number, 
   images: { main: string; front?: string; back?: string; detail?: string }
 ): Promise<void> => {
   try {
-    // Log the images being updated
     console.log(`Updating images for item ${itemId}:`, images);
     
-    // In a real API implementation, you would have an endpoint to upload images
-    // For now, we'll simulate successful update
+    // In a real implementation, we'd send the actual image data to the backend
+    // For demonstration, we'll make a PUT request to update the image URLs
+    const response = await fetch(`${API_BASE_URL}/stock/${itemId}/images`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(images)
+    });
     
-    // Make sure the client-side image URLs are preserved
-    const processedImages = {
-      main: images.main,
-      front: images.front || undefined,
-      back: images.back || undefined,
-      detail: images.detail || undefined
-    };
+    if (!response.ok) {
+      throw new Error('Failed to update stock item images');
+    }
     
     return Promise.resolve();
   } catch (error) {
@@ -75,13 +77,48 @@ export const updateStockItemDetails = async (
   }
 ): Promise<void> => {
   try {
-    // In a real app, this would be an API call to update the details
-    console.log(`Updating details for item ${itemId}:`, details);
-    // For now, we'll just log the update as if it was successful
+    // Send details to the backend API
+    const response = await fetch(`${API_BASE_URL}/stock/${itemId}/details`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(details)
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to update stock item details');
+    }
     
     return Promise.resolve();
   } catch (error) {
     console.error('Error updating stock item details:', error);
+    throw error;
+  }
+};
+
+// Function to upload an image file to the backend
+export const uploadImageFile = async (file: File): Promise<string> => {
+  try {
+    // Create a FormData object to send the file
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    // Send the file to the backend
+    const response = await fetch(`${API_BASE_URL}/upload/image`, {
+      method: 'POST',
+      body: formData,
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to upload image');
+    }
+    
+    // Get the URL of the uploaded image from the response
+    const data = await response.json();
+    return data.imageUrl;
+  } catch (error) {
+    console.error('Error uploading image:', error);
     throw error;
   }
 };

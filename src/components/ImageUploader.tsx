@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { uploadImageFile } from '@/services/StockService';
 
 interface ImageUploaderProps {
   label: string;
@@ -19,7 +20,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -47,19 +48,25 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
 
     setIsLoading(true);
 
-    // Create a local URL for the image
-    const objectUrl = URL.createObjectURL(file);
-    
-    // For a real app, you would upload the file to a server here
-    // For now, we'll just use the local object URL
-    setTimeout(() => {
-      onChange(objectUrl);
-      setIsLoading(false);
+    try {
+      // Upload the file to the backend and get the URL
+      const imageUrl = await uploadImageFile(file);
+      onChange(imageUrl);
+      
       toast({
         title: "Image uploaded",
-        description: "The image has been uploaded successfully",
+        description: "The image has been uploaded successfully to the server",
       });
-    }, 500);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Upload failed",
+        description: "There was an error uploading the image to the server",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRemoveImage = () => {

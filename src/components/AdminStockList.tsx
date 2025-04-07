@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
   Table, 
@@ -13,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { StockItem, stockItems as sampleStockItems } from '@/data/stockItems';
 import { toast } from '@/hooks/use-toast';
-import { Save, X, Upload, RefreshCw, Plus, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Save, X, Upload, RefreshCw, Plus, Trash2, Image as ImageIcon, FileText } from 'lucide-react';
 import { getStockItems, updateStockItem, importStockItems, addStockItem, deleteStockItem } from '@/services/AdminService';
 import { updateStockItemImages, updateStockItemDetails } from '@/services/StockService';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -34,7 +35,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { FileText } from 'lucide-react';
 
 const AdminStockList: React.FC = () => {
   const [items, setItems] = useState<StockItem[]>([]);
@@ -1021,3 +1021,33 @@ const AdminStockList: React.FC = () => {
                       />
                     </TabsContent>
                   </Tabs>
+                  
+                  <div className="flex space-x-3 pt-4">
+                    <Button 
+                      type="submit"
+                      className="flex-1"
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Details
+                    </Button>
+                    <Button 
+                      type="button"
+                      className="flex-1" 
+                      variant="outline"
+                      onClick={() => setIsDetailsDialogOpen(false)}
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default AdminStockList;
