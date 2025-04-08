@@ -1,3 +1,4 @@
+
 /**
  * Chat Service for handling communication with the chat API
  */
@@ -146,6 +147,7 @@ export const getAllChatConversations = async (): Promise<ChatConversation[]> => 
  */
 export const sendAdminChatReply = async (conversationId: string, message: string): Promise<ChatMessage> => {
   try {
+    console.log('Sending admin reply:', { conversationId, message });
     const response = await fetch(`${API_BASE_URL}/chat/admin/reply`, {
       method: 'POST',
       headers: {

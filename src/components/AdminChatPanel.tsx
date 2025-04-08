@@ -58,6 +58,7 @@ const AdminChatPanel: React.FC = () => {
     setIsLoading(true);
     try {
       const data = await getAllChatConversations();
+      console.log("Loaded conversations:", data);
       setConversations(data);
     } catch (error) {
       console.error("Failed to load conversations:", error);
@@ -73,7 +74,9 @@ const AdminChatPanel: React.FC = () => {
 
   const loadMessages = async (conversationId: string) => {
     try {
+      console.log("Loading messages for conversation:", conversationId);
       const data = await getChatMessages(conversationId);
+      console.log("Loaded messages:", data);
       setMessages(data);
     } catch (error) {
       console.error("Failed to load messages:", error);
@@ -89,12 +92,17 @@ const AdminChatPanel: React.FC = () => {
     e.preventDefault();
     
     if (!selectedConversation || !replyMessage.trim()) {
+      console.log("Cannot reply - missing conversation or message");
       return;
     }
     
+    console.log("Sending reply to conversation:", selectedConversation);
+    console.log("Reply message:", replyMessage);
+    
     setIsReplying(true);
     try {
-      await sendAdminChatReply(selectedConversation, replyMessage);
+      const response = await sendAdminChatReply(selectedConversation, replyMessage);
+      console.log("Reply sent successfully:", response);
       setReplyMessage("");
       
       // Reload messages to show the new reply
@@ -102,11 +110,16 @@ const AdminChatPanel: React.FC = () => {
       
       // Reload conversations to update the unread counts
       loadConversations();
+      
+      toast({
+        title: "Reply Sent",
+        description: "Your reply has been sent to the customer",
+      });
     } catch (error) {
       console.error("Failed to send reply:", error);
       toast({
         title: "Error",
-        description: "Failed to send reply",
+        description: "Failed to send reply. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -238,6 +251,7 @@ const AdminChatPanel: React.FC = () => {
                 value={replyMessage}
                 onChange={(e) => setReplyMessage(e.target.value)}
                 className="flex-grow"
+                disabled={isReplying}
               />
               <Button 
                 type="submit"
