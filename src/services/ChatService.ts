@@ -1,4 +1,3 @@
-
 /**
  * Chat Service for handling communication with the chat API
  */
@@ -107,6 +106,7 @@ export const sendChatMessage = async (message: Omit<ChatMessage, 'is_admin_reply
  */
 export const getChatMessages = async (conversationId: string): Promise<ChatMessage[]> => {
   try {
+    console.log(`Getting messages for conversation: ${conversationId}`);
     const response = await fetch(`${API_BASE_URL}/chat/messages/${conversationId}`);
     
     if (!response.ok) {
@@ -115,7 +115,9 @@ export const getChatMessages = async (conversationId: string): Promise<ChatMessa
       throw new Error('Failed to get chat messages');
     }
     
-    return await response.json();
+    const messages = await response.json();
+    console.log(`Retrieved ${messages.length} messages for conversation ${conversationId}`);
+    return messages;
   } catch (error) {
     console.error('Get chat messages error:', error);
     throw error;
@@ -127,6 +129,7 @@ export const getChatMessages = async (conversationId: string): Promise<ChatMessa
  */
 export const getAllChatConversations = async (): Promise<ChatConversation[]> => {
   try {
+    console.log('Getting all chat conversations');
     const response = await fetch(`${API_BASE_URL}/chat/admin/messages`);
     
     if (!response.ok) {
@@ -135,7 +138,9 @@ export const getAllChatConversations = async (): Promise<ChatConversation[]> => 
       throw new Error('Failed to get chat conversations');
     }
     
-    return await response.json();
+    const conversations = await response.json();
+    console.log(`Retrieved ${conversations.length} conversations`);
+    return conversations;
   } catch (error) {
     console.error('Get chat conversations error:', error);
     throw error;
@@ -148,6 +153,13 @@ export const getAllChatConversations = async (): Promise<ChatConversation[]> => 
 export const sendAdminChatReply = async (conversationId: string, message: string): Promise<ChatMessage> => {
   try {
     console.log('Sending admin reply:', { conversationId, message });
+    
+    // Ensure we have valid input
+    if (!conversationId || !message.trim()) {
+      console.error('Invalid input for admin reply');
+      throw new Error('Conversation ID and message are required');
+    }
+    
     const response = await fetch(`${API_BASE_URL}/chat/admin/reply`, {
       method: 'POST',
       headers: {
@@ -160,12 +172,23 @@ export const sendAdminChatReply = async (conversationId: string, message: string
     });
     
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Admin reply error:', errorData);
-      throw new Error('Failed to send admin reply');
+      // Try to get error details from response
+      let errorMessage = 'Failed to send admin reply';
+      try {
+        const errorData = await response.json();
+        console.error('Admin reply error details:', errorData);
+        errorMessage = errorData.error || errorMessage;
+      } catch (parseError) {
+        console.error('Could not parse error response:', parseError);
+      }
+      
+      console.error(`Admin reply error (${response.status}): ${errorMessage}`);
+      throw new Error(errorMessage);
     }
     
-    return await response.json();
+    const result = await response.json();
+    console.log('Admin reply sent successfully:', result);
+    return result;
   } catch (error) {
     console.error('Admin reply error:', error);
     throw error;

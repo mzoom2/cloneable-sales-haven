@@ -802,4 +802,4 @@ def admin_reply_to_chat():
         )
         
         db.session.add(admin_message)
-        db.
+        db.session.commit

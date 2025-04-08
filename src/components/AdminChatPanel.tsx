@@ -57,6 +57,7 @@ const AdminChatPanel: React.FC = () => {
   const loadConversations = async () => {
     setIsLoading(true);
     try {
+      console.log("Fetching chat conversations...");
       const data = await getAllChatConversations();
       console.log("Loaded conversations:", data);
       setConversations(data);
@@ -64,7 +65,7 @@ const AdminChatPanel: React.FC = () => {
       console.error("Failed to load conversations:", error);
       toast({
         title: "Error",
-        description: "Failed to load chat conversations",
+        description: "Failed to load chat conversations. Please try refreshing.",
         variant: "destructive"
       });
     } finally {
@@ -82,7 +83,7 @@ const AdminChatPanel: React.FC = () => {
       console.error("Failed to load messages:", error);
       toast({
         title: "Error",
-        description: "Failed to load chat messages",
+        description: "Failed to load chat messages. Please try selecting the conversation again.",
         variant: "destructive"
       });
     }
@@ -119,7 +120,7 @@ const AdminChatPanel: React.FC = () => {
       console.error("Failed to send reply:", error);
       toast({
         title: "Error",
-        description: "Failed to send reply. Please try again.",
+        description: "Failed to send reply. Please check your network connection and try again.",
         variant: "destructive"
       });
     } finally {
