@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { 
   getAllChatConversations, 
@@ -102,6 +101,7 @@ const AdminChatPanel: React.FC = () => {
     
     setIsReplying(true);
     try {
+      console.log("About to call sendAdminChatReply");
       const response = await sendAdminChatReply(selectedConversation, replyMessage);
       console.log("Reply sent successfully:", response);
       setReplyMessage("");
@@ -118,9 +118,10 @@ const AdminChatPanel: React.FC = () => {
       });
     } catch (error) {
       console.error("Failed to send reply:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       toast({
         title: "Error",
-        description: "Failed to send reply. Please check your network connection and try again.",
+        description: `Failed to send reply: ${errorMessage}`,
         variant: "destructive"
       });
     } finally {

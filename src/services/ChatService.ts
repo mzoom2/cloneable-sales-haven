@@ -160,6 +160,8 @@ export const sendAdminChatReply = async (conversationId: string, message: string
       throw new Error('Conversation ID and message are required');
     }
     
+    console.log(`Making POST request to ${API_BASE_URL}/chat/admin/reply`);
+    
     const response = await fetch(`${API_BASE_URL}/chat/admin/reply`, {
       method: 'POST',
       headers: {
@@ -170,6 +172,8 @@ export const sendAdminChatReply = async (conversationId: string, message: string
         message
       }),
     });
+    
+    console.log(`Response status: ${response.status}`);
     
     if (!response.ok) {
       // Try to get error details from response
